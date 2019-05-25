@@ -9,17 +9,6 @@ Steps:
 1. Open .fits file to view in Python.
 2. 
 """
-# def open_fits():
-#     hdul = fits.open("fits_files/b0759_stitched.fits")
-#     image_data = hdul[0].data
-#     plt.imshow(image_data, cmap="gray")
-#     plt.colorbar()
-#     # print("Got here!")
-#     plt.show()
-
-# open_fits()
-
-
 def open_fits_aplpy():
     gc = aplpy.FITSFigure("fits_files/b0759_stitched.fits")
 
