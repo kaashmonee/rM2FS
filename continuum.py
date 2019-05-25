@@ -29,6 +29,24 @@ class ContinuumCreator:
         plt.colorbar()
         plt.show()
 
+    def locate_regions_of_interest(self):
+        """
+        Identifies spectral regions of interest.
+        Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
+        """
+
+    def fit_fourth_order_legendre_polynomial(self):
+        """
+        Uses the output from the locate_regions_of_interest() function and fits a 4th order Legendre polynomial to each array of 
+        x and y coordinates contained in the interest list. The idea to fit a 4th order polynomial was obtained from [cite paper here].
+        """
+
+    def try_drawing(self):
+        """
+        Temporary routine to determine if it's possible to draw on .fits files.
+        """
+
+
 
 def main():
     """
