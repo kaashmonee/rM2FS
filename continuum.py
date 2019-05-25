@@ -24,6 +24,7 @@ class ContinuumCreator:
         """
         self.hdul = fits.open(fits_file)
         self.image_data = self.hdul[0].data
+        self.log_image_data = np.log(self.image_data)
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
 
@@ -32,6 +33,8 @@ class ContinuumCreator:
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
         The 'image' is really just a NumPy array.
         """
+        # The image must be plotted logarithmically as the pixel value differences
+        # are too great.
         plt.imshow(self.image_data, cmap="gray", norm=LogNorm())
 
         # print(self.image_data)
@@ -74,7 +77,7 @@ class ContinuumCreator:
         return (self.rows, self.cols)
 
 
-
+# We logify the image first. Then we try to find a contour.
 
 
 def main():
@@ -83,8 +86,6 @@ def main():
     """
     test_file = "fits_files/r0760_stitched.fits"
     c = ContinuumCreator(test_file)
-    # c.open_image()
-    # c.try_drawing()
     c.locate_regions_of_interest()
 
 
