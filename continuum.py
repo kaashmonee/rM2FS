@@ -1,6 +1,8 @@
 from astropy.io import fits
 import matplotlib
-
+import numpy as np
+import os
+import argparse
 import matplotlib.pyplot as plt
 
 
@@ -24,8 +26,11 @@ class ContinuumCreator:
     def open_image(self):
         """
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
+        The 'image' is really just a NumPy array.
         """
         plt.imshow(self.image_data, cmap="gray")
+
+        # print(self.image_data)
         plt.colorbar()
         plt.show()
 
@@ -45,6 +50,19 @@ class ContinuumCreator:
         """
         Temporary routine to determine if it's possible to draw on .fits files.
         """
+        # Image shape is 2056 x 2048.
+        # Creating a random array that goes from x \in (0, 2056) and y \in (0, 2048)
+        new_img = np.zeros((2056, 2048))
+        for i in range(2048):
+            for k in range(900, 1000):
+                new_img[k, i] = 30000
+
+        # plt.imshow(new_img, cmap="gray")
+        plt.imshow(new_img + self.image_data, cmap="gray")
+        plt.colorbar()
+        plt.show()
+
+
 
 
 
@@ -55,7 +73,8 @@ def main():
     """
     test_file = "fits_files/b0759_stitched.fits"
     c = ContinuumCreator(test_file)
-    c.open_image()
+    # c.open_image()
+    c.try_drawing()
 
 
      
