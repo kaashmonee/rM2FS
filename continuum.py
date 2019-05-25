@@ -22,6 +22,8 @@ class ContinuumCreator:
         """
         self.hdul = fits.open(fits_file)
         self.image_data = self.hdul[0].data
+        self.rows = self.image_data.shape[0]
+        self.cols = self.image_data.shape[1]
 
     def open_image(self):
         """
@@ -61,6 +63,10 @@ class ContinuumCreator:
         plt.imshow(new_img + self.image_data, cmap="gray")
         plt.colorbar()
         plt.show()
+
+    # Returns dimensions of the image.
+    def get_dimensions(self):
+        return (self.rows, self.cols)
 
 
 
