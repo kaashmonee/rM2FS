@@ -8,5 +8,10 @@ At this point in time we are attempting to develop a way to fit a continuum to t
 This project is written in python 3.6.7.
 
 ## Installing
-It is recommended to use a virtual environment. The required libraries are outlined in the `requirements.txt.`
+It is recommended to use a virtual environment. The required libraries are outlined in the `requirements.txt.` Run `pip install -r requirements.txt`.
 
+## Running
+As mentioned the `continuum.py` file contains all current progress and when complete, should run and create a list of orders and their continuum fits. Run with `python continuum.py`.
+
+## Authors
+Skanda Kaashyap, Carnegie Mellon University
