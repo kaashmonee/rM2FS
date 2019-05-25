@@ -4,6 +4,8 @@ import numpy as np
 import os
 import argparse
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+import cv2
 
 
 """
@@ -30,7 +32,7 @@ class ContinuumCreator:
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
         The 'image' is really just a NumPy array.
         """
-        plt.imshow(self.image_data, cmap="gray")
+        plt.imshow(self.image_data, cmap="gray", norm=LogNorm())
 
         # print(self.image_data)
         plt.colorbar()
@@ -41,6 +43,9 @@ class ContinuumCreator:
         Identifies spectral regions of interest.
         Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
         """
+        # plt.contour(self.image_data, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
+        self.open_image()
+
 
     def fit_fourth_order_legendre_polynomial(self):
         """
@@ -72,15 +77,15 @@ class ContinuumCreator:
 
 
 
-
 def main():
     """
     Main routine for testing purposes..
     """
-    test_file = "fits_files/b0759_stitched.fits"
+    test_file = "fits_files/r0760_stitched.fits"
     c = ContinuumCreator(test_file)
     # c.open_image()
-    c.try_drawing()
+    # c.try_drawing()
+    c.locate_regions_of_interest()
 
 
      
