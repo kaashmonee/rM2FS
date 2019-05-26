@@ -28,14 +28,14 @@ class ContinuumCreator:
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
 
-    def open_image(self):
+    def open_image(self, image):
         """
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
         The 'image' is really just a NumPy array.
         """
         # The image must be plotted logarithmically as the pixel value differences
         # are too great.
-        plt.imshow(self.image_data, cmap="gray", norm=LogNorm())
+        plt.imshow(image, cmap="gray")
 
         # print(self.image_data)
         plt.colorbar()
@@ -47,7 +47,7 @@ class ContinuumCreator:
         Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
         """
         # plt.contour(self.image_data, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
-        self.open_image()
+        self.open_image(self.image_data)
 
 
     def fit_fourth_order_legendre_polynomial(self):
@@ -72,6 +72,15 @@ class ContinuumCreator:
         plt.colorbar()
         plt.show()
 
+    def threshold_image(self):
+        """
+        Threshold's the image so that any values that are less than are set to zero and any values greater than 1000 are set to 1.
+        """
+        self.threshold_value = 5000
+        thresholded_image = (self.image_data < self.threshold_value) * self.image_data
+        self.open_image(thresholded_image)
+
+
     # Returns dimensions of the image.
     def get_dimensions(self):
         return (self.rows, self.cols)
@@ -86,7 +95,7 @@ def main():
     """
     test_file = "fits_files/r0760_stitched.fits"
     c = ContinuumCreator(test_file)
-    c.locate_regions_of_interest()
+    c.threshold_image()
 
 
      
