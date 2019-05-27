@@ -56,29 +56,16 @@ class ContinuumCreator:
         x and y coordinates contained in the interest list. The idea to fit a 4th order polynomial was obtained from [cite paper here].
         """
 
-    def try_drawing(self):
-        """
-        Temporary routine to determine if it's possible to draw on .fits files.
-        """
-        # Image shape is 2056 x 2048.
-        # Creating a random array that goes from x \in (0, 2056) and y \in (0, 2048)
-        new_img = np.zeros((2056, 2048))
-        for i in range(2048):
-            for k in range(900, 1000):
-                new_img[k, i] = 30000
-
-        # plt.imshow(new_img, cmap="gray")
-        plt.imshow(new_img + self.image_data, cmap="gray")
-        plt.colorbar()
-        plt.show()
 
     def threshold_image(self):
         """
         Threshold's the image so that any values that are less than are set to zero and any values greater than 1000 are set to 1.
+        Returns the thresholded image.
         """
         self.threshold_value = 5000
         thresholded_image = (self.image_data < self.threshold_value) * self.image_data
-        self.open_image(thresholded_image)
+        # self.open_image(thresholded_image)
+        return thresholded_image
 
 
     # Returns dimensions of the image.
@@ -98,6 +85,21 @@ def main():
     c.threshold_image()
 
 
+# def try_drawing(self):
+#     """
+#     Temporary routine to determine if it's possible to draw on .fits files.
+#     """
+#     # Image shape is 2056 x 2048.
+#     # Creating a random array that goes from x \in (0, 2056) and y \in (0, 2048)
+#     new_img = np.zeros((2056, 2048))
+#     for i in range(2048):
+#         for k in range(900, 1000):
+#             new_img[k, i] = 30000
+
+#     # plt.imshow(new_img, cmap="gray")
+#     plt.imshow(new_img + self.image_data, cmap="gray")
+#     plt.colorbar()
+#     plt.show()
      
 if __name__ == "__main__":
     main()
