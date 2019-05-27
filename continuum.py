@@ -31,13 +31,10 @@ class ContinuumCreator:
     def open_image(self, image):
         """
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
-        The 'image' is really just a NumPy array.
+        The 'image' is really just a NumPy array. Note that in order to see some of the original 2D images,
+        it must be plotted logarithmically.
         """
-        # The image must be plotted logarithmically as the pixel value differences
-        # are too great.
         plt.imshow(image, cmap="gray")
-
-        # print(self.image_data)
         plt.colorbar()
         plt.show()
 
@@ -46,8 +43,11 @@ class ContinuumCreator:
         Identifies spectral regions of interest.
         Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
         """
-        # plt.contour(self.image_data, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
-        self.open_image(self.image_data)
+        thresholded_image = self.threshold_image()
+        self.open_image(thresholded_image)
+        # plt.contour(thresholded_image, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
+        im2, contours, hierarchy = cv2.findContours(thresholded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(thresholded_image, contours, -1, (0, 255, 0), 3)
 
 
     def fit_fourth_order_legendre_polynomial(self):
@@ -64,7 +64,6 @@ class ContinuumCreator:
         """
         self.threshold_value = 5000
         thresholded_image = (self.image_data < self.threshold_value) * self.image_data
-        # self.open_image(thresholded_image)
         return thresholded_image
 
 
@@ -73,8 +72,6 @@ class ContinuumCreator:
         return (self.rows, self.cols)
 
 
-# We logify the image first. Then we try to find a contour.
-
 
 def main():
     """
@@ -82,7 +79,7 @@ def main():
     """
     test_file = "fits_files/r0760_stitched.fits"
     c = ContinuumCreator(test_file)
-    c.threshold_image()
+    c.locate_regions_of_interest()
 
 
 # def try_drawing(self):
