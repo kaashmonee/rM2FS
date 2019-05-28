@@ -9,15 +9,6 @@ import cv2
 import time
 
 
-"""
-Steps:
-1. Open .fits file to view in Python.
-2. 
-"""
-def open_fits_aplpy():
-    gc = aplpy.FITSFigure("fits_files/b0759_stitched.fits")
-
-
 class ContinuumCreator:
     def __init__(self, fits_file):
         """
@@ -41,8 +32,7 @@ class ContinuumCreator:
 
     def locate_regions_of_interest(self):
         """
-        Identifies spectral regions of interest.
-        Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
+        Identifies spectral regions of interest. Finds anomolous bright spots in the image.
         """
         thresholded_image = self.threshold_image()
         thresholded_8bit = self.bytescale(thresholded_image)
@@ -50,7 +40,6 @@ class ContinuumCreator:
         plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
         im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(thresholded_8bit, contours, 1, (0, 255, 0), 3)
-        print("Draw contours finished")
         self.open_image(thresholded_8bit)
 
 
