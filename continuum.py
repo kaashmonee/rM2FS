@@ -51,6 +51,7 @@ class ContinuumCreator:
         im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(thresholded_8bit, contours, 1, (0, 255, 0), 3)
         print("Draw contours finished")
+        self.open_image(thresholded_8bit)
 
 
     def fit_fourth_order_legendre_polynomial(self):
