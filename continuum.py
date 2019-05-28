@@ -46,10 +46,11 @@ class ContinuumCreator:
         thresholded_image = self.threshold_image()
         thresholded_8bit = self.bytescale(thresholded_image)
         self.open_image(thresholded_8bit)
-        print(thresholded_image.dtype, thresholded_8bit.dtype)
-        plt.contour(thresholded_image, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
-        im2, contours, hierarchy = cv2.findContours(thresholded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(thresholded_image, contours, -1, (0, 255, 0), 3)
+        # print(thresholded_image.dtype, thresholded_8bit.dtype)
+        plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
+        im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(thresholded_8bit, contours, -1, (0, 255, 0), 3)
+        print(contours)
 
 
     def fit_fourth_order_legendre_polynomial(self):
