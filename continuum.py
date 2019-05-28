@@ -30,17 +30,6 @@ class ContinuumCreator:
         plt.colorbar()
         plt.show()
 
-    def locate_regions_of_interest(self):
-        """
-        Identifies spectral regions of interest. Finds anomolous bright spots in the image.
-        """
-        thresholded_image = self.threshold_image()
-        thresholded_8bit = self.bytescale(thresholded_image)
-        self.open_image(thresholded_8bit)
-        plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
-        im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(thresholded_8bit, contours, 1, (0, 255, 0), 3)
-        self.open_image(thresholded_8bit)
 
 
     def fit_fourth_order_legendre_polynomial(self):
@@ -50,6 +39,12 @@ class ContinuumCreator:
         """
 
 
+    # Returns dimensions of the image.
+    def get_dimensions(self):
+        return (self.rows, self.cols)
+
+
+    ### These routines here could be useful for cosmic ray detection.    
     def threshold_image(self):
         """
         Threshold's the image so that any values that are less than are set to zero and any values greater than 1000 are set to 1.
@@ -59,10 +54,19 @@ class ContinuumCreator:
         thresholded_image = (self.image_data < self.threshold_value) * self.image_data
         return thresholded_image
 
+    
+    def bright_spot_detector(self):
+        """
+        Identifies spectral regions of interest. Finds bright spots in the image. Could be useful for identifying and removing cosmic rays.
+        """
+        thresholded_image = self.threshold_image()
+        thresholded_8bit = self.bytescale(thresholded_image)
+        self.open_image(thresholded_8bit)
+        plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
+        im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(thresholded_8bit, contours, 1, (0, 255, 0), 3)
+        self.open_image(thresholded_8bit)
 
-    # Returns dimensions of the image.
-    def get_dimensions(self):
-        return (self.rows, self.cols)
 
     def bytescale(self, image, cmin=None, cmax=None, high=255, low=0):
         """
@@ -92,6 +96,7 @@ class ContinuumCreator:
         scale = float(high - low) / cscale
         bytedata = (image - cmin) * scale + low
         return (bytedata.clip(low, high) + 0.5).astype(np.uint8)
+
 
 
 
