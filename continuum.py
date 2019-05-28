@@ -6,6 +6,7 @@ import argparse
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import cv2
+import time
 
 
 """
@@ -46,11 +47,9 @@ class ContinuumCreator:
         thresholded_image = self.threshold_image()
         thresholded_8bit = self.bytescale(thresholded_image)
         self.open_image(thresholded_8bit)
-        # print(thresholded_image.dtype, thresholded_8bit.dtype)
         plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
         im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(thresholded_8bit, contours, -1, (0, 255, 0), 3)
-        print(contours)
 
 
     def fit_fourth_order_legendre_polynomial(self):
@@ -110,9 +109,12 @@ def main():
     """
     Main routine for testing purposes..
     """
+    t1 = time.time()
     test_file = "fits_files/r0760_stitched.fits"
     c = ContinuumCreator(test_file)
     c.locate_regions_of_interest()
+    t2 = time.time()
+    print("Time taken: ", t2 - t1)
 
 
 # def try_drawing(self):
