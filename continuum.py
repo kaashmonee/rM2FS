@@ -44,8 +44,10 @@ class ContinuumCreator:
         Returns a list of numpy arrays that contain points the x, and y pixel that we want to fit a polynomial to.
         """
         thresholded_image = self.threshold_image()
-        self.open_image(thresholded_image)
-        # plt.contour(thresholded_image, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
+        thresholded_8bit = self.bytescale(thresholded_image)
+        self.open_image(thresholded_8bit)
+        print(thresholded_image.dtype, thresholded_8bit.dtype)
+        plt.contour(thresholded_image, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
         im2, contours, hierarchy = cv2.findContours(thresholded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(thresholded_image, contours, -1, (0, 255, 0), 3)
 
@@ -70,6 +72,36 @@ class ContinuumCreator:
     # Returns dimensions of the image.
     def get_dimensions(self):
         return (self.rows, self.cols)
+
+    def bytescale(self, image, cmin=None, cmax=None, high=255, low=0):
+        """
+        This function is a deprecated SciPy 16 bit image scaler. It is used for converting the 16 bit .fits files
+        into 8 bit images that we can use to perform contour and edge detection functions on in OpenCV.
+        Obtained from: https://stackoverflow.com/questions/25485886/how-to-convert-a-16-bit-to-an-8-bit-image-in-opencv.
+        """
+        if image.dtype == np.uint8:
+            return image
+
+        if high > 255:
+            high = 255
+        if low < 0:
+            low = 0
+        if high < low:
+            raise ValueError("'high' should be greater than or equal to 'low'.")
+        
+        if cmin is None:
+            cmin = image.min()
+        if cmax is None:
+            cmax = image.max()
+
+        cscale = cmax - cmin
+        if cscale == 0:
+            cscale = 1
+        
+        scale = float(high - low) / cscale
+        bytedata = (image - cmin) * scale + low
+        return (bytedata.clip(low, high) + 0.5).astype(np.uint8)
+
 
 
 
