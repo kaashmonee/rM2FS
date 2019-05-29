@@ -25,13 +25,26 @@ def find_flux(image):
     for row_num, row in enumerate(image):
         intensity.append((row_num, row[xpixel]))
 
-    print(intensity)
+    return intensity
+
+def plot_intensity(intensity_array):
+    """
+    Creates a plot of flux v. yvalue so that we can see how the yvalue flux changes at a particular x value.
+    The maxima will be the locations of the orders. 
+    """
+    yvalues = [item[0] for item in intensity_array]
+    flux = [item[1] for item in intensity_array]
+    plt.plot(yvalues, flux)
+    plt.xlabel("ypixels")
+    plt.ylabel("flux")
+    plt.title("flux v. ypixel")
+    plt.show()
 
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
-    find_flux(image)
+    plot_intensity(find_flux(image))
 
 if __name__ == "__main__":
     main()
