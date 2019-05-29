@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import cv2
 import time
+from fitsfile import FitsFile
 
 
 ### These routines here could be useful for cosmic ray detection.    
@@ -16,7 +17,7 @@ def threshold_image(image):
     Returns the thresholded image.
     """
     threshold_value = 5000
-    thresholded_image = (self.image_data < self.threshold_value) * self.image_data
+    thresholded_image = (image < threshold_value) * image
     return thresholded_image
 
 
@@ -24,16 +25,16 @@ def bright_spot_detector(image):
     """
     Identifies spectral regions of interest. Finds bright spots in the image. Could be useful for identifying and removing cosmic rays.
     """
-    thresholded_image = self.threshold_image()
-    thresholded_8bit = self.bytescale(thresholded_image)
-    self.open_image(thresholded_8bit)
+    thresholded_image = threshold_image(image)
+    thresholded_8bit = bytescale(thresholded_image)
+    FitsFile.open_image(thresholded_8bit)
     plt.contour(thresholded_8bit, levels=np.logspace(-4.7, -3., 10), colors="white", alpha=0.5)
     im2, contours, hierarchy = cv2.findContours(thresholded_8bit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(thresholded_8bit, contours, 1, (0, 255, 0), 3)
-    self.open_image(thresholded_8bit)
+    FitsFile.open_image(thresholded_8bit)
 
 
-def bytescale(self, image, cmin=None, cmax=None, high=255, low=0):
+def bytescale(image, cmin=None, cmax=None, high=255, low=0):
     """
     This function is a deprecated SciPy 16 bit image scaler. It is used for converting the 16 bit .fits files
     into 8 bit images that we can use to perform contour and edge detection functions on in OpenCV.
