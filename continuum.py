@@ -69,7 +69,7 @@ def find_order_boundaries(intensity_array):
     print("intensity_array:", intensity_array)
     print("sign_change_array:", sign_change_array)
 
-    plt.plot(intensity_array)
+    plt.plot(intensity_array_shifted_down)
     for y in sign_change_array:
         plt.axvline(y, ymin=0, ymax=3000, color="red")
 
