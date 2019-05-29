@@ -19,13 +19,17 @@ from fitsfile import FitsFile
 # rinse and repeat for a few more spectra and we are good 
 
 
-def find_flux(image):
-    xpixel = 1000
+def find_flux(image, xpixel=1000):
+    """
+    Returns a list of tuples with each tuple containing the y pixel 
+    and the magnitude of the intensity at the given x pixel.
+    """
     intensity = []
     for row_num, row in enumerate(image):
         intensity.append((row_num, row[xpixel]))
 
     return intensity
+
 
 def plot_intensity(intensity_array):
     """
@@ -40,10 +44,25 @@ def plot_intensity(intensity_array):
     plt.title("flux v. ypixel")
     plt.show()
 
+def find_flux_max(yvalues, flux):
+    """
+    Finds the local maxima so that we can obtain the y values at which the flux is greatest.
+    """
+    pass
+
+def find_order_boundaries(intensity_array):
+    # Find the order boundaries.
+    # Find an intersection point at y = 20
+    yvalue_line = 20
+    yvalues, 
+    flatline = np.full((1, len(yvalues)), yvalue_line)
+    plt.plot(flatline)
+
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
+    intensity_array = find_flux(image)
     plot_intensity(find_flux(image))
 
 if __name__ == "__main__":
