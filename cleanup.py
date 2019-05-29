@@ -62,17 +62,3 @@ def bytescale(image, cmin=None, cmax=None, high=255, low=0):
     bytedata = (image - cmin) * scale + low
     return (bytedata.clip(low, high) + 0.5).astype(np.uint8)
 
-
-def main():
-    """
-    Main routine for testing purposes..
-    """
-    t1 = time.time()
-    test_file = "fits_files/r0760_stitched.fits"
-    img = FitsFile(test_file)
-    img.open_self_image()
-    t2 = time.time()
-    print("Time taken: ", t2 - t1)
-
-if __name__ == "__main__":
-    main()
