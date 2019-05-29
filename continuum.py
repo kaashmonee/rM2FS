@@ -59,8 +59,17 @@ def find_order_boundaries(intensity_array):
     do the same thing.
     """
     lower_flux_limit = 20
+    intensity_array = np.array(intensity_array)
+    intensity_array_shifted_down = intensity_array - lower_flux_limit
+
+    # obtains the indices where a sign change occured
+    # obtained from https://stackoverflow.com/questions/2652368/how-to-detect-a-sign-change-for-elements-in-a-numpy-array.
+    sign_change_array = np.where(np.sign(intensity_array_shifted_down[:-1]) != np.sign(intensity_array_shifted_down[1:]))[0] + 1
+
+    print("intensity_array:", intensity_array)
+    print("sign_change_array:", sign_change_array)
+
     flatline = np.full(len(intensity_array), lower_flux_limit)
-    plt.plot(flatline)
     plt.show()
 
 
@@ -68,7 +77,7 @@ def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
     intensity_array = get_intensity_array(image)
-    plot_intensity(intensity_array)
+    # plot_intensity(intensity_array) Plots the intensity array just to make sure that our routines are correct
     find_order_boundaries(intensity_array)
 
 if __name__ == "__main__":
