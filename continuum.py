@@ -36,7 +36,10 @@ def plot_intensity(intensity_array):
     Creates a plot of flux v. yvalue so that we can see how the yvalue flux changes at a particular x value.
     The maxima will be the locations of the orders. 
     """
-    plt.plot(intensity_array)
+    shifted_array = np.array(intensity_array) - 20 # this array is shifted down by 20. it will be used to detect
+    # intersects where the intensity goes to 0
+
+    plt.plot(np.array(intensity_array))
     plt.xlabel("ypixels")
     plt.ylabel("flux")
     plt.title("flux v. ypixel")
