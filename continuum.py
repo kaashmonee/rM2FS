@@ -28,7 +28,7 @@ def get_intensity_array(image, xpixel=1000):
     for row_num, row in enumerate(image):
         intensity.append(row[xpixel])
 
-    return intensity
+    return np.array(intensity)
 
 
 def plot_intensity(intensity_array):
@@ -39,7 +39,7 @@ def plot_intensity(intensity_array):
     shifted_array = np.array(intensity_array) - 20 # this array is shifted down by 20. it will be used to detect
     # intersects where the intensity goes to 0
 
-    plt.plot(np.array(intensity_array))
+    plt.plot(intensity_array)
     plt.xlabel("ypixels")
     plt.ylabel("flux")
     plt.title("flux v. ypixel")
@@ -58,7 +58,7 @@ def find_order_boundaries(intensity_array):
     Storing this x value will be important as we will be using these routines again to 
     do the same thing.
     """
-    lower_flux_limit = 20
+    lower_flux_limit = 10
     intensity_array = np.array(intensity_array)
     intensity_array_shifted_down = intensity_array - lower_flux_limit
 
@@ -69,7 +69,10 @@ def find_order_boundaries(intensity_array):
     print("intensity_array:", intensity_array)
     print("sign_change_array:", sign_change_array)
 
-    flatline = np.full(len(intensity_array), lower_flux_limit)
+    plt.plot(intensity_array)
+    for y in sign_change_array:
+        plt.axvline(y, ymin=0, ymax=3000, color="red")
+
     plt.show()
 
 
