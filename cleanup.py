@@ -20,7 +20,7 @@ def threshold_image(image):
     return thresholded_image
 
 
-def bright_spot_detector(image):
+def detect_bright_spots(image):
     """
     Identifies spectral regions of interest. Finds bright spots in the image. Could be useful for identifying and removing cosmic rays.
     """
@@ -62,3 +62,10 @@ def bytescale(image, cmin=None, cmax=None, high=255, low=0):
     bytedata = (image - cmin) * scale + low
     return (bytedata.clip(low, high) + 0.5).astype(np.uint8)
 
+def main():
+    fits_file = FitsFile("fits_files/r0760_stitched.fits")
+    image = fits_file.image_data
+    detect_bright_spots(image)
+
+if __name__ == "__main__":
+    main()
