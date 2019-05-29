@@ -20,13 +20,18 @@ class FitsFile:
         self.cols = self.image_data.shape[1]
     
     @staticmethod
-    def open_image(self, image):
+    def open_image(image):
         """
         Opens the .fits image for viewing. This is for testing purposes to ensure that the image opened is correct. 
         The 'image' is really just a NumPy array. Note that in order to see some of the original 2D images,
         it must be plotted logarithmically.
         """
         plt.imshow(image, cmap="gray")
+        plt.colorbar()
+        plt.show()
+
+    def open_self_image(self):
+        plt.imshow(self.image_data, cmap="gray")
         plt.colorbar()
         plt.show()
         
