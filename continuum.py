@@ -19,14 +19,14 @@ from fitsfile import FitsFile
 # rinse and repeat for a few more spectra and we are good 
 
 
-def find_flux(image, xpixel=1000):
+def get_intensity_array(image, xpixel=1000):
     """
     Returns a list of tuples with each tuple containing the y pixel 
     and the magnitude of the intensity at the given x pixel.
     """
     intensity = []
     for row_num, row in enumerate(image):
-        intensity.append((row_num, row[xpixel]))
+        intensity.append(row[xpixel])
 
     return intensity
 
@@ -36,9 +36,7 @@ def plot_intensity(intensity_array):
     Creates a plot of flux v. yvalue so that we can see how the yvalue flux changes at a particular x value.
     The maxima will be the locations of the orders. 
     """
-    yvalues = [item[0] for item in intensity_array]
-    flux = [item[1] for item in intensity_array]
-    plt.plot(yvalues, flux)
+    plt.plot(intensity_array)
     plt.xlabel("ypixels")
     plt.ylabel("flux")
     plt.title("flux v. ypixel")
@@ -51,19 +49,24 @@ def find_flux_max(yvalues, flux):
     pass
 
 def find_order_boundaries(intensity_array):
-    # Find the order boundaries.
-    # Find an intersection point at y = 20
-    yvalue_line = 20
-    yvalues, 
-    flatline = np.full((1, len(yvalues)), yvalue_line)
+    """
+    This function takes in a variable called `intensity_array` which contains a list of tuples 
+    where each tuple contains the ypixel and the intensity of the pixel at a particular x value.
+    Storing this x value will be important as we will be using these routines again to 
+    do the same thing.
+    """
+    lower_flux_limit = 20
+    flatline = np.full(len(intensity_array), lower_flux_limit)
     plt.plot(flatline)
+    plt.show()
 
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
-    intensity_array = find_flux(image)
-    plot_intensity(find_flux(image))
+    intensity_array = get_intensity_array(image)
+    plot_intensity(intensity_array)
+    find_order_boundaries(intensity_array)
 
 if __name__ == "__main__":
     main()
