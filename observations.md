@@ -26,7 +26,3 @@ other is where the boundary would be.
 ![bins](assets/binaveragevbinnumber.png)
 
 
-
-
-
-

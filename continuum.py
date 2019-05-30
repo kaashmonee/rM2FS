@@ -51,6 +51,12 @@ def find_flux_max(yvalues, flux):
     """
     pass
 
+def find_step_boundaries(step_array, threshold=50):
+    """
+    Takes in an array that looks somewhat like a step function.
+    Finds boundaries of the step function.
+    """
+
 def find_order_boundaries(intensity_array):
     """
     This function takes in a variable called `intensity_array` which contains a list of tuples 
@@ -60,14 +66,22 @@ def find_order_boundaries(intensity_array):
     """
     num_bins = 100
 
-    index_array = np.arange(len(intensity_array))
-    index_bins = np.array_split(index_array, num_bins)
-
     intensity_array = np.array(intensity_array)
+    fft_intensity_array = np.fft.irfft(intensity_array)
+    plt.yscale("log")
+    plt.plot(fft_intensity_array)#, "ro")
+    # plt.plot(intensity_array)#, "bo")
+
     bins = np.array_split(intensity_array, num_bins)
     bin_averages = [np.average(bin) for bin in bins]
+    # test_array = [414, 796, 1234]
+    # for y in test_array:
+    #     plt.axvline(y, ymin=0, color="blue")
 
-    plt.plot(bin_averages) #, "ro")
+    # Finds the indices where the bin averages differ by greater than a default 50.
+    boundaries = find_step_boundaries(bin_averages)
+
+    # plt.plot(bin_averages) #, "ro")
 
     # plt.plot(intensity_array)
     # intensity_array_shifted_down = intensity_array - lower_flux_limit
