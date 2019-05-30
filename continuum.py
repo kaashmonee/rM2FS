@@ -90,7 +90,7 @@ def is_rectangular(l):
 
     return True
 
-def something(image):
+def create_spectra(image):
     # so far we have the y pixels of all the orders.
     # now we just need to repeat this process for a bunch of xpixels and then fit an order through all of them.
     xpixels = [600, 800, 1000, 1200, 400]
