@@ -1,3 +1,5 @@
+# Progress
+
 Progress 5/28/19
 * Wanted to find continuum fit for each order.
 * Thought I could do it by thresholding the image and using an OpenCV function to find contours.
@@ -26,3 +28,8 @@ other is where the boundary would be.
 ![bins](assets/binaveragevbinnumber.png)
 
 
+
+# Miscellaneous Observations
+5/30/19
+* Tried irfft the intensity, plotted logarithmically, and this is what resulted. There is a perfect left right symmetry...not sure what that means.
+[irfft symmetry image](assets/irfft_intensity.png)

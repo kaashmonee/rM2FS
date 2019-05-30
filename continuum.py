@@ -84,9 +84,9 @@ def find_order_boundaries(intensity_array):
     # plt.plot(bin_averages) #, "ro")
 
     # plt.plot(intensity_array)
-    plt.xlabel("Bin number")
-    plt.ylabel("Bin average")
-    plt.title("Bin average v. Bin number")
+    plt.xlabel("ypixel")
+    plt.ylabel("FFT log intensity")
+    plt.title("inverse real fourier transformed intensity vs. ypixel plotted logarithmically")
 
     plt.show()
 
