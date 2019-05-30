@@ -32,4 +32,4 @@ other is where the boundary would be.
 # Miscellaneous Observations
 5/30/19
 * Tried irfft the intensity, plotted logarithmically, and this is what resulted. There is a perfect left right symmetry...not sure what that means.
-[irfft symmetry image](assets/irfft_intensity.png)
+![irfft symmetry image](assets/irfft_intensity.png)
