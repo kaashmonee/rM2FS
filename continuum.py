@@ -19,6 +19,10 @@ class Spectrum:
         self.xvalues = xvalues
         self.yvalues = yvalues
 
+    def plot(self, show=False):
+        plt.scatter(xvalues, yvalues)
+        if show: plt.show()
+
 
 
 # Pick an x pixel to plot flux

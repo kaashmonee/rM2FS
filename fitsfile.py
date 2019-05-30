@@ -37,3 +37,10 @@ class FitsFile:
         
     def get_dimensions(self):
         return (self.rows, self.cols)
+
+    def overplot(self, spectrum):
+        """
+        Takes in a Spectrum object and plots it on top of the image.
+        """
+        #TODO: write this function
+        pass
