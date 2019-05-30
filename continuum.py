@@ -64,30 +64,8 @@ def find_order_boundaries(intensity_array):
     Storing this x value will be important as we will be using these routines again to 
     do the same thing.
     """
-    num_bins = 100
 
     intensity_array = np.array(intensity_array)
-    fft_intensity_array = np.fft.irfft(intensity_array)
-    plt.yscale("log")
-    plt.plot(fft_intensity_array)#, "ro")
-    # plt.plot(intensity_array)#, "bo")
-
-    bins = np.array_split(intensity_array, num_bins)
-    bin_averages = [np.average(bin) for bin in bins]
-    # test_array = [414, 796, 1234]
-    # for y in test_array:
-    #     plt.axvline(y, ymin=0, color="blue")
-
-    # Finds the indices where the bin averages differ by greater than a default 50.
-    boundaries = find_step_boundaries(bin_averages)
-
-    # plt.plot(bin_averages) #, "ro")
-
-    # plt.plot(intensity_array)
-    plt.xlabel("ypixel")
-    plt.ylabel("FFT log intensity")
-    plt.title("inverse real fourier transformed intensity vs. ypixel plotted logarithmically")
-
     plt.show()
 
 
