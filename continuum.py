@@ -60,6 +60,8 @@ def find_peaks(intensity_array):
     
     plt.plot(intensity_array)
 
+    # Makes a scatter plot of the location of the peaks (peaks[0]) and
+    # the intensity value of the peaks (intensity_array[peaks[0]])
     plt.scatter(peaks[0], intensity_array[peaks[0]], color="red")
     plt.show()
 
