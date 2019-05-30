@@ -22,8 +22,7 @@ from fitsfile import FitsFile
 
 def get_intensity_array(image, xpixel=1000):
     """
-    Returns a list of tuples with each tuple containing the y pixel 
-    and the magnitude of the intensity at the given x pixel.
+    Returns an array of ypixels and their intensity at a given xpixel
     """
     intensity = []
     for row_num, row in enumerate(image):
@@ -32,19 +31,18 @@ def get_intensity_array(image, xpixel=1000):
     return np.array(intensity)
 
 
-def plot_intensity(intensity_array):
+def plot_intensity(intensity_array, show=False):
     """
     Creates a plot of flux v. yvalue so that we can see how the yvalue flux changes at a particular x value.
     The maxima will be the locations of the orders. 
     """
-    shifted_array = np.array(intensity_array) - 20 # this array is shifted down by 20. it will be used to detect
-    # intersects where the intensity goes to 0
-
     plt.plot(intensity_array)
-    plt.xlabel("ypixels")
-    plt.ylabel("flux")
-    plt.title("flux v. ypixel")
-    plt.show()
+
+    if show: 
+        plt.xlabel("ypixels")
+        plt.ylabel("flux")
+        plt.title("flux v. ypixel")
+        plt.show()
 
 def find_flux_max(yvalues, flux):
     """
@@ -52,31 +50,37 @@ def find_flux_max(yvalues, flux):
     """
     pass
 
-def find_peaks(intensity_array):
+def find_peaks(intensity_array, show=False):
     """
     Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
     """
     peaks = scipy.signal.find_peaks(intensity_array, height=100) # ignores peaks with intensities less than 100
-    print("peaks:", peaks)
     
     plt.plot(intensity_array)
 
     # Makes a scatter plot of the location of the peaks (peaks[0]) and
     # the intensity value of the peaks (intensity_array[peaks[0]])
-    plt.xlabel("ypixel")
-    plt.ylabel("intensity")
-    plt.title("intensity v. ypixel with peaks shown")
-    plt.scatter(peaks[0], intensity_array[peaks[0]], color="red")
-    plt.show()
+    plt.scatter(peaks[0], intensity_array[peaks[0]])
+    
+    if show: 
+        plt.xlabel("ypixel")
+        plt.ylabel("intensity")
+        plt.title("intensity v. ypixel with peaks shown")
+        plt.show()
+
 
 
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
-    intensity_array = get_intensity_array(image)
+    plt.rc('axes', prop_cycle=(plt.cycler('color', ['r', 'g', 'b'])))
+    intensity_array1 = get_intensity_array(image, xpixel=1500)
+    intensity_array2 = get_intensity_array(image, xpixel=1000)
     # plot_intensity(intensity_array) Plots the intensity array just to make sure that our routines are correct
-    find_peaks(intensity_array)
+    find_peaks(intensity_array1)
+    find_peaks(intensity_array2)
+    plt.show()
 
 if __name__ == "__main__":
     main()
