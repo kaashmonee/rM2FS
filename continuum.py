@@ -58,7 +58,7 @@ def find_order_boundaries(intensity_array):
     Storing this x value will be important as we will be using these routines again to 
     do the same thing.
     """
-    num_bins = 1000
+    num_bins = 100
 
     index_array = np.arange(len(intensity_array))
     index_bins = np.array_split(index_array, num_bins)
@@ -67,7 +67,7 @@ def find_order_boundaries(intensity_array):
     bins = np.array_split(intensity_array, num_bins)
     bin_averages = [np.average(bin) for bin in bins]
 
-    plt.plot(bin_averages, "ro")
+    plt.plot(bin_averages) #, "ro")
 
     # plt.plot(intensity_array)
     # intensity_array_shifted_down = intensity_array - lower_flux_limit
@@ -82,6 +82,9 @@ def find_order_boundaries(intensity_array):
     # plt.plot(intensity_array_shifted_down)
     # for y in sign_change_array:
     #     plt.axvline(y, ymin=0, ymax=3000, color="red")
+    plt.xlabel("Bin number")
+    plt.ylabel("Bin average")
+    plt.title("Bin average v. Bin number")
 
     plt.show()
 
