@@ -84,18 +84,6 @@ def find_order_boundaries(intensity_array):
     # plt.plot(bin_averages) #, "ro")
 
     # plt.plot(intensity_array)
-    # intensity_array_shifted_down = intensity_array - lower_flux_limit
-
-    # obtains the indices where a sign change occured
-    # obtained from https://stackoverflow.com/questions/2652368/how-to-detect-a-sign-change-for-elements-in-a-numpy-array.
-    # sign_change_array = np.where(np.sign(intensity_array_shifted_down[:-1]) != np.sign(intensity_array_shifted_down[1:]))[0] + 1
-
-    # print("intensity_array:", intensity_array)
-    # print("sign_change_array:", sign_change_array)
-
-    # plt.plot(intensity_array_shifted_down)
-    # for y in sign_change_array:
-    #     plt.axvline(y, ymin=0, ymax=3000, color="red")
     plt.xlabel("Bin number")
     plt.ylabel("Bin average")
     plt.title("Bin average v. Bin number")
