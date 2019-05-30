@@ -11,6 +11,15 @@ import time
 from fitsfile import FitsFile
 
 
+class Spectrum:
+    """
+    This is a class that represents each white spot on the image.
+    """
+    def __init__(self, xvalues, yvalues):
+        self.xvalues = xvalues
+        self.yvalues = yvalues
+
+
 
 # Pick an x pixel to plot flux
 # Find intensity of y pixels
