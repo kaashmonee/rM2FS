@@ -1,6 +1,7 @@
 from astropy.io import fits
 import matplotlib
 import numpy as np
+import scipy.signal
 import os
 import argparse
 import matplotlib.pyplot as plt
@@ -51,22 +52,17 @@ def find_flux_max(yvalues, flux):
     """
     pass
 
-def find_step_boundaries(step_array, threshold=50):
+def find_peaks(intensity_array):
     """
-    Takes in an array that looks somewhat like a step function.
-    Finds boundaries of the step function.
+    Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
     """
+    peaks = scipy.signal.find_peaks(intensity_array)
+    
+    plt.plot(intensity_array)
 
-def find_order_boundaries(intensity_array):
-    """
-    This function takes in a variable called `intensity_array` which contains a list of tuples 
-    where each tuple contains the ypixel and the intensity of the pixel at a particular x value.
-    Storing this x value will be important as we will be using these routines again to 
-    do the same thing.
-    """
-
-    intensity_array = np.array(intensity_array)
+    plt.scatter(peaks[0], intensity_array[peaks[0]], color="red")
     plt.show()
+
 
 
 def main():
@@ -74,7 +70,7 @@ def main():
     image = fits_file.image_data
     intensity_array = get_intensity_array(image)
     # plot_intensity(intensity_array) Plots the intensity array just to make sure that our routines are correct
-    find_order_boundaries(intensity_array)
+    find_peaks(intensity_array)
 
 if __name__ == "__main__":
     main()
