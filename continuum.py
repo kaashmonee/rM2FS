@@ -61,26 +61,50 @@ def find_peaks(intensity_array, show=False):
     # Makes a scatter plot of the location of the peaks (peaks[0]) and
     # the intensity value of the peaks (intensity_array[peaks[0]])
     plt.scatter(peaks[0], intensity_array[peaks[0]])
-    
+
     if show: 
         plt.xlabel("ypixel")
         plt.ylabel("intensity")
         plt.title("intensity v. ypixel with peaks shown")
         plt.show()
 
+    return peaks[0]
 
+def is_rectangular(l):
+    for i in l:
+        if len(i) != len(l[0]):
+            return False
+
+    return True
+
+def something(image):
+    # so far we have the y pixels of all the orders.
+    # now we just need to repeat this process for a bunch of xpixels and then fit an order through all of them.
+    xpixels = [600, 800, 1000, 1200, 400]
+    list_of_IA = []
+    list_of_peaks = []
+    for xpixel in xpixels:
+        ia = get_intensity_array(image, xpixel=xpixel)
+        list_of_IA.append(ia)
+        peaks = find_peaks(ia)
+        list_of_peaks.append(peaks)
+
+    # Each order is identified by the index of peak. 
+    # Testing that we are detecting the same number of orders every time.
+    assert(is_rectangular(list_of_peaks))
 
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
-    plt.rc('axes', prop_cycle=(plt.cycler('color', ['r', 'g', 'b'])))
-    intensity_array1 = get_intensity_array(image, xpixel=1500)
-    intensity_array2 = get_intensity_array(image, xpixel=1000)
-    # plot_intensity(intensity_array) Plots the intensity array just to make sure that our routines are correct
-    find_peaks(intensity_array1)
-    find_peaks(intensity_array2)
-    plt.show()
+    # plt.rc('axes', prop_cycle=(plt.cycler('color', ['r', 'g', 'b'])))
+    # intensity_array1 = get_intensity_array(image, xpixel=1200)
+    # intensity_array2 = get_intensity_array(image, xpixel=1000)
+    # # plot_intensity(intensity_array) Plots the intensity array just to make sure that our routines are correct
+    # find_peaks(intensity_array1)
+    # find_peaks(intensity_array2)
+    # plt.show()
+    something(image)
 
 if __name__ == "__main__":
     main()
