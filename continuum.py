@@ -31,11 +31,24 @@ class Spectrum:
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
 
-    def fit_polynomial(self):
+    def fit_polynomial(self, domain=None):
         # what kind of polynomial should be fit here?
         # fitting a 4th order legendre polynomial
-        self.fit = Legendre.fit(self.xvalues, self.yvalues, 4)
-        print("legendre_fit:", self.fit)
+        # self.fit = Legendre.fit(self.xvalues, self.yvalues, 4, domain=domain)
+        print("xvalues:", self.xvalues)
+        polynomial = np.polyfit(self.xvalues, self.yvalues, 4)
+        fit = self.polynomial_function(polynomial, self.xvalues)
+
+
+    def polynomial_function(self, f, domain):
+        y = np.zeros((1, len(domain)))
+        print("y before:", y)
+        for i in range(len(f)):
+            y += f[i] * domain**i
+
+        print("y:", y)
+        return y
+
         
 
 
@@ -143,9 +156,12 @@ def get_spectra(image):
 
 def plot_spectra(image, spectra, show=False):
     plt.imshow(image)
+    image_rows = image.shape[0]
+    image_cols = image.shape[1]
     for spectrum in spectra:
         spectrum.plot()
-        spectrum.fit_polynomial()
+        print("image type:", image.shape)
+        spectrum.fit_polynomial(domain=np.arange(image_cols))
         break
 
     if show: plt.show()
