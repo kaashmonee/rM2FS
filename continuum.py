@@ -9,6 +9,7 @@ from matplotlib.colors import LogNorm
 import cv2
 import time
 from fitsfile import FitsFile
+from numpy.polynomial.legendre import Legendre
 
 
 class Spectrum:
@@ -29,6 +30,13 @@ class Spectrum:
     def plot(self, show=False):
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
+
+    def fit_polynomial(self):
+        # what kind of polynomial should be fit here?
+        # fitting a 4th order legendre polynomial
+        self.fit = Legendre.fit(self.xvalues, self.yvalues, 4)
+        print("legendre_fit:", self.fit)
+        
 
 
 
@@ -137,6 +145,8 @@ def plot_spectra(image, spectra, show=False):
     plt.imshow(image)
     for spectrum in spectra:
         spectrum.plot()
+        spectrum.fit_polynomial()
+        break
 
     if show: plt.show()
 
