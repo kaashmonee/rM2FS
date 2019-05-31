@@ -103,7 +103,10 @@ def get_spectra(image):
         ia = get_intensity_array(image, xpixel=xpixel)
         list_of_IA.append(ia)
         peaks = find_peaks(ia)
-        list_of_peaks.append(peaks)
+        list_of_peaks.append(np.array(peaks))
+
+    # numpifying list_of_peaks
+    list_of_peaks = np.array(list_of_peaks)
 
     # Each order is identified by the index of peak. 
     # Testing that we are detecting the same number of orders every time.
@@ -111,17 +114,27 @@ def get_spectra(image):
 
     lopt = np.transpose(np.array(list_of_peaks))
     spectra = []
-    for ctr, x in enumerate(xpixels):
-        xvalues = np.repeat(x, len(lopt[0]))
-        yvalues = np.array(lopt[ctr])
-        assert(len(xvalues) == len(yvalues))
+    xvals = []
+    for x in xpixels:
+        xvals.append(np.repeat(x, len(list_of_peaks[0])))
+    
+    # numpifying array
+    xvals = np.array(xvals)
+
+    # Correctness check
+    assert(np.array(xvals).shape == np.array(list_of_peaks).shape)
+
+    num_cols = len(list_of_peaks[0])
+    print("list of peaks:", list_of_peaks)
+    for i in range(num_cols):
+        xvalues = xvals[:, i]
+        yvalues = list_of_peaks[:, i]
         spectra.append(Spectrum(xvalues, yvalues))
 
     return spectra
 
 def plot_spectra(image, spectra, show=False):
     plt.imshow(image)
-    print(len(spectra))
     for spectrum in spectra:
         spectrum.plot()
 
