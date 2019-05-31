@@ -9,6 +9,7 @@ from matplotlib.colors import LogNorm
 import cv2
 import time
 from fitsfile import FitsFile
+from numpy.polynomial.legendre import legfit
 from numpy.polynomial.legendre import Legendre
 
 
@@ -31,27 +32,30 @@ class Spectrum:
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
 
-    def fit_polynomial(self, domain=None):
+    def fit_polynomial(self, domain):
         # what kind of polynomial should be fit here?
         # fitting a 4th order legendre polynomial
-        # self.fit = Legendre.fit(self.xvalues, self.yvalues, 4, domain=domain)
         print("xvalues:", self.xvalues)
-        polynomial = np.polyfit(self.xvalues, self.yvalues, 4)
-        fit = self.polynomial_function(polynomial, self.xvalues)
+        print("yvalues:", self.yvalues)
+        poly = np.polyfit(self.xvalues, self.yvalues, 4)
+        f = self.__construct_function(poly)
+        output = f(domain)
+        print("output:", output)
 
 
-    def polynomial_function(self, f, domain):
-        y = np.zeros((1, len(domain)))
-        print("y before:", y)
-        for i in range(len(f)):
-            y += f[i] * domain**i
+    def __construct_function(self, poly_list):
+        """
+        Constructs a polynomial function based on the coefficients
+        in the polynomial list and returns the function.
+        """
+        def f(x):
+            y = np.zeros(len(x))
+            for i, c in enumerate(poly_list):
+                y += c * x**i
 
-        print("y:", y)
-        return y
+            return y
 
-        
-
-
+        return f
 
 
 # Pick an x pixel to plot flux
@@ -161,8 +165,7 @@ def plot_spectra(image, spectra, show=False):
     for spectrum in spectra:
         spectrum.plot()
         print("image type:", image.shape)
-        spectrum.fit_polynomial(domain=np.arange(image_cols))
-        break
+        spectrum.fit_polynomial(np.arange(0, image.shape[1]))
 
     if show: plt.show()
 
