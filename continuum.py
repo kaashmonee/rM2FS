@@ -50,8 +50,8 @@ class Spectrum:
         """
         def f(x):
             y = np.zeros(len(x))
-            for i, c in enumerate(poly_list):
-                print("i, c:", i, c)
+            for i, c in enumerate(poly_list[::-1]):
+                # print("i, c:", i, c)
                 y += c * x**i
 
             return y
@@ -165,7 +165,7 @@ def plot_spectra(image, spectra, show=False):
     degree = 4
     for spectrum in spectra:
         spectrum.plot()
-        spectrum.fit_polynomial(np.arange(400,403), degree)
+        spectrum.fit_polynomial(np.arange(0, image_cols), degree)
         spectrum.plot_fit()
 
     if show: plt.show()
