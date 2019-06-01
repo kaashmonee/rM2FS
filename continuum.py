@@ -32,12 +32,12 @@ class Spectrum:
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
 
-    def fit_polynomial(self, domain):
+    def fit_polynomial(self, domain, degree):
         # what kind of polynomial should be fit here?
-        # fitting a 4th order legendre polynomial
-        poly = np.polyfit(self.xvalues, self.yvalues, 4)
+        poly = np.polyfit(self.xvalues, self.yvalues, degree)
         f = self.__construct_function(poly)
         self.output = f(domain)
+        print(self.output)
 
     def plot_fit(self, show=False):
         plt.plot(self.output)
@@ -51,6 +51,7 @@ class Spectrum:
         def f(x):
             y = np.zeros(len(x))
             for i, c in enumerate(poly_list):
+                print("i, c:", i, c)
                 y += c * x**i
 
             return y
@@ -158,12 +159,13 @@ def get_spectra(image):
     return spectra
 
 def plot_spectra(image, spectra, show=False):
-    plt.imshow(image)
+    plt.imshow(image, origin="lower")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
+    degree = 4
     for spectrum in spectra:
         spectrum.plot()
-        spectrum.fit_polynomial(np.arange(0, image.shape[1]))
+        spectrum.fit_polynomial(np.arange(400,403), degree)
         spectrum.plot_fit()
 
     if show: plt.show()
