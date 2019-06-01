@@ -37,7 +37,7 @@ class Spectrum:
         poly = np.polyfit(self.xvalues, self.yvalues, degree)
         f = self.__construct_function(poly)
         self.output = f(domain)
-        print(self.output)
+
 
     def plot_fit(self, show=False):
         plt.plot(self.output)
