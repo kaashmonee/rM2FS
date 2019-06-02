@@ -182,7 +182,8 @@ def get_spectra(image):
 
 
 
-def plot_spectra(image, spectra, show=False):
+def plot_spectra(fits_image, spectra, show=False):
+    image = fits_image.image_data
     plt.imshow(image, origin="lower")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
@@ -192,14 +193,18 @@ def plot_spectra(image, spectra, show=False):
         spectrum.fit_polynomial(np.arange(0, image_cols), degree)
         spectrum.plot_fit()
 
-    if show: plt.show()
+    if show: 
+        plt.xlabel("xpixel")
+        plt.ylabel("ypixel") 
+        plt.title("Image " + fits_image.get_file_name() + " with Spectral Continuum Fits")
+        plt.show()
 
 
 def main():
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
     spectra = get_spectra(image)
-    plot_spectra(image, spectra, show=True)
+    plot_spectra(fits_file, spectra, show=True)
 
 
 

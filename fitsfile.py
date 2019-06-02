@@ -13,6 +13,7 @@ class FitsFile:
         """
         Creates a class that opens and contains .fits image attributes. It takes in a fits image path.
         """
+        self.fits_file = fits_file
         self.hdul = fits.open(fits_file)
         self.image_data = self.hdul[0].data
         self.log_image_data = np.log(self.image_data)
@@ -44,3 +45,9 @@ class FitsFile:
         """
         #TODO: write this function
         pass
+
+    def get_file_name(self):
+        """
+        Returns the name of the file independent of the path.
+        """
+        return self.fits_file[self.fits_file.rfind("/")+1:]
