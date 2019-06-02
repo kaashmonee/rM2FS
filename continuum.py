@@ -11,6 +11,8 @@ import time
 from fitsfile import FitsFile
 from numpy.polynomial.legendre import legfit
 from numpy.polynomial.legendre import Legendre
+from matplotlib.widgets import Button
+import argparse
 
 
 class Spectrum:
@@ -41,8 +43,8 @@ class Spectrum:
         the input domain. 
         """
         # what kind of polynomial should be fit here?
-        poly = np.polyfit(self.xvalues, self.yvalues, degree)
-        f = self.__construct_function(poly) # returns the function to apply
+        self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
+        f = self.__construct_function(self.poly) # returns the function to apply
         self.output = f(domain)
 
 
@@ -100,7 +102,8 @@ def find_peaks(intensity_array, show=False):
     """
     Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
     """
-    peaks = scipy.signal.find_peaks(intensity_array, height=100) # ignores peaks with intensities less than 100
+    # ignores peaks with intensities less than 100
+    peaks = scipy.signal.find_peaks(intensity_array, height=100) 
     
 
     if show: 
@@ -142,6 +145,8 @@ def get_spectra(image):
         list_of_peaks.append(np.array(peaks))
 
     # numpifying list_of_peaks
+    # This array contains peaks for each x value 
+    # in x pixels.
     list_of_peaks = np.array(list_of_peaks)
 
     # Each order is identified by the index of peak. 
@@ -161,11 +166,15 @@ def get_spectra(image):
     xvals = np.array(xvals)
 
     # Correctness check
-    # This ensures that the images are the same shape.
     assert(np.array(xvals).shape == np.array(list_of_peaks).shape)
 
     num_cols = len(list_of_peaks[0])
 
+    # list_of_peaks contains the peaks for a singular x value, and 
+    # xvalues contain the same x values for the length of each 
+    # array in list_of_peaks. So this simply takes each column
+    # from each array, which gives us the x and y coordinates
+    # for each spectrum.
     for i in range(num_cols):
         xvalues = xvals[:, i]
         yvalues = list_of_peaks[:, i]
@@ -174,8 +183,8 @@ def get_spectra(image):
     return spectra
 
 
-
-def plot_spectra(image, spectra, show=False):
+def plot_spectra(fits_image, spectra, show=False):
+    image = fits_image.image_data
     plt.imshow(image, origin="lower")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
@@ -185,14 +194,38 @@ def plot_spectra(image, spectra, show=False):
         spectrum.fit_polynomial(np.arange(0, image_cols), degree)
         spectrum.plot_fit()
 
-    if show: plt.show()
+    if show: 
+        plt.xlabel("xpixel")
+        plt.ylabel("ypixel") 
+        plt.title("Image " + fits_image.get_file_name() + " with Spectral Continuum Fits")
+        plt.show()
+
+
+
+def export_spectra(file_name, spectra):
+    """
+    Exports the fit polynomials. This can be run only after 
+    Spectrum.fit_polynomial is run.
+    """
+    polynomials = np.array([spectrum.poly for spectrum in spectra])
+    np.savetxt(file_name, polynomials, delimiter=",")
 
 
 def main():
+    # Doing brief cmd line parsing.
+    parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
+    parser.add_argument("--export", help="--export <outputfile>")
+    args = parser.parse_args()
+
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
     spectra = get_spectra(image)
-    plot_spectra(image, spectra, show=True)
+    plot_spectra(fits_file, spectra, show=True)
+
+
+    if args.export is not None:
+        file_name = args.export
+        export_spectra(file_name, spectra) # exports the spectrum to a txt.
 
 
 
