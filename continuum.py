@@ -100,7 +100,8 @@ def find_peaks(intensity_array, show=False):
     """
     Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
     """
-    peaks = scipy.signal.find_peaks(intensity_array, height=100) # ignores peaks with intensities less than 100
+    # ignores peaks with intensities less than 100
+    peaks = scipy.signal.find_peaks(intensity_array, height=100) 
     
 
     if show: 
