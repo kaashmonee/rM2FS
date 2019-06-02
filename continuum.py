@@ -142,6 +142,8 @@ def get_spectra(image):
         list_of_peaks.append(np.array(peaks))
 
     # numpifying list_of_peaks
+    # This array contains peaks for each x value 
+    # in x pixels.
     list_of_peaks = np.array(list_of_peaks)
 
     # Each order is identified by the index of peak. 
@@ -161,11 +163,15 @@ def get_spectra(image):
     xvals = np.array(xvals)
 
     # Correctness check
-    # This ensures that the images are the same shape.
     assert(np.array(xvals).shape == np.array(list_of_peaks).shape)
 
     num_cols = len(list_of_peaks[0])
 
+    # list_of_peaks contains the peaks for a singular x value, and 
+    # xvalues contain the same x values for the length of each 
+    # array in list_of_peaks. So this simply takes each column
+    # from each array, which gives us the x and y coordinates
+    # for each spectrum.
     for i in range(num_cols):
         xvalues = xvals[:, i]
         yvalues = list_of_peaks[:, i]
