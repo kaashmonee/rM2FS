@@ -22,10 +22,16 @@ because it was too noisy.
 
 ![undersensitive order detection](assets/undersensitive_order_detection.png)
 
-* The next attempt was to reduce the noise by creating bins that contain the average value of all the pixels in that bin. The bins that contain big jumps between each
-other is where the boundary would be.
+~The next attempt was to reduce the noise by creating bins that contain the average value of all the pixels in that bin. The bins that contain big jumps between each
+other is where the boundary would be.~
 
-![bins](assets/binaveragevbinnumber.png)
+* Each peak is where the spectrum is located.
+
+* Over the weekend, was able to complete spectrum finding and created continuum fits:
+![pic1](assets/finished_continuum_example.png)
+![pic2](assets/zoomed_in_fits.png)
+![pic3](assets/much_more_zoomed_in_fit.png)
+
 
 
 
