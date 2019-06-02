@@ -10,7 +10,7 @@ Progress 5/28/19
 * Zooming into a particular dot gives us this. I do not know what this is or why it happens. This can be looked into later, since the contour method is not priority at the moment.
 ![zoomed in contour](assets/zoomed_in_on_contour_bright_spot.png)
 
-Progress 5/29/19
+~Progress 5/29/19
 * Measured flux vs. y pixel at a particular x = 1000 pixels.
 Obtained this plot: 
 ![flux v. ypixel](assets/fluxvypixel.png)
@@ -18,7 +18,7 @@ Obtained this plot:
 * The next step was to detect the order boundaries so that I could pick the midpoint to use as one of the points for the continuum fit.
 * Tried shifting entire plot down by 10 - 20 pixels. Tried to use intersection points with 0 as the boundary locations, but that was unsuccessful
 because it was too noisy.
-* This would result in too many or too few boundary points.
+* This would result in too many or too few boundary points~
 
 ![undersensitive order detection](assets/undersensitive_order_detection.png)
 
