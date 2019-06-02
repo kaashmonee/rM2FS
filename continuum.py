@@ -11,6 +11,8 @@ import time
 from fitsfile import FitsFile
 from numpy.polynomial.legendre import legfit
 from numpy.polynomial.legendre import Legendre
+from matplotlib.widgets import Button
+import argparse
 
 
 class Spectrum:
@@ -41,8 +43,8 @@ class Spectrum:
         the input domain. 
         """
         # what kind of polynomial should be fit here?
-        poly = np.polyfit(self.xvalues, self.yvalues, degree)
-        f = self.__construct_function(poly) # returns the function to apply
+        self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
+        f = self.__construct_function(self.poly) # returns the function to apply
         self.output = f(domain)
 
 
@@ -181,7 +183,6 @@ def get_spectra(image):
     return spectra
 
 
-
 def plot_spectra(fits_image, spectra, show=False):
     image = fits_image.image_data
     plt.imshow(image, origin="lower")
@@ -200,11 +201,31 @@ def plot_spectra(fits_image, spectra, show=False):
         plt.show()
 
 
+
+def export_spectra(file_name, spectra):
+    """
+    Exports the fit polynomials. This can be run only after 
+    Spectrum.fit_polynomial is run.
+    """
+    polynomials = np.array([spectrum.poly for spectrum in spectra])
+    np.savetxt(file_name, polynomials, delimiter=",")
+
+
 def main():
+    # Doing brief cmd line parsing.
+    parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
+    parser.add_argument("--export", help="--export <outputfile>")
+    args = parser.parse_args()
+
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
     spectra = get_spectra(image)
     plot_spectra(fits_file, spectra, show=True)
+
+
+    if args.export is not None:
+        file_name = args.export
+        export_spectra(file_name, spectra) # exports the spectrum to a txt.
 
 
 
