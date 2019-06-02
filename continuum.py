@@ -29,13 +29,20 @@ class Spectrum:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
 
     def plot(self, show=False):
+        """
+        Takes in an optional parameter `show` that shows the plot as well.
+        """
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
 
     def fit_polynomial(self, domain, degree):
+        """
+        This function fits a polynomial of degree `degree` and returns the output on 
+        the input domain. 
+        """
         # what kind of polynomial should be fit here?
         poly = np.polyfit(self.xvalues, self.yvalues, degree)
-        f = self.__construct_function(poly)
+        f = self.__construct_function(poly) # returns the function to apply
         self.output = f(domain)
 
 
@@ -51,7 +58,6 @@ class Spectrum:
         def f(x):
             y = np.zeros(len(x))
             for i, c in enumerate(poly_list[::-1]):
-                # print("i, c:", i, c)
                 y += c * x**i
 
             return y
@@ -59,17 +65,15 @@ class Spectrum:
         return f
 
 
-# Pick an x pixel to plot flux
-# Find intensity of y pixels
-# Plot intensity
-# Obtain local maxima
-# local maxima is the y value at which the continuum exists.
-# rinse and repeat for a few more spectra and we are good 
+##############################
+##### End Spectrum Class #####
+##############################
 
 
 def get_intensity_array(image, xpixel=1000):
     """
-    Returns an array of ypixels and their intensity at a given xpixel
+    At a particular xpixle, (default is 1000), this function returns
+    an array of intensity for each pixel in y.
     """
     intensity = []
     for row_num, row in enumerate(image):
@@ -80,8 +84,8 @@ def get_intensity_array(image, xpixel=1000):
 
 def plot_intensity(intensity_array, show=False):
     """
-    Creates a plot of flux v. yvalue so that we can see how the yvalue flux changes at a particular x value.
-    The maxima will be the locations of the orders. 
+    Creates a plot of flux v. yvalue so that we can see how the intensity changes.
+    The maxima will be the locations of the spectra. 
     """
     plt.plot(intensity_array)
 
@@ -113,6 +117,10 @@ def find_peaks(intensity_array, show=False):
     return peaks[0]
 
 def is_rectangular(l):
+    """
+    This is a correctness check function that is used in get_spectra() routine below.
+    It ensures that the given array l is rectangular.
+    """
     for i in l:
         if len(i) != len(l[0]):
             return False
@@ -120,11 +128,13 @@ def is_rectangular(l):
     return True
 
 def get_spectra(image):
-    # so far we have the y pixels of all the orders.
-    # now we just need to repeat this process for a bunch of xpixels and then fit an order through all of them.
     xpixels = [600, 800, 1000, 1200, 400]
-    list_of_IA = []
-    list_of_peaks = []
+
+    list_of_IA = [] # list of intensity arrays
+    list_of_peaks = []  
+
+    # Obtain the y v. intensity for each x pixel so 
+    # we can find peaks for various values in the domain.
     for xpixel in xpixels:
         ia = get_intensity_array(image, xpixel=xpixel)
         list_of_IA.append(ia)
@@ -135,12 +145,15 @@ def get_spectra(image):
     list_of_peaks = np.array(list_of_peaks)
 
     # Each order is identified by the index of peak. 
-    # Testing that we are detecting the same number of orders every time.
+    # Have to ensure that list_of_peaks is rectangular because
+    # we have to ensure that we are detecting the same number
+    # of spectra for each x value. Otherwise, something will be 
+    # discontinuous.
     assert(is_rectangular(list_of_peaks))
 
-    lopt = np.transpose(np.array(list_of_peaks))
     spectra = []
-    xvals = []
+    xvals = [] # An array that contains x values of each pixel.
+
     for x in xpixels:
         xvals.append(np.repeat(x, len(list_of_peaks[0])))
     
@@ -148,15 +161,19 @@ def get_spectra(image):
     xvals = np.array(xvals)
 
     # Correctness check
+    # This ensures that the images are the same shape.
     assert(np.array(xvals).shape == np.array(list_of_peaks).shape)
 
     num_cols = len(list_of_peaks[0])
+
     for i in range(num_cols):
         xvalues = xvals[:, i]
         yvalues = list_of_peaks[:, i]
         spectra.append(Spectrum(xvalues, yvalues))
 
     return spectra
+
+
 
 def plot_spectra(image, spectra, show=False):
     plt.imshow(image, origin="lower")
