@@ -11,7 +11,8 @@ This project is written in Python 3.6.7.
 It is recommended to use a virtual environment. The required libraries are outlined in the `requirements.txt.` Run `pip install -r requirements.txt`.
 
 ## Running
-As mentioned the `continuum.py` file contains all current progress and when complete, should run and create a list of orders and their continuum fits. Run with `python continuum.py`.
+As mentioned the `continuum.py` runs and fits continuums for all the spectra in the fits_files/r0760_stitched.fits file. An optional --export command line argument has been 
+added which will save all the spectra to an output text file.
 
 ## Authors
 Skanda Kaashyap, Carnegie Mellon University
