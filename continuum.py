@@ -223,11 +223,19 @@ def export_spectra(file_name, spectra):
     polynomials = np.array([spectrum.poly for spectrum in spectra])
     np.savetxt(file_name, polynomials, delimiter=",")
 
+def perform_fits(fits_file):
+    image = fits_file.image_data
+    spectra = get_spectra(image)
+    plot_spectra(fits_file, spectra, show=True)
+
+
 
 def main():
     # Doing brief cmd line parsing.
     parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
     parser.add_argument("--export", help="--export <outputfile>")
+    parser.add_argument("-l", 
+       help="use this flag to loop through all fits files", action="store_true")
     args = parser.parse_args()
 
     # We need to write a function that will automatically perform these routines
@@ -235,10 +243,17 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    fits_file = FitsFile("fits_files/r0760_stitched.fits")
-    image = fits_file.image_data
-    spectra = get_spectra(image)
-    plot_spectra(fits_file, spectra, show=True)
+    directory = "fits_files/"
+    default_path = directory + "r0760_stitched.fits"
+
+    if args.l is not False:
+        for fits_path in os.listdir(directory):
+            fits_file = FitsFile(directory+fits_path)
+            perform_fits(fits_file)
+    else:
+        fits_file = FitsFile(default_path)
+        perform_fits(fits_file)
+
 
 
     if args.export is not None:
