@@ -15,4 +15,4 @@ As mentioned the `continuum.py` runs and fits continuums for all the spectra in 
 added which will save all the spectra to an output text file.
 
 ## Authors
-Skanda Kaashyap, Carnegie Mellon University
+(c) Skanda Kaashyap, Carnegie Mellon University
