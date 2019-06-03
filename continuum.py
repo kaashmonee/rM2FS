@@ -131,10 +131,18 @@ def is_rectangular(l):
     return True
 
 def get_spectra(image):
-    xpixels = [600, 800, 1000, 1200, 400]
+    
+    # This is the pixel we use to determine how many spectra there are
+    prime_pixel = 1000 
+    xpixels = np.arange(image.shape[1])
+    print("xpixels:", xpixels)
 
     list_of_IA = [] # list of intensity arrays
     list_of_peaks = []  
+
+    # Finds the number of peaks based on the reference prime x pixel
+    num_peaks_prime = find_peaks(get_intensity_array(image, xpixel=prime_pixel))
+    used_xpixels = []
 
     # Obtain the y v. intensity for each x pixel so 
     # we can find peaks for various values in the domain.
@@ -142,7 +150,12 @@ def get_spectra(image):
         ia = get_intensity_array(image, xpixel=xpixel)
         list_of_IA.append(ia)
         peaks = find_peaks(ia)
-        list_of_peaks.append(np.array(peaks))
+
+        # This helps ensure that the same number of spectra are detected in each
+        # xpixel as the reference xpixel, which is tentatively set to 1000
+        if len(peaks) == len(num_peaks_prime):
+            list_of_peaks.append(np.array(peaks))
+            used_xpixels.append(xpixel)
 
     # numpifying list_of_peaks
     # This array contains peaks for each x value 
@@ -159,7 +172,7 @@ def get_spectra(image):
     spectra = []
     xvals = [] # An array that contains x values of each pixel.
 
-    for x in xpixels:
+    for x in used_xpixels:
         xvals.append(np.repeat(x, len(list_of_peaks[0])))
     
     # numpifying array
@@ -188,7 +201,7 @@ def plot_spectra(fits_image, spectra, show=False):
     plt.imshow(image, origin="lower")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
-    degree = 4
+    degree = 3
     for spectrum in spectra:
         spectrum.plot()
         spectrum.fit_polynomial(np.arange(0, image_cols), degree)
