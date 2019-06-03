@@ -188,7 +188,7 @@ def plot_spectra(fits_image, spectra, show=False):
     plt.imshow(image, origin="lower")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
-    degree = 4
+    degree = 2
     for spectrum in spectra:
         spectrum.plot()
         spectrum.fit_polynomial(np.arange(0, image_cols), degree)
