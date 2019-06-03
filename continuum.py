@@ -217,6 +217,11 @@ def main():
     parser.add_argument("--export", help="--export <outputfile>")
     args = parser.parse_args()
 
+    # We need to write a function that will automatically perform these routines
+    # so that we can determine for which functions this code does/does not work.
+    # For each one, we should identify the assertion that failed and see what we
+    # can change so that it does work.
+
     fits_file = FitsFile("fits_files/r0760_stitched.fits")
     image = fits_file.image_data
     spectra = get_spectra(image)
