@@ -86,10 +86,10 @@ class Spectrum:
         narrowed_y = []
         narrowed_x = []
 
-        for ind, ypixel in enumerate(self.yvalues[1:]):
-            if ypixel <= prev_y_pixel + 2:
+        for ind, ypixel in enumerate(self.yvalues):
+            if ypixel >= prev_y_pixel - 1 and ypixel <= prev_y_pixel + 1:
                 narrowed_y.append(ypixel)
-                narrowed_x.append(self.xvalues[ind+1])
+                narrowed_x.append(self.xvalues[ind])
 
         self.xvalues = np.array(narrowed_x)
         self.yvalues = np.array(narrowed_y)
