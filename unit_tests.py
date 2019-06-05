@@ -16,8 +16,8 @@ class SpectrumUnitTest(unittest.TestCase):
         self.test_spectrum = Spectrum(xvals, yvals)
         print(self.test_spectrum.xvalues)
         print(self.test_spectrum.yvalues)
-        self.assertTrue(self.test_spectrum.xvalues.all() == np.array([1, 2]).all())
-        self.assertTrue(self.test_spectrum.yvalues.all() == np.array([2, 2.5]).all())
+        self.assertTrue(np.array_equal(self.test_spectrum.xvalues, np.array([1, 2, 5])))
+        self.assertTrue(np.array_equal(self.test_spectrum.yvalues, np.array([2, 2.5, 9])))
 
 
 if __name__ == "__main__":

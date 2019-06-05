@@ -91,6 +91,8 @@ class Spectrum:
                 narrowed_y.append(ypixel)
                 narrowed_x.append(self.xvalues[ind])
 
+            prev_y_pixel = ypixel
+
         self.xvalues = np.array(narrowed_x)
         self.yvalues = np.array(narrowed_y)
 
