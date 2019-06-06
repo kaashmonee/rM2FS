@@ -35,6 +35,9 @@ class Spectrum:
 
         # Narrow the spectrum immediately upon initialization.
         self.__narrow_spectrum()
+        
+        # Removes overlapping portions of the spectrum
+        self.__remove_overlapping_spectrum() 
 
     def plot(self, show=False):
         """
@@ -100,3 +103,10 @@ class Spectrum:
 
         self.is_narrowed = True
 
+    def __remove_overlapping_spectrum(self):
+        diff_array = np.ediff1d(self.xvalues)
+        max_diff = np.amax(diff_array)
+        max_diff_ind = np.argmax(diff_array)
+
+        while max_diff > diff_threshold:
+            cut(self.xvalues, self.yvalues)
