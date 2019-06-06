@@ -12,6 +12,7 @@ from fitsfile import FitsFile
 from numpy.polynomial.legendre import legfit
 from numpy.polynomial.legendre import Legendre
 from matplotlib.widgets import Button
+import cleanup
 import argparse
 
 
@@ -230,7 +231,8 @@ def get_spectra(image):
 
 def plot_spectra(fits_image, spectra, show=False):
     image = fits_image.image_data
-    plt.imshow(image, origin="lower")
+    thresholded_im = cleanup.threshold_image(image)
+    plt.imshow(thresholded_im, origin="lower", cmap="gray")
     image_rows = image.shape[0]
     image_cols = image.shape[1]
     degree = 3
