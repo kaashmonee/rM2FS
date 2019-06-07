@@ -31,7 +31,7 @@ class FitsFile:
         Plots the spectra on top of the image.
         """
 
-        # importing inside function to fix circular dependency issue
+        # importing inside function to avoid circular dependency issues
         import cleanup 
 
         thresholded_im = cleanup.threshold_image(self.image_data)
