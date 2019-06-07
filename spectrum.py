@@ -1,19 +1,5 @@
-from astropy.io import fits
-import matplotlib
 import numpy as np
-import scipy.signal
-import os
-import argparse
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import cv2
-import time
-from fitsfile import FitsFile
-from numpy.polynomial.legendre import legfit
-from numpy.polynomial.legendre import Legendre
-from matplotlib.widgets import Button
-import cleanup
-import argparse
 
 
 
@@ -104,9 +90,13 @@ class Spectrum:
         self.is_narrowed = True
 
     def __remove_overlapping_spectrum(self):
-        diff_array = np.ediff1d(self.xvalues)
-        max_diff = np.amax(diff_array)
-        max_diff_ind = np.argmax(diff_array)
+        # Finds the differences between 2 adjacent elements in the array.
+        diff_array = np.ediff1d(self.xvalues) 
 
-        while max_diff > diff_threshold:
-            cut(self.xvalues, self.yvalues)
+        # Diff threshold to detect overlapping spectra
+        diff_threshold = 20
+        diff_dict = dict()
+
+        print(diff_dict)
+
+        pass
