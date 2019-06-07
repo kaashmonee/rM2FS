@@ -30,39 +30,13 @@ def get_intensity_array(image, xpixel=1000):
     return np.array(intensity)
 
 
-def plot_intensity(intensity_array, show=False):
-    """
-    Creates a plot of flux v. yvalue so that we can see how the intensity changes.
-    The maxima will be the locations of the spectra. 
-    """
-    plt.plot(intensity_array)
-
-    if show: 
-        plt.xlabel("ypixels")
-        plt.ylabel("flux")
-        plt.title("flux v. ypixel")
-        plt.show()
-
-
-def find_peaks(intensity_array, show=False):
+def find_peaks(intensity_array):
     """
     Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
     """
     # ignores peaks with intensities less than 100
     peaks = scipy.signal.find_peaks(intensity_array, height=100) 
     
-
-    if show: 
-        plt.plot(intensity_array)
-
-        # Makes a scatter plot of the location of the peaks (peaks[0]) and
-        # the intensity value of the peaks (intensity_array[peaks[0]])
-        plt.scatter(peaks[0], intensity_array[peaks[0]])
-        plt.xlabel("ypixel")
-        plt.ylabel("intensity")
-        plt.title("intensity v. ypixel with peaks shown")
-        plt.show()
-
     return peaks[0]
 
 def is_rectangular(l):
