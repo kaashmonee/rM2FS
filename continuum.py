@@ -143,6 +143,9 @@ def get_spectra(image):
 
 
 def plot_spectra(fits_image, spectra, show=False):
+    """
+    Plots the spectra on top of the image.
+    """
     image = fits_image.image_data
     thresholded_im = cleanup.threshold_image(image)
     plt.imshow(thresholded_im, origin="lower", cmap="gray")
