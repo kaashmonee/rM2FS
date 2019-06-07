@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
 class Spectrum:
     """
     This is a class that represents each white spot on the image.
@@ -90,13 +89,26 @@ class Spectrum:
         self.is_narrowed = True
 
     def __remove_overlapping_spectrum(self):
+
         # Finds the differences between 2 adjacent elements in the array.
         diff_array = np.ediff1d(self.xvalues) 
 
         # Diff threshold to detect overlapping spectra
         diff_threshold = 20
-        diff_dict = dict()
 
-        print(diff_dict)
+        # Contains list of indices where next index differs by more than 
+        # diff_threshold
+        diff_ind_list = [] 
 
-        pass
+        for ind, diff in enumerate(diff_array):
+            if diff >= diff_threshold:
+                diff_ind_list.append(ind)
+
+        # Starting and ending indices of the self.xvalues that we ought consider
+        startx = diff_ind_list[0] + 1
+        endx = diff_ind_list[1]
+
+        self.xvalues = self.xvalues[startx:endx]
+        self.yvalues = self.yvalues[startx:endx]
+
+
