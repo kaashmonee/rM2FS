@@ -116,27 +116,6 @@ def get_spectra(image):
     return spectra
 
 
-def plot_spectra(fits_image, spectra, show=False):
-    """
-    Plots the spectra on top of the image.
-    """
-    image = fits_image.image_data
-    thresholded_im = cleanup.threshold_image(image)
-    plt.imshow(thresholded_im, origin="lower", cmap="gray")
-    image_rows = image.shape[0]
-    image_cols = image.shape[1]
-    degree = 3
-    for spectrum in spectra:
-        spectrum.plot()
-        spectrum.fit_polynomial(np.arange(0, image_cols), degree)
-        spectrum.plot_fit()
-
-    if show: 
-        plt.xlabel("xpixel")
-        plt.ylabel("ypixel") 
-        plt.title("Image " + fits_image.get_file_name() + " with Spectral Continuum Fits")
-        plt.show()
-
 
 
 def export_spectra(file_name, spectra):
@@ -150,7 +129,7 @@ def export_spectra(file_name, spectra):
 def perform_fits(fits_file):
     image = fits_file.image_data
     spectra = get_spectra(image)
-    plot_spectra(fits_file, spectra, show=True)
+    fits_file.plot_spectra(spectra, show=True)
 
 
 
