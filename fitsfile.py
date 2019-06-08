@@ -10,6 +10,12 @@ import time
 import scipy
 from spectrum import Spectrum
 
+### global variable for button toggling purposes, modeled off the matplotlib
+# documentation here: https://matplotlib.org/2.1.2/gallery/event_handling/keypress_demo.html.
+
+gssp = None # global 
+gfp = None # global fit plot
+
 class FitsFile:
     def __init__(self, fits_file):
         """
@@ -28,21 +34,49 @@ class FitsFile:
 
     def plot_spectra(self, show=False):
         """
-        Plots the spectra on top of the image.
+       Plots the spectra on top of the image.
         """
 
         # importing inside function to avoid circular dependency issues
         import cleanup 
 
+        # Setting up plotting...
+        fig = plt.figure()
         thresholded_im = cleanup.threshold_image(self.image_data)
-        plt.imshow(thresholded_im, origin="lower", cmap="gray")
+
+        ax_im = fig.add_subplot(1, 1, 1)
+        ax_plt = fig.add_subplot(1, 1, 1)
+
+        global toggle_axis
+        toggle_axis = ax_plt
+        
+        ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
+        
+        # Setting up the listener
+        fig.canvas.mpl_connect("key_press_event", press)
+
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]
         degree = 3
+
+        spectrum_scatter_plots = []
+        fit_plots = []
+
         for spectrum in self.spectra:
-            spectrum.plot()
+
+            spectrum_scatter = spectrum.plot(ax_plt)
             spectrum.fit_polynomial(np.arange(0, image_cols), degree)
-            spectrum.plot_fit()
+            fit_plot = spectrum.plot_fit(ax_plt)
+
+            spectrum_scatter_plots.append(spectrum_scatter)
+            fit_plots.append(fit_plot)
+
+        global gssp
+        global gfp
+
+        gssp = spectrum_scatter_plots
+        gfp = fit_plots
+
 
         if show: 
             plt.xlabel("xpixel")
@@ -158,3 +192,12 @@ def is_rectangular(l):
             return False
 
     return True
+
+def press(event):
+    print("key pressed")
+
+    # sys.stdout.flush()
+    if event.key == "t":
+
+        plt.draw()
+
