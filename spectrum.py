@@ -51,11 +51,16 @@ class Spectrum:
         plt.plot(self.output)
 
 
+    # Deprecated after PR #36. This routine is useful for polynomial fitting,
+    # but instead we are using the scipy spline interpolation routine.
+    # It will be left here for documentation purposes for now, but should be
+    # removed later if deemed unnecessary.
+    """ 
     def __construct_function(self, poly_list):
-        """
+        '''
         Constructs a polynomial function based on the coefficients
         in the polynomial list and returns the function.
-        """
+        '''
         def f(x):
             y = np.zeros(len(x))
             for i, c in enumerate(poly_list[::-1]):
@@ -64,6 +69,7 @@ class Spectrum:
             return y
 
         return f
+    """
 
 
     def __narrow_spectrum(self):
