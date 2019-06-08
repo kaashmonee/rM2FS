@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy
 
 
 class Spectrum:
@@ -37,8 +38,12 @@ class Spectrum:
         the input domain. 
         """
         # what kind of polynomial should be fit here?
-        self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
-        f = self.__construct_function(self.poly) # returns the function to apply
+        # self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
+        # f = self.__construct_function(self.poly) # returns the function to apply
+
+        f = scipy.interpolate.interp1d(self.xvalues, self.yvalues, 
+                                       fill_value="extrapolate")
+
         self.output = f(domain)
 
 
