@@ -25,12 +25,14 @@ class Spectrum:
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
 
+
     def plot(self, show=False):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
         plt.scatter(self.xvalues, self.yvalues)
         if show: plt.show()
+
 
     def fit_polynomial(self, domain, degree):
         """
