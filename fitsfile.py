@@ -13,8 +13,6 @@ from spectrum import Spectrum
 ### global variable for button toggling purposes, modeled off the matplotlib
 # documentation here: https://matplotlib.org/2.1.2/gallery/event_handling/keypress_demo.html.
 
-gssp = None # global 
-gfp = None # global fit plot
 
 class FitsFile:
     def __init__(self, fits_file):
@@ -52,9 +50,6 @@ class FitsFile:
         
         ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
         
-        # Setting up the listener
-        fig.canvas.mpl_connect("key_press_event", press)
-
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]
         degree = 3
@@ -70,12 +65,6 @@ class FitsFile:
 
             spectrum_scatter_plots.append(spectrum_scatter)
             fit_plots.append(fit_plot)
-
-        global gssp
-        global gfp
-
-        gssp = spectrum_scatter_plots
-        gfp = fit_plots
 
 
         if show: 
@@ -192,12 +181,3 @@ def is_rectangular(l):
             return False
 
     return True
-
-def press(event):
-    print("key pressed")
-
-    # sys.stdout.flush()
-    if event.key == "t":
-
-        plt.draw()
-
