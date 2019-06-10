@@ -52,6 +52,25 @@ class Spectrum:
     def plot_fit(self, show=False):
         plt.plot(self.output)
 
+    
+    def find_true_centers(self):
+        """
+        This function finds the true center for each peak in the spectrum.
+        """
+        # This function returns the width of the spectrum at (xvalue, ypeak)
+        width = self.__get_width(xvalue, ypeak)
+
+        # Obtains points to fit the gaussian
+        gfitpoints = self.__get_points_to_fit(xvalue, ypeak, width)
+
+        # Fit a gaussian
+        gaussian = self.__fit_gaussian(gfitpoints)
+
+        # Get gaussian center
+        center = self.__get_center(gaussian)
+
+        return center
+
 
     # Deprecated after PR #36. This routine is useful for polynomial fitting,
     # but instead we are using the scipy spline interpolation routine.
