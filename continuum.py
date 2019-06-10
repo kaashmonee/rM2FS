@@ -30,7 +30,6 @@ def perform_fits(fits_file):
     fits_file.plot_spectra(show=True)
 
 
-
 def main():
     # Doing brief cmd line parsing.
     parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
