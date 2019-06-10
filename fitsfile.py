@@ -45,9 +45,6 @@ class FitsFile:
         ax_im = fig.add_subplot(1, 1, 1)
         ax_plt = fig.add_subplot(1, 1, 1)
 
-        global toggle_axis
-        toggle_axis = ax_plt
-        
         ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
         
         image_rows = self.image_data.shape[0]
