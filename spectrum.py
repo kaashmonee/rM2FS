@@ -58,10 +58,6 @@ class Spectrum:
         return fit_plot
 
     
-
-
-
-
     # Deprecated after PR #36. This routine is useful for polynomial fitting,
     # but instead we are using the scipy spline interpolation routine.
     # It will be left here for documentation purposes for now, but should be

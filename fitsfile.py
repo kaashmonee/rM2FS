@@ -1,4 +1,5 @@
 from astropy.io import fits
+from astropy import modeling
 import matplotlib
 import numpy as np
 import os
@@ -165,18 +166,28 @@ class FitsFile:
         """
         # Each element in this list contains a list of points to 
         # fit to the gaussian
+        self.xdomain = self.spectra[0].xvalues
         for spectrum in self.spectra:
 
-            gfitpoints = []
-            for xvalue, ypeak in zip(self.xvalues, self.yvalues):
+            self.gfitpoints = []
+            for xvalue, ypeak in zip(spectrum.xvalues, spectrum.yvalues):
                 fit_points = self.__get_gaussian_coords(xvalue, ypeak)
-                gfitpoints.append(fit_points)
+                self.gfitpoints.append(fit_points)
 
             # Fit a gaussian
-            fitted_models = self.__fit_gaussian(self.xvalues, gfitpoints)
+            self.fitted_models = self.__fit_gaussian(spectrum.xvalues, 
+                                                     self.gfitpoints)
             self.centers = [max(fit) for fit in fitted_models]
 
         return self.centers
+
+    # Getters to obtain the points to fit and the fitted models, since 
+    # internal variable names are somewhat obscure and hard to define.
+    def get_points_to_fit(self):
+        return self.gfitpoints
+
+    def get_fitted_models(self):
+        return self.fitted_models
 
 
     def plot_true_centers(self):
@@ -190,12 +201,17 @@ class FitsFile:
         """
         fitter = modeling.fitting.LevMarLSQFitter()
         model = modeling.models.Gaussian1D()
-        fitted_models = [fitter(model, xvalues, points) for points in gfitpoints]
+        intensity_array = [self.image_data[xvalue, yvalues[0]:yvalues[-1]+1] for xvalue, yvalues in zip(xvalues, gfitpoints)]
+        assert(len(intensity_array) == len(gfitpoints))
+        for points, intensity in zip(gfitpoints, intensity_array):
+            print(len(points), len(intensity))
+            assert(len(points) == len(intensity))
+        fitted_models = [fitter(model, points, intensity) for points, intensity in zip(gfitpoints, intensity_array)]
 
         return fitted_models
 
 
-    def __get_gaussian_coords(xvalue, peak):
+    def __get_gaussian_coords(self, xvalue, peak):
         """
         Finds the width of the peaks.
         """
@@ -209,20 +225,20 @@ class FitsFile:
 
         gypixels.append(cur_y)
 
-        while self.image[xvalue, cur_y] > intensity_threshold:
+        while self.image_data[xvalue, cur_y] > intensity_threshold:
             cur_y -= 1
             gypixels.append(cur_y)
 
         cur_y = peak
 
-        while self.image[xvalue, cur_y] > intensity_threshold:
+        while self.image_data[xvalue, cur_y] > intensity_threshold:
             cur_y += 1
             gypixels.append(cur_y)
 
         gxpixels = np.repeat(xvalue, len(gypixels))
         gypixels = np.array(gypixels)
 
-        return xpixels, gypixels
+        return gypixels
 
 
     def get_file_name(self):
