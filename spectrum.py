@@ -38,7 +38,7 @@ class Spectrum:
         return scatter_plot
 
 
-    def fit_polynomial(self, domain, degree):
+    def fit_spectrum(self, domain, degree):
         """
         This function fits a polynomial of degree `degree` and returns the output on 
         the input domain. 

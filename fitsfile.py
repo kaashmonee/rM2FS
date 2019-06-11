@@ -57,7 +57,7 @@ class FitsFile:
         for spectrum in self.spectra:
 
             spectrum_scatter = spectrum.plot(ax_plt)
-            spectrum.fit_polynomial(np.arange(0, image_cols), degree)
+            spectrum.fit_spectrum(np.arange(0, image_cols), degree)
             fit_plot = spectrum.plot_fit(ax_plt)
 
             spectrum_scatter_plots.append(spectrum_scatter)
@@ -165,16 +165,19 @@ class FitsFile:
         """
         # Each element in this list contains a list of points to 
         # fit to the gaussian
-        gfitpoints = []
-        for xvalue, ypeak in zip(self.xvalues, self.yvalues):
-            fit_points = self.__get_gaussian_coords(xvalue, ypeak)
-            gfitpoints.append(fit_points)
+        for spectrum in self.spectra:
 
-        # Fit a gaussian
-        fitted_models = self.__fit_gaussian(self.xvalues, gfitpoints)
-        self.centers = [max(fit) for fit in fitted_models]
+            gfitpoints = []
+            for xvalue, ypeak in zip(self.xvalues, self.yvalues):
+                fit_points = self.__get_gaussian_coords(xvalue, ypeak)
+                gfitpoints.append(fit_points)
+
+            # Fit a gaussian
+            fitted_models = self.__fit_gaussian(self.xvalues, gfitpoints)
+            self.centers = [max(fit) for fit in fitted_models]
 
         return self.centers
+
 
     def plot_true_centers(self):
         plt.scatter(self.xvalues, self.centers)
