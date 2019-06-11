@@ -36,11 +36,11 @@ class FitsFile:
         """
 
         # importing inside function to avoid circular dependency issues
-        import cleanup 
+        import misc
 
         # Setting up plotting...
         fig = plt.figure()
-        thresholded_im = cleanup.threshold_image(self.image_data)
+        thresholded_im = misc.threshold_image(self.image_data)
 
         ax_im = fig.add_subplot(1, 1, 1)
         ax_plt = fig.add_subplot(1, 1, 1)
