@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from astropy import modeling
+from gaussfit import Peak
 
 
 class Spectrum:
@@ -11,6 +12,7 @@ class Spectrum:
     def __init__(self, xvalues, yvalues, image):
         self.xvalues = xvalues
         self.yvalues = yvalues
+        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
         self.is_narrowed = False
         self.image = image
 

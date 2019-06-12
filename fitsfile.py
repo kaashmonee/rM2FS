@@ -159,13 +159,16 @@ class FitsFile:
 
         self.spectra = spectra
 
+        # Just a check to see if each spectrum contains the same number of 
+        # points
+        assert(is_rectangular(self.spectra))
+
 
     def find_true_centers(self):
         """
         This function finds the true center for each peak in the spectrum.
         """
         # Each element in this list contains a list of points to 
-        # fit to the gaussian
         self.xdomain = self.spectra[0].xvalues
         for spectrum in self.spectra:
 
@@ -227,6 +230,8 @@ class FitsFile:
 
         while self.image_data[xvalue, cur_y] > intensity_threshold:
             cur_y -= 1
+            if cur_y < 0:
+                break
             gypixels.append(cur_y)
 
         cur_y = peak
@@ -254,6 +259,15 @@ def is_rectangular(l):
     This is a correctness check function that is used in get_spectra() routine below.
     It ensures that the given array l is rectangular.
     """
+    
+    if isinstance(l[0], Spectrum):
+        spec1 = l[0]
+        for spectrum in spectra:
+            if len(spectrum.xvalues) != len(spec1):
+                return False
+
+        return True
+
     for i in l:
         if len(i) != len(l[0]):
             return False
