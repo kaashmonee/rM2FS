@@ -1,6 +1,6 @@
 import argparse
-import misc
 from fitsfile import FitsFile
+import util
 
 def main():
     # Doing brief cmd line parsing.
@@ -16,15 +16,26 @@ def main():
     # can change so that it does work.
 
     directory = "fits_files/"
-    default_path = directory + "r0760_stitched.fits"
+    fn = "r0760_stitched.fits"
+    default_path = directory + fn
 
     if args.l is not False:
         for fits_path in os.listdir(directory):
             fits_file = FitsFile(directory+fits_path)
-            misc.perform_fits(fits_file)
+            util.perform_fits(fits_file)
     else:
         fits_file = FitsFile(default_path)
-        misc.perform_fits(fits_file)
+
+        ## Proof of concept for pickling
+        # TODO: incorporate command line parsing to allow user to manually input
+        # this information
+        # TODO: ensure that the fits are still there, without going through the 
+        # perform_fits pipeline.
+        util.perform_fits(fits_file)
+        util.save(fits_file)
+        fits_file = util.load(fn + ".pkl")
+        util.perform_fits(fits_file)
+
 
 
 
