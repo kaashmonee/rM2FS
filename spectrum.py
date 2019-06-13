@@ -50,6 +50,8 @@ class Spectrum:
         f = scipy.interpolate.interp1d(self.xvalues, self.yvalues, 
                                        fill_value="extrapolate")
 
+        self.spectrum_fit_function = f
+
         self.output = f(domain)
 
 
