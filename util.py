@@ -1,4 +1,6 @@
 from astropy.io import fits
+from astropy.io.misc import fnpickle
+from astropy.io.misc import fnunpickle
 import matplotlib
 import numpy as np
 import scipy.signal
@@ -14,6 +16,16 @@ from numpy.polynomial.legendre import Legendre
 from matplotlib.widgets import Button
 import argparse
 from spectrum import Spectrum
+
+
+# Using built in Python serializers as adding some custom functionality to save 
+# and load fits_files.
+def save(fits_file):
+    fnpickle(fits_file, fits_file.get_file_name() + ".pkl")
+
+def load(fits_file_path):
+    fits_file = fnunpickle(fits_file_path)
+    return fits_file
 
 
 def export_spectra(file_name, spectra):

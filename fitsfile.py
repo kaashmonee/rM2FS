@@ -1,4 +1,5 @@
 from astropy.io import fits
+from astropy.table import Table
 from astropy import modeling
 import matplotlib
 import numpy as np
@@ -21,11 +22,17 @@ class FitsFile:
         Creates a class that opens and contains .fits image attributes. It takes in a fits image path.
         """
         self.fits_file = fits_file
-        self.hdul = fits.open(fits_file)
-        self.image_data = self.hdul[0].data
+        hdul = fits.open(fits_file)
+        self.image_data = hdul[0].data
         self.log_image_data = np.log(self.image_data)
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
+
+
+    def save(self):
+        save_dict = {
+            "fits_file": self.fits_file
+        }
 
 
     def get_dimensions(self):
@@ -37,11 +44,11 @@ class FitsFile:
         """
 
         # importing inside function to avoid circular dependency issues
-        import misc
+        import util
 
         # Setting up plotting...
         fig = plt.figure()
-        thresholded_im = misc.threshold_image(self.image_data)
+        thresholded_im = util.threshold_image(self.image_data)
 
         ax_im = fig.add_subplot(1, 1, 1)
         ax_plt = fig.add_subplot(1, 1, 1)
