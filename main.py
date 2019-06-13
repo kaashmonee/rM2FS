@@ -24,8 +24,7 @@ def main():
             misc.perform_fits(fits_file)
     else:
         fits_file = FitsFile(default_path)
-        # misc.perform_fits(fits_file)
-        misc.display_centers(fits_file)
+        misc.perform_fits(fits_file)
 
 
 
