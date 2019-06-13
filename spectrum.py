@@ -84,7 +84,7 @@ class Spectrum:
     def __narrow_spectrum(self):
         """
         This function narrows the spectrum down from a naive peak finding method
-        to ensuring that the peaks are no more than 1 or 2 pixels away from each
+        to ensuring that the peaks are no more than 2 pixels away from each
         other.
         """
 
