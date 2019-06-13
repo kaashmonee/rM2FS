@@ -1,6 +1,6 @@
 import argparse
-import misc
 from fitsfile import FitsFile
+import util
 
 def main():
     # Doing brief cmd line parsing.
@@ -21,10 +21,12 @@ def main():
     if args.l is not False:
         for fits_path in os.listdir(directory):
             fits_file = FitsFile(directory+fits_path)
-            misc.perform_fits(fits_file)
+            util.perform_fits(fits_file)
     else:
         fits_file = FitsFile(default_path)
-        misc.perform_fits(fits_file)
+        util.perform_fits(fits_file)
+        util.save(fits_file)
+
 
 
 
