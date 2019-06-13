@@ -174,14 +174,6 @@ def is_rectangular(l):
     It ensures that the given array l is rectangular.
     """
     
-    if isinstance(l[0], Spectrum):
-        spec1 = l[0]
-        for spectrum in spectra:
-            if len(spectrum.xvalues) != len(spec1):
-                return False
-
-        return True
-
     for i in l:
         if len(i) != len(l[0]):
             return False
