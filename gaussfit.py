@@ -1,5 +1,6 @@
 # Routines for gauss fitting.
 import numpy as np
+import scipy
 
 class Peak:
     def __init__(self, x, y):
@@ -22,7 +23,18 @@ def get_true_peaks(fits_file):
             fit_gaussian(fits_file, rng, peak)
 
 def fit_gaussian(fits_file, rng, peak):
-    pass
+    fits_image = fits_file.image_data
+    intensity = fits_file[peak.x, rng[0]:rng[1]]
+    yrange = np.arange(range[0], range[1]+1)
+
+    # safety check to ensure same number of x and y points
+    assert(len(intensity) == len(yrange))
+
+    mean, std = scipy.norm.fit(intensity)
+
+
+
+
             
 
 def get_previous_peak(fits_file, peak, spec_ind):
@@ -36,7 +48,7 @@ def get_previous_peak(fits_file, peak, spec_ind):
 def get_next_peak(fits_file, peak, spec_ind):
     cur_spectrum = fits_file.spectra[spec_ind]
     next_spectrum = fits_file.spectra[spec_ind+1]
-    next_peak_ind = np.where(np.arra(next_spectrum) == peak.x)
+    next_peak_ind = np.where(np.array(next_spectrum) == peak.x)
     yplus1 = next_spectrum.yvalues[next_peak_ind]
 
     return yplus1
