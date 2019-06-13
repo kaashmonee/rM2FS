@@ -15,13 +15,6 @@ from matplotlib.widgets import Button
 import argparse
 from spectrum import Spectrum
 
-class GaussFit:
-    def __init__(self, spectrum):
-        self.spectrum = spectrum
-
-    def fit_guassian(self):
-        pass
-
 
 def export_spectra(file_name, spectra):
     """
