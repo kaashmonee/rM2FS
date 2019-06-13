@@ -25,6 +25,10 @@ def main():
             util.perform_fits(fits_file)
     else:
         fits_file = FitsFile(default_path)
+
+        ## Proof of concept for pickling
+        # TODO: incorporate command line parsing to allow user to manually input
+        # this information
         util.perform_fits(fits_file)
         util.save(fits_file)
         fits_file = util.load(fn + ".pkl")
