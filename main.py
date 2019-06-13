@@ -1,34 +1,6 @@
-from astropy.io import fits
-import matplotlib
-import numpy as np
-import scipy.signal
-import os
 import argparse
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import cv2
-import time
+import misc
 from fitsfile import FitsFile
-from numpy.polynomial.legendre import legfit
-from numpy.polynomial.legendre import Legendre
-from matplotlib.widgets import Button
-import cleanup
-import argparse
-from spectrum import Spectrum
-
-
-def export_spectra(file_name, spectra):
-    """
-    Exports the fit polynomials. This can be run only after 
-    Spectrum.fit_polynomial is run.
-    """
-    polynomials = np.array([spectrum.poly for spectrum in spectra])
-    np.savetxt(file_name, polynomials, delimiter=",")
-
-def perform_fits(fits_file):
-    fits_file.get_spectra()
-    fits_file.plot_spectra(show=True)
-
 
 def main():
     # Doing brief cmd line parsing.
@@ -49,10 +21,10 @@ def main():
     if args.l is not False:
         for fits_path in os.listdir(directory):
             fits_file = FitsFile(directory+fits_path)
-            perform_fits(fits_file)
+            misc.perform_fits(fits_file)
     else:
         fits_file = FitsFile(default_path)
-        perform_fits(fits_file)
+        misc.perform_fits(fits_file)
 
 
 
@@ -64,4 +36,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

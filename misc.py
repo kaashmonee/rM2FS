@@ -1,6 +1,7 @@
 from astropy.io import fits
 import matplotlib
 import numpy as np
+import scipy.signal
 import os
 import argparse
 import matplotlib.pyplot as plt
@@ -8,7 +9,38 @@ from matplotlib.colors import LogNorm
 import cv2
 import time
 from fitsfile import FitsFile
+from numpy.polynomial.legendre import legfit
+from numpy.polynomial.legendre import Legendre
+from matplotlib.widgets import Button
+import argparse
+from spectrum import Spectrum
 
+
+def export_spectra(file_name, spectra):
+    """
+    Exports the fit polynomials. This can be run only after 
+    Spectrum.fit_polynomial is run.
+    """
+    polynomials = np.array([spectrum.poly for spectrum in spectra])
+    np.savetxt(file_name, polynomials, delimiter=",")
+
+def perform_fits(fits_file):
+    fits_file.get_spectra()
+    fits_file.plot_spectra(show=True)
+
+def display_centers(fits_file):
+    """
+    This should display the gaussian and the fit for each peak.
+    """
+    fits_file.get_spectra()
+    fits_file.find_true_centers()
+    xvalues = fits_file.xdomain
+    gfitpoints = fits_file.get_points_to_fit() 
+    fitted_models = fits_file.get_fitted_models()
+
+    plt.scatter(xvalues, gfitpoints[0])
+    plt.plot(fitted_models[0])
+    plt.show()
 
 def threshold_image(image):
     """
@@ -62,10 +94,3 @@ def bytescale(image, cmin=None, cmax=None, high=255, low=0):
     bytedata = (image - cmin) * scale + low
     return (bytedata.clip(low, high) + 0.5).astype(np.uint8)
 
-def main():
-    fits_file = FitsFile("fits_files/r0760_stitched.fits")
-    image = fits_file.image_data
-    detect_bright_spots(image)
-
-if __name__ == "__main__":
-    main()

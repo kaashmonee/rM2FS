@@ -1,4 +1,5 @@
 from astropy.io import fits
+from astropy import modeling
 import matplotlib
 import numpy as np
 import os
@@ -36,18 +37,15 @@ class FitsFile:
         """
 
         # importing inside function to avoid circular dependency issues
-        import cleanup 
+        import misc
 
         # Setting up plotting...
         fig = plt.figure()
-        thresholded_im = cleanup.threshold_image(self.image_data)
+        thresholded_im = misc.threshold_image(self.image_data)
 
         ax_im = fig.add_subplot(1, 1, 1)
         ax_plt = fig.add_subplot(1, 1, 1)
 
-        global toggle_axis
-        toggle_axis = ax_plt
-        
         ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
         
         image_rows = self.image_data.shape[0]
@@ -60,7 +58,7 @@ class FitsFile:
         for spectrum in self.spectra:
 
             spectrum_scatter = spectrum.plot(ax_plt)
-            spectrum.fit_polynomial(np.arange(0, image_cols), degree)
+            spectrum.fit_spectrum(np.arange(0, image_cols), degree)
             fit_plot = spectrum.plot_fit(ax_plt)
 
             spectrum_scatter_plots.append(spectrum_scatter)
@@ -157,10 +155,9 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
-            spectra.append(Spectrum(xvalues, yvalues))
+            spectra.append(Spectrum(xvalues, yvalues, self.image_data))
 
         self.spectra = spectra
-
 
 
     def get_file_name(self):
@@ -176,6 +173,7 @@ def is_rectangular(l):
     This is a correctness check function that is used in get_spectra() routine below.
     It ensures that the given array l is rectangular.
     """
+    
     for i in l:
         if len(i) != len(l[0]):
             return False

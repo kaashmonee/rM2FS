@@ -1,16 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
+from astropy import modeling
 
 
 class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    def __init__(self, xvalues, yvalues):
+    def __init__(self, xvalues, yvalues, image):
         self.xvalues = xvalues
         self.yvalues = yvalues
         self.is_narrowed = False
+        self.image = image
 
         xlen = len(xvalues)
         ylen = len(yvalues)
@@ -35,7 +37,8 @@ class Spectrum:
         
         return scatter_plot
 
-    def fit_polynomial(self, domain, degree):
+
+    def fit_spectrum(self, domain, degree):
         """
         This function fits a polynomial of degree `degree` and returns the output on 
         the input domain. 
@@ -54,7 +57,7 @@ class Spectrum:
         fit_plot = ax.plot(self.output)
         return fit_plot
 
-
+    
     # Deprecated after PR #36. This routine is useful for polynomial fitting,
     # but instead we are using the scipy spline interpolation routine.
     # It will be left here for documentation purposes for now, but should be
