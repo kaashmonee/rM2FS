@@ -16,7 +16,8 @@ def main():
     # can change so that it does work.
 
     directory = "fits_files/"
-    default_path = directory + "r0760_stitched.fits"
+    fn = "r0760_stitched.fits"
+    default_path = directory + fn
 
     if args.l is not False:
         for fits_path in os.listdir(directory):
@@ -26,6 +27,8 @@ def main():
         fits_file = FitsFile(default_path)
         util.perform_fits(fits_file)
         util.save(fits_file)
+        fits_file = util.load(fn + ".pkl")
+        util.perform_fits(fits_file)
 
 
 
