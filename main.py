@@ -29,6 +29,8 @@ def main():
         ## Proof of concept for pickling
         # TODO: incorporate command line parsing to allow user to manually input
         # this information
+        # TODO: ensure that the fits are still there, without going through the 
+        # perform_fits pipeline.
         util.perform_fits(fits_file)
         util.save(fits_file)
         fits_file = util.load(fn + ".pkl")
