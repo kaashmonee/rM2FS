@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from astropy import modeling
+from gaussfit import Peak
 
 
 class Spectrum:

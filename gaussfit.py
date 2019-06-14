@@ -10,6 +10,9 @@ class Peak:
 
 
 def get_true_peaks(fits_file):
+    """
+    This function obtains the true spectra
+    """
     
     # Generate the spectra if this already hasn't been done.
     if fits_file.spectra is None:
@@ -25,16 +28,17 @@ def get_true_peaks(fits_file):
 def fit_gaussian(fits_file, rng, peak):
     fits_image = fits_file.image_data
     intensity = fits_file[peak.x, rng[0]:rng[1]]
-    yrange = np.arange(range[0], range[1]+1)
+    yrange = np.arange(rng[0], rng[1]+1)
 
     # safety check to ensure same number of x and y points
     assert(len(intensity) == len(yrange))
 
+    # Fits the intensity profile to an array of 
     mean, std = scipy.norm.fit(intensity)
+    m = modeling.models.Gaussian1D(mean=mean, stddev=std)
+    output = m(yrange)
 
-
-
-
+    peak.true_center = max(output)
             
 
 def get_previous_peak(fits_file, peak, spec_ind):
