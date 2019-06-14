@@ -1,6 +1,7 @@
 import argparse
 from fitsfile import FitsFile
 import util
+import os
 
 def main():
     # Doing brief cmd line parsing.
