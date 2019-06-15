@@ -13,7 +13,9 @@ def get_true_peaks(fits_file):
     """
     This function obtains the true spectra
     """
-    
+
+    import pdb 
+    image_height = fits_file.image_data.shape[1]
     # Generate the spectra if this already hasn't been done.
     if fits_file.spectra is None:
         fits_file.get_spectra()
@@ -23,8 +25,18 @@ def get_true_peaks(fits_file):
             y0 = get_previous_peak(fits_file, peak, spec_ind)
             y1 = peak.y
             y2 = get_next_peak(fits_file, peak, spec_ind)
-            rng = ((y2-y1)/2, (y1-y0)/2)
+            rng = get_range(y0, y1, y2, image_height)
             fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
+
+def get_range(y0, y1, y2, image_height):
+    if y0 == 0:
+        return (y0, y1)
+
+    elif y2 == image_height:
+        return (y1, y2)
+    
+    else:
+        return ((y2-y1)/2, (y1-y0)/2)
 
 def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
@@ -62,7 +74,7 @@ def get_previous_peak(fits_file, peak, spec_ind):
     cur_spectrum = fits_file.spectra[spec_ind]
     previous_spectrum = fits_file.spectra[spec_ind-1]
     prev_peak_ind = np.where(np.array(previous_spectrum.xvalues) == peak.x)
-    ynminus1 = previous_spectrum.yvalues[prev_peak_ind]
+    ynminus1 = previous_spectrum.yvalues[prev_peak_ind[0][0]]
 
     return ynminus1
 
@@ -73,8 +85,7 @@ def get_next_peak(fits_file, peak, spec_ind):
     choose a y-domain to fit a Gaussian.
     """
 
-    # import pdb
-    # pdb.set_trace()
+    import pdb
 
     # If this is the last spectrum, then the next peak is the end of the picture
     if spec_ind == len(fits_file.spectra) - 1:
@@ -83,9 +94,9 @@ def get_next_peak(fits_file, peak, spec_ind):
     cur_spectrum = fits_file.spectra[spec_ind]
     next_spectrum = fits_file.spectra[spec_ind+1]
     next_peak_ind = np.where(np.array(next_spectrum.xvalues) == peak.x)
-    yplus1 = next_spectrum.yvalues[next_peak_ind]
-    
+    yplus1 = next_spectrum.yvalues[next_peak_ind[0][0]]
     # pdb.set_trace()
+    
 
     return yplus1
 
