@@ -31,6 +31,7 @@ class Spectrum:
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
+
     def plot(self, ax, show=False):
         """
         Takes in an optional parameter `show` that shows the plot as well.
