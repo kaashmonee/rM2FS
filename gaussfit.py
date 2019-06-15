@@ -43,17 +43,17 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
     # print("spectral index:", spec_ind)
     # print("rng[0]", rng[0])
-    # assert(isinstance(rng[0], int))
-    # assert(isinstance(rng[1], int))
+    # assert(isinstance(rng[0], np.int64))
+    # assert(isinstance(rng[1], np.int64))
     # print("shape:", fits_image.shape)
     intensity = fits_image[peak.x, rng[0]:rng[1]]
-    yrange = np.arange(rng[0], rng[1]+1)
+    yrange = np.arange(rng[0], rng[1])
 
     # safety check to ensure same number of x and y points
     assert(len(intensity) == len(yrange))
 
     # Fits the intensity profile to an array of 
-    mean, std = scipy.norm.fit(intensity)
+    mean, std = scipy.stats.norm.fit(intensity)
     m = modeling.models.Gaussian1D(mean=mean, stddev=std)
     output = m(yrange)
 
