@@ -48,6 +48,12 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
             
 
 def get_previous_peak(fits_file, peak, spec_ind):
+    """
+    This function obtains the previous peak in the same column in the image so that
+    we can find the midpoint between the peaks to choose the y-domain for our 
+    Gaussian fit.
+    """
+
     # If this is the first spectrum, then the previous peak is the start of the 
     # picture.
     if spec_ind == 0:
@@ -61,6 +67,12 @@ def get_previous_peak(fits_file, peak, spec_ind):
     return ynminus1
 
 def get_next_peak(fits_file, peak, spec_ind):
+    """
+    This function obtains the next peak in the same column in the image so that
+    we can find the midpoint between the currnet peak and the next peak to 
+    choose a y-domain to fit a Gaussian.
+    """
+
     # If this is the last spectrum, then the next peak is the end of the picture
     if spec_ind == len(fits_file.spectra) - 1:
         return fits_file.fits_image.shape[1]
