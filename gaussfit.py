@@ -28,6 +28,7 @@ def get_true_peaks(fits_file):
             rng = get_range(y0, y1, y2, image_height)
             fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
 
+
 def get_range(y0, y1, y2, image_height):
     if y0 == 0:
         return (y0, y1)
