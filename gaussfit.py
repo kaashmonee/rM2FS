@@ -28,11 +28,11 @@ def get_true_peaks(fits_file):
 
 def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
-    print("spectral index:", spec_ind)
-    print("rng[0]", rng[0])
-    assert(isinstance(rng[0], int))
-    assert(isinstance(rng[1], int))
-    print("shape:", fits_image.shape)
+    # print("spectral index:", spec_ind)
+    # print("rng[0]", rng[0])
+    # assert(isinstance(rng[0], int))
+    # assert(isinstance(rng[1], int))
+    # print("shape:", fits_image.shape)
     intensity = fits_image[peak.x, rng[0]:rng[1]]
     yrange = np.arange(rng[0], rng[1]+1)
 
@@ -73,14 +73,19 @@ def get_next_peak(fits_file, peak, spec_ind):
     choose a y-domain to fit a Gaussian.
     """
 
+    # import pdb
+    # pdb.set_trace()
+
     # If this is the last spectrum, then the next peak is the end of the picture
     if spec_ind == len(fits_file.spectra) - 1:
         return fits_file.fits_image.shape[1]
 
     cur_spectrum = fits_file.spectra[spec_ind]
     next_spectrum = fits_file.spectra[spec_ind+1]
-    next_peak_ind = np.where(np.array(next_spectrum) == peak.x)
+    next_peak_ind = np.where(np.array(next_spectrum.xvalues) == peak.x)
     yplus1 = next_spectrum.yvalues[next_peak_ind]
+    
+    # pdb.set_trace()
 
     return yplus1
 

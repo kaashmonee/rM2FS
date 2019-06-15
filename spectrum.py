@@ -12,7 +12,6 @@ class Spectrum:
     def __init__(self, xvalues, yvalues, image):
         self.xvalues = xvalues
         self.yvalues = yvalues
-        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
         self.is_narrowed = False
         self.image = image
 
@@ -28,6 +27,9 @@ class Spectrum:
         
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
+
+        # Generating peaks after the spectrum is cleaned and narrowed
+        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
     def plot(self, ax, show=False):
         """
