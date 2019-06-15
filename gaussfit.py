@@ -21,13 +21,19 @@ def get_true_peaks(fits_file):
     for spec_ind, spectrum in enumerate(fits_file.spectra):
         for peak in spectrum.peaks:
             y0 = get_previous_peak(fits_file, peak, spec_ind)
+            y1 = peak.y
             y2 = get_next_peak(fits_file, peak, spec_ind)
             rng = ((y2-y1)/2, (y1-y0)/2)
-            fit_gaussian(fits_file, rng, peak)
+            fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
 
-def fit_gaussian(fits_file, rng, peak):
+def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
-    intensity = fits_file[peak.x, rng[0]:rng[1]]
+    print("spectral index:", spec_ind)
+    print("rng[0]", rng[0])
+    assert(isinstance(rng[0], int))
+    assert(isinstance(rng[1], int))
+    print("shape:", fits_image.shape)
+    intensity = fits_image[peak.x, rng[0]:rng[1]]
     yrange = np.arange(rng[0], rng[1]+1)
 
     # safety check to ensure same number of x and y points
@@ -42,6 +48,11 @@ def fit_gaussian(fits_file, rng, peak):
             
 
 def get_previous_peak(fits_file, peak, spec_ind):
+    # If this is the first spectrum, then the previous peak is the start of the 
+    # picture.
+    if spec_ind == 0:
+        return 0
+
     cur_spectrum = fits_file.spectra[spec_ind]
     previous_spectrum = fits_file.spectra[spec_ind-1]
     prev_peak_ind = np.where(np.array(previous_spectrum.xvalues) == peak.x)
@@ -50,6 +61,10 @@ def get_previous_peak(fits_file, peak, spec_ind):
     return ynminus1
 
 def get_next_peak(fits_file, peak, spec_ind):
+    # If this is the last spectrum, then the next peak is the end of the picture
+    if spec_ind == 0:
+        return fits_file.fits_image.shape[1]
+
     cur_spectrum = fits_file.spectra[spec_ind]
     next_spectrum = fits_file.spectra[spec_ind+1]
     next_peak_ind = np.where(np.array(next_spectrum) == peak.x)
