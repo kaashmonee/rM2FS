@@ -62,7 +62,7 @@ def get_previous_peak(fits_file, peak, spec_ind):
 
 def get_next_peak(fits_file, peak, spec_ind):
     # If this is the last spectrum, then the next peak is the end of the picture
-    if spec_ind == 0:
+    if spec_ind == len(fits_file.spectra) - 1:
         return fits_file.fits_image.shape[1]
 
     cur_spectrum = fits_file.spectra[spec_ind]
