@@ -1,6 +1,8 @@
 # Routines for gauss fitting.
 import numpy as np
 import scipy
+from astropy import modeling
+import matplotlib.pyplot as plt
 
 class Peak:
     def __init__(self, x, y):
@@ -22,40 +24,62 @@ def get_true_peaks(fits_file):
 
     for spec_ind, spectrum in enumerate(fits_file.spectra):
         for peak in spectrum.peaks:
-            y0 = get_previous_peak(fits_file, peak, spec_ind)
+            # y0 = get_previous_peak(fits_file, peak, spec_ind)
+            # y1 = peak.y
+            # y2 = get_next_peak(fits_file, peak, spec_ind)
+            # rng = get_range(y1-10, y1, y1+10, image_height)
             y1 = peak.y
-            y2 = get_next_peak(fits_file, peak, spec_ind)
-            rng = get_range(y0, y1, y2, image_height)
+            y0 = y1-3
+            y2 = y1+3
+            if y0 <= 0: y0 = 0
+            if y2 >= image_height: y2 = image_height
+            rng = (y0, y2)
             fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
 
 
 def get_range(y0, y1, y2, image_height):
     if y0 == 0:
-        return (y0, y1)
+        return (y0, y2)
 
     elif y2 == image_height:
-        return (y1, y2)
+        return (y0, y2)
     
     else:
         return ((y2-y1)/2, (y1-y0)/2)
 
+def non_int_to_int(iterable):
+    return [int(x) for x in iterable]
+
+
 def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
-    # print("spectral index:", spec_ind)
-    # print("rng[0]", rng[0])
-    # assert(isinstance(rng[0], np.int64))
-    # assert(isinstance(rng[1], np.int64))
-    # print("shape:", fits_image.shape)
-    intensity = fits_image[peak.x, rng[0]:rng[1]]
-    yrange = np.arange(rng[0], rng[1])
+    
+    # At a particular x value, this obtains the y values in the image so that 
+    # we can get a set of points for which we want to fit the Gaussian.
+    ystart = rng[0] # rng[0]-200 if rng[0]-200 >= 0 else 0
+    yend = rng[1] # rng[1]+100 if rng[1]+100 <= fits_image.shape[1] else fits_file.image[1]
+    yrange = np.arange(ystart, yend)
+    yrange = non_int_to_int(yrange)
+    peak.x = int(peak.x)
+    # print("yrange.dtype:", yrange.dtype, "peak.x dtype:", peak.x.dtype)
+    intensity = fits_image[yrange, peak.x]
+    # intensity = fits_image[peak.x, yrange]
+    print("peak.y:", peak.y)
+    print("intensity at peak:", fits_image[peak.x, peak.y])
+    plt.plot(intensity)
+    plt.show()
+    print("fits_image.shape:", fits_image.shape)
+    print("intensity:",intensity)
 
-    # safety check to ensure same number of x and y points
+    # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
 
     # Fits the intensity profile to an array of 
     mean, std = scipy.stats.norm.fit(intensity)
     m = modeling.models.Gaussian1D(mean=mean, stddev=std)
+
     output = m(yrange)
+    print(output)
 
     peak.true_center = max(output)
             
@@ -86,8 +110,6 @@ def get_next_peak(fits_file, peak, spec_ind):
     choose a y-domain to fit a Gaussian.
     """
 
-    import pdb
-
     # If this is the last spectrum, then the next peak is the end of the picture
     if spec_ind == len(fits_file.spectra) - 1:
         return fits_file.fits_image.shape[1]
@@ -96,15 +118,9 @@ def get_next_peak(fits_file, peak, spec_ind):
     next_spectrum = fits_file.spectra[spec_ind+1]
     next_peak_ind = np.where(np.array(next_spectrum.xvalues) == peak.x)
     yplus1 = next_spectrum.yvalues[next_peak_ind[0][0]]
-    # pdb.set_trace()
     
 
     return yplus1
-
-
-
-
-
 
 # fits file
 # have spectra
@@ -112,5 +128,3 @@ def get_next_peak(fits_file, peak, spec_ind):
 # generate distribution
 # fit distribution
 # plot distribution
-
-
