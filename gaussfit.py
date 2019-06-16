@@ -46,6 +46,9 @@ def get_range(y0, y1, y2, image_height):
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
+def gauss(x, a, x0, sigma):
+    return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
+
 
 def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     fits_image = fits_file.image_data
@@ -54,30 +57,34 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     # we can get a set of points for which we want to fit the Gaussian.
     ystart = rng[0] # rng[0]-200 if rng[0]-200 >= 0 else 0
     yend = rng[1] # rng[1]+100 if rng[1]+100 <= fits_image.shape[1] else fits_file.image[1]
-    yrange = np.arange(ystart, yend)
-    yrange = non_int_to_int(yrange)
+    yrange = non_int_to_int(np.arange(ystart, yend))
     peak.x = int(peak.x)
-    # print("yrange.dtype:", yrange.dtype, "peak.x dtype:", peak.x.dtype)
     intensity = fits_image[yrange, peak.x]
-    # intensity = fits_image[peak.x, yrange]
-    print("peak.y:", peak.y)
-    print("intensity at peak:", fits_image[peak.x, peak.y])
-    plt.plot(intensity)
-    plt.show()
-    print("fits_image.shape:", fits_image.shape)
-    print("intensity:",intensity)
+    plt.scatter(yrange, intensity, color="red")
+    
 
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
+    n = len(intensity)
+
+    x = np.array(yrange); y = np.array(intensity)
+    mean = sum(x*y)/n
+    sigma = sum(y*(x-mean)**2)/n
+
+    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=[1, mean, sigma])
+    plt.plot(x, gauss(x, *popt), label="fit")
 
     # Fits the intensity profile to an array of 
-    mean, std = scipy.stats.norm.fit(intensity)
-    m = modeling.models.Gaussian1D(mean=mean, stddev=std)
+    # mean, std = scipy.stats.norm.fit(intensity)
+    # m = modeling.models.Gaussian1D(mean=mean, stddev=std)
+    # fitter = modeling.fitting.LevMarLSQFitter()
+    # model = modeling.models.Gaussian1D()
+    # fitted_model = fitter(model, yrange, intensity)
 
-    output = m(yrange)
-    print(output)
+    # plt.plot(yrange, fitted_model(yrange))
+    plt.show()
 
-    peak.true_center = max(output)
+    # peak.true_center = max(output)
             
 # fits file
 # have spectra
