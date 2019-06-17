@@ -102,7 +102,15 @@ def fit_gaussian(fits_file, rng, peak):
     popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
                                       p0=[peak_value, mean, sigma], maxfev=5000)
 
+
+    mean_intensity = popt[0]
+    mean_y = popt[1]
+    peak.true_center = mean_y
+
     plt.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
 
+    plt.xlabel("ypixel")
+    plt.ylabel("intensity")
+    plt.title("Intensity v. ypixel for " + fits_file.get_file_name() + " at x=" + str(peak.x))
     plt.show()
 
