@@ -68,21 +68,5 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=[peak_value, mean, sigma], maxfev=5000)
     plt.plot(xx, gauss(xx, *popt), label="fit")
 
-    # Fits the intensity profile to an array of 
-    # mean, std = scipy.stats.norm.fit(intensity)
-    # m = modeling.models.Gaussian1D(mean=mean, stddev=std)
-    # fitter = modeling.fitting.LevMarLSQFitter()
-    # model = modeling.models.Gaussian1D()
-    # fitted_model = fitter(model, yrange, intensity)
-
-    # plt.plot(yrange, fitted_model(yrange))
     plt.show()
 
-    # peak.true_center = max(output)
-            
-# fits file
-# have spectra
-# obtain the peaks and the points adjacent to the peaks
-# generate distribution
-# fit distribution
-# plot distribution
