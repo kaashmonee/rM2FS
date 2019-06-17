@@ -29,12 +29,6 @@ class FitsFile:
         self.cols = self.image_data.shape[1]
 
 
-    def save(self):
-        save_dict = {
-            "fits_file": self.fits_file
-        }
-
-
     def get_dimensions(self):
         return (self.rows, self.cols)
 
