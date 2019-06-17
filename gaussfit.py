@@ -25,23 +25,14 @@ def get_true_peaks(fits_file):
     for spec_ind, spectrum in enumerate(fits_file.spectra):
         for peak in spectrum.peaks:
             y1 = peak.y
-            y0 = y1-3
-            y2 = y1+3
+            y0 = y1-5
+            y2 = y1+6
             if y0 <= 0: y0 = 0
             if y2 >= image_height: y2 = image_height
             rng = (y0, y2)
             fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
 
 
-def get_range(y0, y1, y2, image_height):
-    if y0 == 0:
-        return (y0, y2)
-
-    elif y2 == image_height:
-        return (y0, y2)
-    
-    else:
-        return ((y2-y1)/2, (y1-y0)/2)
 
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
@@ -68,11 +59,14 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
     n = len(intensity)
 
     x = np.array(yrange); y = np.array(intensity)
-    mean = sum(x*y)/n
-    sigma = sum(y*(x-mean)**2)/n
+    xx = np.linspace(yrange[0], yrange[-1], 100)
 
-    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=[1, mean, sigma])
-    plt.plot(x, gauss(x, *popt), label="fit")
+    peak_value = y.max()
+    mean = sum(x*y)/sum(y)
+    sigma = sum(y*(x-mean)**2)/sum(y)
+
+    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=[peak_value, mean, sigma], maxfev=5000)
+    plt.plot(xx, gauss(xx, *popt), label="fit")
 
     # Fits the intensity profile to an array of 
     # mean, std = scipy.stats.norm.fit(intensity)
