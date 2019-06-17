@@ -13,7 +13,9 @@ class Peak:
 
 def get_true_peaks(fits_file):
     """
-    This function obtains the true spectra
+    This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
+    it finds the center of the Gaussian and assigns it to the peak.true_center
+    parameter of each Peak object in each Spectrum. 
     """
 
     import pdb 
@@ -25,11 +27,18 @@ def get_true_peaks(fits_file):
     for spec_ind, spectrum in enumerate(fits_file.spectra):
         for peak in spectrum.peaks:
             y1 = peak.y
-            y0 = y1-5
-            y2 = y1+6
+            left_range = 5
+            right_range = 6
+            y0 = y1-left_range
+            y2 = y1+right_range
+
+            # Ensure that the ranges do not exceed the width and height of the 
+            # image
             if y0 <= 0: y0 = 0
             if y2 >= image_height: y2 = image_height
             rng = (y0, y2)
+
+            # This does the fitting and the peak.true_center setting.
             fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
 
 
@@ -56,6 +65,11 @@ def fit_gaussian(fits_file, rng, peak, spec_ind=0):
 
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
+
+
+    ### I'm really not sure what a lot of this code here does. A lot of it is taken
+    # straight from stack overflow links that are cited here.
+    # it is taken from a lot of different online sources, and they are cited here:
     n = len(intensity)
 
     x = np.array(yrange); y = np.array(intensity)
