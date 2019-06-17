@@ -39,7 +39,7 @@ def get_true_peaks(fits_file):
             rng = (y0, y2)
 
             # This does the fitting and the peak.true_center setting.
-            fit_gaussian(fits_file, rng, peak, spec_ind=spec_ind)
+            fit_gaussian(fits_file, rng, peak)
 
 
 
@@ -57,7 +57,7 @@ def gauss(x, a, x0, sigma):
     return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
 
 
-def fit_gaussian(fits_file, rng, peak, spec_ind=0):
+def fit_gaussian(fits_file, rng, peak):
     """
     This function obtains the fitting parameters for each Gaussian profile. 
     This includes the mean, expected max, and the standard deviation. It then 
