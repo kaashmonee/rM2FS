@@ -112,7 +112,7 @@ def fit_gaussian(fits_file, rng, peak):
     ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
 
     ax.annotate(
-        "gaussian peak: (" + str(mean_y) + "," + str(mean_intensity) + ")", 
+        "gaussian peak:(" + str(mean_y) + "," + str(mean_intensity) + ")", 
         xy=(mean_y, mean_intensity), 
         xytext=(mean_y+1, mean_intensity+1.5), 
         arrowprops=dict(facecolor="black", shrink=0.5)
