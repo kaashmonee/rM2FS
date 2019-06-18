@@ -1,20 +1,11 @@
 from astropy.io import fits
 from astropy.io.misc import fnpickle
 from astropy.io.misc import fnunpickle
-import matplotlib
+import gaussfit
 import numpy as np
 import scipy.signal
-import os
-import argparse
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import cv2
-import time
 from fitsfile import FitsFile
-from numpy.polynomial.legendre import legfit
-from numpy.polynomial.legendre import Legendre
-from matplotlib.widgets import Button
-import argparse
 from spectrum import Spectrum
 
 
@@ -38,6 +29,7 @@ def export_spectra(file_name, spectra):
 
 def perform_fits(fits_file):
     fits_file.get_spectra()
+    # gaussfit.get_true_peaks(fits_file) # modifies the fits_file and saves each
     fits_file.plot_spectra(show=True)
 
 def display_centers(fits_file):
