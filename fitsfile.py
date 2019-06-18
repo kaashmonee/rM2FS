@@ -1,14 +1,8 @@
 from astropy.io import fits
-from astropy.table import Table
-from astropy import modeling
 import matplotlib
 import numpy as np
-import os
-import argparse
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-import cv2
-import time
 import scipy
 from spectrum import Spectrum
 
