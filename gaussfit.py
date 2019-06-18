@@ -39,7 +39,7 @@ def get_true_peaks(fits_file):
             rng = (y0, y2)
 
             # This does the fitting and the peak.true_center setting.
-            fit_gaussian(fits_file, rng, peak)
+            fit_gaussian(fits_file, rng, peak, show=True)
 
 
 
@@ -57,7 +57,7 @@ def gauss(x, a, x0, sigma):
     return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
 
 
-def fit_gaussian(fits_file, rng, peak):
+def fit_gaussian(fits_file, rng, peak, show=False):
     """
     This function obtains the fitting parameters for each Gaussian profile. 
     This includes the mean, expected max, and the standard deviation. It then 
@@ -78,7 +78,6 @@ def fit_gaussian(fits_file, rng, peak):
 
     # Grabs the intensity at each y value and the given x value
     intensity = fits_image[yrange, peak.x]
-    ax.scatter(yrange, intensity, color="red")
     
 
     # safety check to ensure same number of my points
@@ -109,17 +108,19 @@ def fit_gaussian(fits_file, rng, peak):
     mean_y = popt[1]
     peak.true_center = mean_y
 
-    ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
+    if show:
+        ax.scatter(yrange, intensity, color="red")
+        ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
 
-    ax.annotate(
-        "gaussian peak:(" + str(mean_y) + "," + str(mean_intensity) + ")", 
-        xy=(mean_y, mean_intensity), 
-        xytext=(mean_y+1, mean_intensity+1.5), 
-        arrowprops=dict(facecolor="black", shrink=0.5)
-    )
+        ax.annotate(
+            "gaussian peak:(" + str(mean_y) + "," + str(mean_intensity) + ")", 
+            xy=(mean_y, mean_intensity), 
+            xytext=(mean_y+1, mean_intensity+1.5), 
+            arrowprops=dict(facecolor="black", shrink=0.5)
+        )
 
-    plt.xlabel("ypixel")
-    plt.ylabel("intensity")
-    plt.title("Intensity v. ypixel for " + fits_file.get_file_name() + " at x=" + str(peak.x))
-    plt.show()
+        plt.xlabel("ypixel")
+        plt.ylabel("intensity")
+        plt.title("Intensity v. ypixel for " + fits_file.get_file_name() + " at x=" + str(peak.x))
+        plt.show()
 
