@@ -1,6 +1,8 @@
 import argparse
 from fitsfile import FitsFile
 import util
+import os
+import gaussfit
 
 def main():
     # Doing brief cmd line parsing.
@@ -32,9 +34,10 @@ def main():
         # TODO: ensure that the fits are still there, without going through the 
         # perform_fits pipeline.
         util.perform_fits(fits_file)
-        util.save(fits_file)
-        fits_file = util.load(fn + ".pkl")
-        util.perform_fits(fits_file)
+        # util.save(fits_file)
+        # fits_file = util.load(fn + ".pkl")
+        # util.perform_fits(fits_file)
+        gaussfit.get_true_peaks(fits_file)
 
 
 

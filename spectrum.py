@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from astropy import modeling
+from gaussfit import Peak
 
 
 class Spectrum:
@@ -26,6 +27,10 @@ class Spectrum:
         
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
+
+        # Generating peaks after the spectrum is cleaned and narrowed
+        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
+
 
     def plot(self, ax, show=False):
         """

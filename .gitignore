@@ -3,4 +3,5 @@ questions.md
 __pycache__
 *.fits
 *.pkl
+questions.txt
 

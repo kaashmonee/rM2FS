@@ -1,14 +1,8 @@
 from astropy.io import fits
-from astropy.table import Table
-from astropy import modeling
 import matplotlib
 import numpy as np
-import os
-import argparse
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-import cv2
-import time
 import scipy
 from spectrum import Spectrum
 
@@ -27,12 +21,6 @@ class FitsFile:
         self.log_image_data = np.log(self.image_data)
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
-
-
-    def save(self):
-        save_dict = {
-            "fits_file": self.fits_file
-        }
 
 
     def get_dimensions(self):
