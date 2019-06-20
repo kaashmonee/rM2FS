@@ -11,35 +11,6 @@ class Peak:
         self.true_center = None
 
 
-def get_true_peaks(fits_file, show=False):
-    """
-    This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
-    it finds the center of the Gaussian and assigns it to the peak.true_center
-    parameter of each Peak object in each Spectrum. 
-    """
-
-    import pdb 
-    image_height = fits_file.image_data.shape[1]
-
-    for spec_ind, spectrum in enumerate(fits_file.spectra):
-        for peak in spectrum.peaks:
-            y1 = peak.y
-            left_range = 5
-            right_range = 6
-            y0 = y1-left_range
-            y2 = y1+right_range
-
-            # Ensure that the ranges do not exceed the width and height of the 
-            # image
-            if y0 <= 0: y0 = 0
-            if y2 >= image_height: y2 = image_height
-            rng = (y0, y2)
-
-            # This does the fitting and the peak.true_center setting.
-            fit_gaussian(fits_file, rng, peak, show=show)
-
-
-
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
