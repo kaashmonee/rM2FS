@@ -28,7 +28,7 @@ def export_spectra(file_name, spectra):
     np.savetxt(file_name, polynomials, delimiter=",")
 
 def perform_fits(fits_file):
-    # gaussfit.get_true_peaks(fits_file) # modifies the fits_file and saves each
+    # fits_file.get_true_peaks()
     fits_file.plot_spectra(show=True)
 
 def display_centers(fits_file):
