@@ -52,8 +52,7 @@ class Spectrum:
         # self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
         # f = self.__construct_function(self.poly) # returns the function to apply
 
-        f = scipy.interpolate.interp1d(self.xvalues, self.yvalues, 
-                                       fill_value="extrapolate")
+        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
 
         self.spectrum_fit_function = f
 
