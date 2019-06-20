@@ -6,6 +6,7 @@ from matplotlib.colors import LogNorm
 import scipy
 from spectrum import Spectrum
 import gaussfit
+import sys
 
 ### global variable for button toggling purposes, modeled off the matplotlib
 # documentation here: https://matplotlib.org/2.1.2/gallery/event_handling/keypress_demo.html.
@@ -82,6 +83,10 @@ class FitsFile:
 
         print("Fitting gaussian...")
         for spec_ind, spectrum in enumerate(self.spectra):
+
+            sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
+            sys.stdout.flush()
+
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
