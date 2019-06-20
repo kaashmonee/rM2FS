@@ -65,8 +65,6 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     Gaussian from which we can obtain each peak.
     """
     fits_image = fits_file.image_data
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
     
     # At a particular x value, this obtains the y values in the image so that 
     # we can get a set of points for which we want to fit the Gaussian.
@@ -109,6 +107,8 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     peak.true_center = mean_y
 
     if show:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         ax.scatter(yrange, intensity, color="red")
         ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
 
