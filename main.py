@@ -35,9 +35,6 @@ def main():
         # perform_fits pipeline.
         util.perform_fits(fits_file)
 
-
-
-
     if args.export is not None:
         file_name = args.export
         export_spectra(file_name, spectra) # exports the spectrum to a txt.
