@@ -11,7 +11,7 @@ class Peak:
         self.true_center = None
 
 
-def get_true_peaks(fits_file):
+def get_true_peaks(fits_file, show=False):
     """
     This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
     it finds the center of the Gaussian and assigns it to the peak.true_center
@@ -39,7 +39,7 @@ def get_true_peaks(fits_file):
             rng = (y0, y2)
 
             # This does the fitting and the peak.true_center setting.
-            fit_gaussian(fits_file, rng, peak, show=True)
+            fit_gaussian(fits_file, rng, peak, show=show)
 
 
 
