@@ -48,10 +48,6 @@ class Spectrum:
         This function fits a polynomial of degree `degree` and returns the output on 
         the input domain. 
         """
-        # what kind of polynomial should be fit here?
-        # self.poly = np.polyfit(self.xvalues, self.yvalues, degree)
-        # f = self.__construct_function(self.poly) # returns the function to apply
-
         f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
 
         self.spectrum_fit_function = f
@@ -64,27 +60,6 @@ class Spectrum:
         return fit_plot
 
     
-    # Deprecated after PR #36. This routine is useful for polynomial fitting,
-    # but instead we are using the scipy spline interpolation routine.
-    # It will be left here for documentation purposes for now, but should be
-    # removed later if deemed unnecessary.
-    """ 
-    def __construct_function(self, poly_list):
-        '''
-        Constructs a polynomial function based on the coefficients
-        in the polynomial list and returns the function.
-        '''
-        def f(x):
-            y = np.zeros(len(x))
-            for i, c in enumerate(poly_list[::-1]):
-                y += c * x**i
-
-            return y
-
-        return f
-    """
-
-
     def __narrow_spectrum(self):
         """
         This function narrows the spectrum down from a naive peak finding method

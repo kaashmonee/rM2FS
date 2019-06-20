@@ -11,38 +11,6 @@ class Peak:
         self.true_center = None
 
 
-def get_true_peaks(fits_file):
-    """
-    This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
-    it finds the center of the Gaussian and assigns it to the peak.true_center
-    parameter of each Peak object in each Spectrum. 
-    """
-
-    import pdb 
-    image_height = fits_file.image_data.shape[1]
-    # Generate the spectra if this already hasn't been done.
-    if fits_file.spectra is None:
-        fits_file.get_spectra()
-
-    for spec_ind, spectrum in enumerate(fits_file.spectra):
-        for peak in spectrum.peaks:
-            y1 = peak.y
-            left_range = 5
-            right_range = 6
-            y0 = y1-left_range
-            y2 = y1+right_range
-
-            # Ensure that the ranges do not exceed the width and height of the 
-            # image
-            if y0 <= 0: y0 = 0
-            if y2 >= image_height: y2 = image_height
-            rng = (y0, y2)
-
-            # This does the fitting and the peak.true_center setting.
-            fit_gaussian(fits_file, rng, peak, show=True)
-
-
-
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
@@ -65,8 +33,6 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     Gaussian from which we can obtain each peak.
     """
     fits_image = fits_file.image_data
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
     
     # At a particular x value, this obtains the y values in the image so that 
     # we can get a set of points for which we want to fit the Gaussian.
@@ -109,6 +75,8 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     peak.true_center = mean_y
 
     if show:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         ax.scatter(yrange, intensity, color="red")
         ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
 

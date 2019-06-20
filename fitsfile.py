@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import scipy
 from spectrum import Spectrum
+import gaussfit
 
 ### global variable for button toggling purposes, modeled off the matplotlib
 # documentation here: https://matplotlib.org/2.1.2/gallery/event_handling/keypress_demo.html.
@@ -21,6 +22,8 @@ class FitsFile:
         self.log_image_data = np.log(self.image_data)
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
+
+        self.__get_spectra()
 
 
     def get_dimensions(self):
@@ -67,6 +70,35 @@ class FitsFile:
             plt.show()
 
 
+    def get_true_peaks(self, show=False):
+        """
+        This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
+        it finds the center of the Gaussian and assigns it to the peak.true_center
+        parameter of each Peak object in each Spectrum. 
+        """
+
+        import pdb 
+        image_height = self.image_data.shape[1]
+
+        for spec_ind, spectrum in enumerate(self.spectra):
+            for peak in spectrum.peaks:
+                y1 = peak.y
+                left_range = 5
+                right_range = 6
+                y0 = y1-left_range
+                y2 = y1+right_range
+
+                # Ensure that the ranges do not exceed the width and height of the 
+                # image
+                if y0 <= 0: y0 = 0
+                if y2 >= image_height: y2 = image_height
+                rng = (y0, y2)
+
+                # This does the fitting and the peak.true_center setting.
+                gaussfit.fit_gaussian(self, rng, peak, show=show)
+
+
+
     def __get_intensity_array(self, xpixel=1000):
         """
         At a particular xpixle, (default is 1000), this function returns
@@ -89,7 +121,7 @@ class FitsFile:
         return peaks[0]
 
 
-    def get_spectra(self):
+    def __get_spectra(self):
         
         # This is the pixel we use to determine how many spectra there are
         prime_pixel = 1000 
