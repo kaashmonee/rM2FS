@@ -80,6 +80,7 @@ class FitsFile:
         import pdb 
         image_height = self.image_data.shape[1]
 
+        print("Fitting gaussian...")
         for spec_ind, spectrum in enumerate(self.spectra):
             for peak in spectrum.peaks:
                 y1 = peak.y
