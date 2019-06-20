@@ -20,9 +20,6 @@ def get_true_peaks(fits_file, show=False):
 
     import pdb 
     image_height = fits_file.image_data.shape[1]
-    # Generate the spectra if this already hasn't been done.
-    if fits_file.spectra is None:
-        fits_file.get_spectra()
 
     for spec_ind, spectrum in enumerate(fits_file.spectra):
         for peak in spectrum.peaks:

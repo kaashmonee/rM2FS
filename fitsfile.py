@@ -22,6 +22,8 @@ class FitsFile:
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
 
+        self.__get_spectra()
+
 
     def get_dimensions(self):
         return (self.rows, self.cols)
@@ -89,7 +91,7 @@ class FitsFile:
         return peaks[0]
 
 
-    def get_spectra(self):
+    def __get_spectra(self):
         
         # This is the pixel we use to determine how many spectra there are
         prime_pixel = 1000 
