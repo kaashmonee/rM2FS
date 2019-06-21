@@ -31,12 +31,21 @@ class Spectrum:
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
+        self.has_true_peak_vals = False
+
 
     def plot(self, ax, show=False):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        scatter_plot = ax.scatter(self.xvalues, self.yvalues)
+
+        if self.has_true_peak_vals:
+            true_yvalues = np.array([peak.true_center for peak in self.peaks])
+            print("true_yvalues:", true_yvalues, "\nself.yvalues:", self.yvalues)
+            scatter_plot = ax.scatter(self.xvalues, true_yvalues)
+
+        else:
+            scatter_plot = ax.scatter(self.xvalues, self.yvalues)
         
         if show: plt.show()
         

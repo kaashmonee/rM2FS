@@ -30,10 +30,13 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, show=False):
+    def plot_spectra(self, show=False, num_to_plot=None):
         """
-       Plots the spectra on top of the image.
+        Plots the spectra on top of the image.
         """
+
+        if num_to_plot is None: 
+            num = len(self.spectra)
 
         # importing inside function to avoid circular dependency issues
         import util
@@ -54,7 +57,8 @@ class FitsFile:
         spectrum_scatter_plots = []
         fit_plots = []
 
-        for spectrum in self.spectra:
+        print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
+        for spectrum in self.spectra[:num_to_plot]:
 
             spectrum_scatter = spectrum.plot(ax_plt)
             spectrum.fit_spectrum(np.arange(0, image_cols), degree)
@@ -87,6 +91,9 @@ class FitsFile:
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
 
+            if spec_ind == 10:
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
+
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
@@ -102,6 +109,9 @@ class FitsFile:
 
                 # This does the fitting and the peak.true_center setting.
                 gaussfit.fit_gaussian(self, rng, peak, show=show)
+
+            spectrum.has_true_peak_vals = True
+
 
 
 
