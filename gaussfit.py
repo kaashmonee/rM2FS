@@ -53,7 +53,8 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     x = np.array(yrange)
     y = np.array(intensity)
 
-    # We use a continuous domain as cited here so that we have a smooth Gaussian
+    # We use a continuous domain as suggested here so that we have a 
+    # smooth Gaussian:
     # https://stackoverflow.com/questions/42026554/fitting-a-better-gaussian-to-data-points
     x_continuous = np.linspace(yrange[0], yrange[-1], 100)
 

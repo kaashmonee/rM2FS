@@ -32,6 +32,7 @@ class Spectrum:
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
         self.has_true_peak_vals = False
+        self.true_yvals = None
 
 
     def plot(self, ax, show=False):
@@ -40,9 +41,7 @@ class Spectrum:
         """
 
         if self.has_true_peak_vals:
-            true_yvalues = np.array([peak.true_center for peak in self.peaks])
-            print("true_yvalues:", true_yvalues, "\nself.yvalues:", self.yvalues)
-            scatter_plot = ax.scatter(self.xvalues, true_yvalues)
+            scatter_plot = ax.scatter(self.xvalues, self.true_yvals)
 
         else:
             scatter_plot = ax.scatter(self.xvalues, self.yvalues)
@@ -54,10 +53,11 @@ class Spectrum:
 
     def fit_spectrum(self, domain, degree):
         """
-        This function fits a polynomial of degree `degree` and returns the output on 
-        the input domain. 
+        This function fits a polynomial of degree `degree` and returns the 
+        output on the input domain. 
         """
-        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
+        yvals = self.true_yvals if self.has_true_peak_vals else self.yvalues
+        f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
 
         self.spectrum_fit_function = f
 

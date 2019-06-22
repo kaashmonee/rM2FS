@@ -94,6 +94,19 @@ class FitsFile:
             if spec_ind == 10:
                 self.plot_spectra(show=True, num_to_plot=spec_ind)
 
+            if spec_ind in [35, 36, 37, 38, 39, 40]:
+                print("spec_ind:", spec_ind)
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
+            # if spec_ind == 35:
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
+            # if spec_ind == 40:
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
+            # if spec_ind == 45:
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
+            # if spec_ind == 50:
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
+
+
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
@@ -111,6 +124,7 @@ class FitsFile:
                 gaussfit.fit_gaussian(self, rng, peak, show=show)
 
             spectrum.has_true_peak_vals = True
+            spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
 
 
 
