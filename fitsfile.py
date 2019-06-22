@@ -197,7 +197,7 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
-            spectra.append(Spectrum(xvalues, yvalues, self.image_data))
+            spectra.append(Spectrum(xvalues, yvalues))
 
         self.spectra = spectra
 

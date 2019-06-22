@@ -9,10 +9,9 @@ class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    def __init__(self, xvalues, yvalues, image):
+    def __init__(self, xvalues, yvalues):
         self.xvalues = xvalues
         self.yvalues = yvalues
-        self.image = image
 
         self.has_true_peak_vals = False
         self.true_yvals = None
