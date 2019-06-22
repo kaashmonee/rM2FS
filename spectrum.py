@@ -15,6 +15,9 @@ class Spectrum:
         self.is_narrowed = False
         self.image = image
 
+        self.has_true_peak_vals = False
+        self.true_yvals = None
+
         xlen = len(xvalues)
         ylen = len(yvalues)
 
@@ -23,7 +26,7 @@ class Spectrum:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
 
         # Narrow the spectrum immediately upon initialization.
-        self.__narrow_spectrum()
+        self.narrow_spectrum()
         
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
@@ -31,8 +34,6 @@ class Spectrum:
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
-        self.has_true_peak_vals = False
-        self.true_yvals = None
 
 
     def plot(self, ax, show=False):
@@ -69,7 +70,7 @@ class Spectrum:
         return fit_plot
 
     
-    def __narrow_spectrum(self):
+    def narrow_spectrum(self):
         """
         This function narrows the spectrum down from a naive peak finding method
         to ensuring that the peaks are no more than 2 pixels away from each
@@ -80,11 +81,15 @@ class Spectrum:
         if self.is_narrowed is True:
             return
 
-        prev_y_pixel = self.yvalues[0]
+        yvals = self.yvalues
+        if self.has_true_peak_vals:
+            yvals = self.true_yvals
+
+        prev_y_pixel = yvals[0]
         narrowed_y = []
         narrowed_x = []
 
-        for ind, ypixel in enumerate(self.yvalues):
+        for ind, ypixel in enumerate(yvals):
             if ypixel >= prev_y_pixel - 1 and ypixel <= prev_y_pixel + 1:
                 narrowed_y.append(ypixel)
                 narrowed_x.append(self.xvalues[ind])
@@ -92,7 +97,11 @@ class Spectrum:
             prev_y_pixel = ypixel
 
         self.xvalues = np.array(narrowed_x)
-        self.yvalues = np.array(narrowed_y)
+
+        if self.has_true_peak_vals: 
+            self.true_yvals = narrowed_y
+        else: 
+            self.yvalues = np.array(narrowed_y)
 
         self.is_narrowed = True
 
