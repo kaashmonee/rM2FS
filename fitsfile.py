@@ -91,22 +91,6 @@ class FitsFile:
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
 
-            if spec_ind == 10:
-                self.plot_spectra(show=True, num_to_plot=spec_ind)
-
-            if spec_ind in range(25, 31):
-                print("spec_ind:", spec_ind)
-                self.plot_spectra(show=True, num_to_plot=spec_ind)
-            # if spec_ind == 35:
-            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
-            # if spec_ind == 40:
-            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
-            # if spec_ind == 45:
-            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
-            # if spec_ind == 50:
-            #     self.plot_spectra(show=True, num_to_plot=spec_ind)
-
-
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
