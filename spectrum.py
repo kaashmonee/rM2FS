@@ -12,7 +12,6 @@ class Spectrum:
     def __init__(self, xvalues, yvalues, image):
         self.xvalues = xvalues
         self.yvalues = yvalues
-        self.is_narrowed = False
         self.image = image
 
         self.has_true_peak_vals = False
@@ -77,10 +76,6 @@ class Spectrum:
         other.
         """
 
-        # Do not narrow an already narrowed spectrum.
-        if self.is_narrowed is True:
-            return
-
         yvals = self.yvalues
         if self.has_true_peak_vals:
             yvals = self.true_yvals
@@ -99,11 +94,10 @@ class Spectrum:
         self.xvalues = np.array(narrowed_x)
 
         if self.has_true_peak_vals: 
-            self.true_yvals = narrowed_y
+            self.true_yvals = np.array(narrowed_y)
         else: 
             self.yvalues = np.array(narrowed_y)
 
-        self.is_narrowed = True
 
     def __remove_overlapping_spectrum(self):
 
