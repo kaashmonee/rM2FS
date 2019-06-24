@@ -34,7 +34,7 @@ class Spectrum:
 
 
 
-    def plot(self, show=False):
+    def plot(self):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
@@ -44,8 +44,6 @@ class Spectrum:
 
         else:
             scatter_plot = plt.scatter(self.xvalues, self.yvalues)
-        
-        if show: plt.show()
         
         return scatter_plot
 
@@ -57,8 +55,6 @@ class Spectrum:
         """
         yvals = self.true_yvals if self.true_yvals is not None else self.yvalues
         f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
-
-        self.spectrum_fit_function = f
 
         self.output = f(domain)
 
@@ -99,7 +95,11 @@ class Spectrum:
 
 
     def __remove_overlapping_spectrum(self):
-        # import pdb; pdb.set_trace()
+        """
+        This routine removes the part of the spectrum on either side that is 
+        responsible that overlaps. This way, we only use the middle spectrum for 
+        our analysis.
+        """
 
         # Finds the differences between 2 adjacent elements in the array.
         diff_array = np.ediff1d(self.xvalues) 
