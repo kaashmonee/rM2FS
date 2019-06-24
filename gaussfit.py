@@ -60,6 +60,7 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # These are parameters used to construct the Gaussian.
     # We divide by sum(y) for the reason cited here:
     # https://stackoverflow.com/questions/44398770/python-gaussian-curve-fitting-gives-straight-line-supplied-amplitude-of-y
+    """TODO: (Q) What should we choose for our mean sigma and peak_value values?"""
     peak_value = y.max()
     # mean = sum(x*y)/sum(y)
     n = len(y)
