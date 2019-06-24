@@ -111,7 +111,7 @@ class FitsFile:
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
-            if spec_ind == 20:
+            if spec_ind == 5:
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
             if spec_ind == 60:
