@@ -13,7 +13,6 @@ class Spectrum:
         self.xvalues = xvalues
         self.yvalues = yvalues
 
-        self.has_true_peak_vals = False
         self.true_yvals = None
 
         xlen = len(xvalues)
@@ -23,27 +22,28 @@ class Spectrum:
         if xlen != ylen:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
 
-        # Narrow the spectrum immediately upon initialization.
-        self.narrow_spectrum()
-        
+
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
+
+        # Narrow the spectrum immediately upon initialization.
+        self.narrow_spectrum()
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
 
 
-    def plot(self, ax, show=False):
+    def plot(self, show=False):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
 
-        if self.has_true_peak_vals:
-            scatter_plot = ax.scatter(self.xvalues, self.true_yvals)
+        if self.true_yvals is not None:
+            scatter_plot = plt.scatter(self.xvalues, self.true_yvals)
 
         else:
-            scatter_plot = ax.scatter(self.xvalues, self.yvalues)
+            scatter_plot = plt.scatter(self.xvalues, self.yvalues)
         
         if show: plt.show()
         
@@ -55,7 +55,7 @@ class Spectrum:
         This function fits a polynomial of degree `degree` and returns the 
         output on the input domain. 
         """
-        yvals = self.true_yvals if self.has_true_peak_vals else self.yvalues
+        yvals = self.true_yvals if self.true_yvals is not None else self.yvalues
         f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
 
         self.spectrum_fit_function = f
@@ -63,8 +63,8 @@ class Spectrum:
         self.output = f(domain)
 
 
-    def plot_fit(self, ax):
-        fit_plot = ax.plot(self.output)
+    def plot_fit(self):
+        fit_plot = plt.plot(self.output)
         return fit_plot
 
     
@@ -76,7 +76,7 @@ class Spectrum:
         """
 
         yvals = self.yvalues
-        if self.has_true_peak_vals:
+        if self.true_yvals is not None:
             yvals = self.true_yvals
 
         prev_y_pixel = yvals[0]
@@ -88,17 +88,18 @@ class Spectrum:
                 narrowed_y.append(ypixel)
                 narrowed_x.append(self.xvalues[ind])
 
-            prev_y_pixel = ypixel
+                prev_y_pixel = ypixel
 
         self.xvalues = np.array(narrowed_x)
 
-        if self.has_true_peak_vals: 
+        if self.true_yvals is not None: 
             self.true_yvals = np.array(narrowed_y)
         else: 
             self.yvalues = np.array(narrowed_y)
 
 
     def __remove_overlapping_spectrum(self):
+        # import pdb; pdb.set_trace()
 
         # Finds the differences between 2 adjacent elements in the array.
         diff_array = np.ediff1d(self.xvalues) 

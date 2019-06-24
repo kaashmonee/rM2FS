@@ -45,10 +45,7 @@ class FitsFile:
         fig = plt.figure()
         thresholded_im = util.threshold_image(self.image_data)
 
-        ax_im = fig.add_subplot(1, 1, 1)
-        ax_plt = fig.add_subplot(1, 1, 1)
-
-        ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
+        plt.imshow(thresholded_im, origin="lower", cmap="gray")
         
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]
@@ -60,9 +57,9 @@ class FitsFile:
         print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
         for spectrum in self.spectra[:num_to_plot]:
 
-            spectrum_scatter = spectrum.plot(ax_plt)
+            spectrum_scatter = spectrum.plot()
             spectrum.fit_spectrum(np.arange(0, image_cols), degree)
-            fit_plot = spectrum.plot_fit(ax_plt)
+            fit_plot = spectrum.plot_fit()
 
             spectrum_scatter_plots.append(spectrum_scatter)
             fit_plots.append(fit_plot)
@@ -72,6 +69,8 @@ class FitsFile:
             plt.xlabel("xpixel")
             plt.ylabel("ypixel") 
             plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits")
+            plt.xlim(0, self.get_dimensions()[1])
+            plt.ylim(0, self.get_dimensions()[0])
             plt.show()
 
 
@@ -82,7 +81,6 @@ class FitsFile:
         parameter of each Peak object in each Spectrum. 
         """
 
-        import pdb 
         image_height = self.image_data.shape[1]
 
         print("Fitting gaussian...")
@@ -90,6 +88,9 @@ class FitsFile:
 
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
+
+
+
 
             for peak in spectrum.peaks:
                 y1 = peak.y
@@ -107,9 +108,26 @@ class FitsFile:
                 # This does the fitting and the peak.true_center setting.
                 gaussfit.fit_gaussian(self, rng, peak, show=show)
 
-            spectrum.has_true_peak_vals = True
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
+
+            if spec_ind == 20:
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+            if spec_ind == 60:
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+            if spec_ind == 65:
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+            if spec_ind == 100:
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
+
+            if spec_ind == 120:
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
+
+            if spec_ind == len(self.spectra) - 1:
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
 
 
 
