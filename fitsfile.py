@@ -68,7 +68,7 @@ class FitsFile:
         if show: 
             plt.xlabel("xpixel")
             plt.ylabel("ypixel") 
-            plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits")
+            plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
             plt.xlim(0, self.get_dimensions()[1])
             plt.ylim(0, self.get_dimensions()[0])
             plt.show()
