@@ -89,9 +89,6 @@ class FitsFile:
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
 
-
-
-
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
@@ -106,7 +103,10 @@ class FitsFile:
                 rng = (y0, y2)
 
                 # This does the fitting and the peak.true_center setting.
-                gaussfit.fit_gaussian(self, rng, peak, show=show)
+                if spec_ind == 57:
+                    gaussfit.fit_gaussian(self, rng, peak, show=True)
+                else:
+                    gaussfit.fit_gaussian(self, rng, peak, show=False)
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
