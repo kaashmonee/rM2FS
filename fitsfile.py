@@ -110,21 +110,16 @@ class FitsFile:
                 rng = (y0, y2)
 
                 # This does the fitting and the peak.true_center setting.
-                # if spec_ind == 57:
-                #     gaussfit.fit_gaussian(self, rng, peak, show=True)
-                # else:
                 gaussfit.fit_gaussian(self, rng, peak, show=False)
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
-            if spec_ind == 55:
+            if spec_ind == 60:
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            # if spec_ind in range(60, 121, 5):
-            #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
             if spec_ind == len(self.spectra):
                 self.plot_spectra(show=True, num_to_plot=spec_ind)
