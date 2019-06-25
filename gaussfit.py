@@ -3,6 +3,7 @@ import numpy as np
 import scipy
 from astropy import modeling
 import matplotlib.pyplot as plt
+import math
 
 class Peak:
     def __init__(self, x, y):
@@ -14,15 +15,13 @@ class Peak:
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
-def gauss(x, a, x0, sigma):
+def gauss(x, amp, cen, wid):
     """
-    This is the Gaussian function. This takes the following parameters:
-    x: xvalues
-    a: yvalues
-    x0: ?
-    sigma: standard deviation
+    Gauss fitting function. Using the precision (tau) to define the width of the
+    distribution, as mentioned here: 
+    https://en.wikipedia.org/wiki/Normal_distribution.
     """
-    return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
+    return (amp / ((2*math.pi)**0.5 * wid)) * scipy.exp(-(x-cen)**2 / (2*wid**2))
 
 
 def fit_gaussian(fits_file, rng, peak, show=False):
@@ -45,7 +44,6 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # Grabs the intensity at each y value and the given x value
     intensity = fits_image[yrange, peak.x]
     
-
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
 
@@ -53,7 +51,8 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     x = np.array(yrange)
     y = np.array(intensity)
 
-    # We use a continuous domain as cited here so that we have a smooth Gaussian
+    # We use a continuous domain as suggested here so that we have a 
+    # smooth Gaussian:
     # https://stackoverflow.com/questions/42026554/fitting-a-better-gaussian-to-data-points
     x_continuous = np.linspace(yrange[0], yrange[-1], 100)
 
@@ -67,7 +66,8 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # To determine the p0 values, we used the information here:
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.
     popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
-                                      p0=[peak_value, mean, sigma], maxfev=5000)
+                                          p0=[peak_value, mean, sigma], 
+                                          maxfev=10000)
 
 
     mean_intensity = popt[0]

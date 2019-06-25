@@ -9,11 +9,11 @@ class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    def __init__(self, xvalues, yvalues, image):
+    def __init__(self, xvalues, yvalues):
         self.xvalues = xvalues
         self.yvalues = yvalues
-        self.is_narrowed = False
-        self.image = image
+
+        self.true_yvals = None
 
         xlen = len(xvalues)
         ylen = len(yvalues)
@@ -22,72 +22,84 @@ class Spectrum:
         if xlen != ylen:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
 
-        # Narrow the spectrum immediately upon initialization.
-        self.__narrow_spectrum()
-        
+
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
+
+        # Narrow the spectrum immediately upon initialization.
+        self.narrow_spectrum()
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
 
-    def plot(self, ax, show=False):
+
+    def plot(self):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        scatter_plot = ax.scatter(self.xvalues, self.yvalues)
-        
-        if show: plt.show()
+
+        if self.true_yvals is not None:
+            scatter_plot = plt.scatter(self.xvalues, self.true_yvals)
+
+        else:
+            scatter_plot = plt.scatter(self.xvalues, self.yvalues)
         
         return scatter_plot
 
 
     def fit_spectrum(self, domain, degree):
         """
-        This function fits a polynomial of degree `degree` and returns the output on 
-        the input domain. 
+        This function fits a polynomial of degree `degree` and returns the 
+        output on the input domain. 
         """
-        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
-
-        self.spectrum_fit_function = f
+        yvals = self.true_yvals if self.true_yvals is not None else self.yvalues
+        f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
 
         self.output = f(domain)
 
 
-    def plot_fit(self, ax):
-        fit_plot = ax.plot(self.output)
+    def plot_fit(self):
+        fit_plot = plt.plot(self.output)
         return fit_plot
 
     
-    def __narrow_spectrum(self):
+    def narrow_spectrum(self):
         """
         This function narrows the spectrum down from a naive peak finding method
         to ensuring that the peaks are no more than 2 pixels away from each
         other.
         """
 
-        # Do not narrow an already narrowed spectrum.
-        if self.is_narrowed is True:
-            return
+        yvals = self.yvalues
+        if self.true_yvals is not None:
+            yvals = self.true_yvals
 
-        prev_y_pixel = self.yvalues[0]
+        prev_y_pixel = yvals[0]
         narrowed_y = []
         narrowed_x = []
 
-        for ind, ypixel in enumerate(self.yvalues):
+        for ind, ypixel in enumerate(yvals):
             if ypixel >= prev_y_pixel - 1 and ypixel <= prev_y_pixel + 1:
                 narrowed_y.append(ypixel)
                 narrowed_x.append(self.xvalues[ind])
 
-            prev_y_pixel = ypixel
+                prev_y_pixel = ypixel
 
         self.xvalues = np.array(narrowed_x)
-        self.yvalues = np.array(narrowed_y)
 
-        self.is_narrowed = True
+        if self.true_yvals is not None: 
+            self.true_yvals = np.array(narrowed_y)
+        else: 
+            self.yvalues = np.array(narrowed_y)
+
 
     def __remove_overlapping_spectrum(self):
+        """
+        This routine removes the part of the spectrum on either side that is 
+        responsible that overlaps. This way, we only use the middle spectrum for 
+        our analysis.
+        """
 
         # Finds the differences between 2 adjacent elements in the array.
         diff_array = np.ediff1d(self.xvalues) 

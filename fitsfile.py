@@ -6,6 +6,7 @@ from matplotlib.colors import LogNorm
 import scipy
 from spectrum import Spectrum
 import gaussfit
+import sys
 
 ### global variable for button toggling purposes, modeled off the matplotlib
 # documentation here: https://matplotlib.org/2.1.2/gallery/event_handling/keypress_demo.html.
@@ -29,10 +30,13 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, show=False):
+    def plot_spectra(self, show=False, num_to_plot=None):
         """
-       Plots the spectra on top of the image.
+        Plots the spectra on top of the image.
         """
+
+        if num_to_plot is None: 
+            num_to_plot = len(self.spectra)
 
         # importing inside function to avoid circular dependency issues
         import util
@@ -41,10 +45,7 @@ class FitsFile:
         fig = plt.figure()
         thresholded_im = util.threshold_image(self.image_data)
 
-        ax_im = fig.add_subplot(1, 1, 1)
-        ax_plt = fig.add_subplot(1, 1, 1)
-
-        ax_im.imshow(thresholded_im, origin="lower", cmap="gray")
+        plt.imshow(thresholded_im, origin="lower", cmap="gray")
         
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]
@@ -53,11 +54,13 @@ class FitsFile:
         spectrum_scatter_plots = []
         fit_plots = []
 
-        for spectrum in self.spectra:
+        print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
 
-            spectrum_scatter = spectrum.plot(ax_plt)
+        for spectrum in self.spectra[:num_to_plot]:
+
+            spectrum_scatter = spectrum.plot()
             spectrum.fit_spectrum(np.arange(0, image_cols), degree)
-            fit_plot = spectrum.plot_fit(ax_plt)
+            fit_plot = spectrum.plot_fit()
 
             spectrum_scatter_plots.append(spectrum_scatter)
             fit_plots.append(fit_plot)
@@ -66,7 +69,9 @@ class FitsFile:
         if show: 
             plt.xlabel("xpixel")
             plt.ylabel("ypixel") 
-            plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits")
+            plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
+            plt.xlim(0, self.get_dimensions()[1])
+            plt.ylim(0, self.get_dimensions()[0])
             plt.show()
 
 
@@ -77,11 +82,20 @@ class FitsFile:
         parameter of each Peak object in each Spectrum. 
         """
 
-        import pdb 
         image_height = self.image_data.shape[1]
 
         print("Fitting gaussian...")
+        import time
+        t1 = time.time()
         for spec_ind, spectrum in enumerate(self.spectra):
+            
+            try:
+                sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
+                sys.stdout.flush()
+            except Exception as e:
+                print("e:", e)
+                print("spec_ind:", spec_ind, len(self.spectra))
+
             for peak in spectrum.peaks:
                 y1 = peak.y
                 left_range = 5
@@ -96,7 +110,20 @@ class FitsFile:
                 rng = (y0, y2)
 
                 # This does the fitting and the peak.true_center setting.
-                gaussfit.fit_gaussian(self, rng, peak, show=show)
+                gaussfit.fit_gaussian(self, rng, peak, show=False)
+
+            spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
+            spectrum.narrow_spectrum()
+
+            if spec_ind == 60:
+                t2 = time.time()
+                print("time taken:", t2-t1)
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+
+            if spec_ind == len(self.spectra):
+                self.plot_spectra(show=True, num_to_plot=spec_ind)
+
 
 
 
@@ -183,7 +210,7 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
-            spectra.append(Spectrum(xvalues, yvalues, self.image_data))
+            spectra.append(Spectrum(xvalues, yvalues))
 
         self.spectra = spectra
 

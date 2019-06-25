@@ -33,7 +33,9 @@ def main():
         # this information
         # TODO: ensure that the fits are still there, without going through the 
         # perform_fits pipeline.
+        import time
         util.perform_fits(fits_file)
+        print("\nDone")
 
     if args.export is not None:
         file_name = args.export
