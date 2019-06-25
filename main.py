@@ -35,6 +35,7 @@ def main():
         # perform_fits pipeline.
         import time
         util.perform_fits(fits_file)
+        print("\nDone")
 
     if args.export is not None:
         file_name = args.export

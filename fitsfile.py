@@ -36,7 +36,7 @@ class FitsFile:
         """
 
         if num_to_plot is None: 
-            num = len(self.spectra)
+            num_to_plot = len(self.spectra)
 
         # importing inside function to avoid circular dependency issues
         import util
@@ -55,6 +55,7 @@ class FitsFile:
         fit_plots = []
 
         print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
+
         for spectrum in self.spectra[:num_to_plot]:
 
             spectrum_scatter = spectrum.plot()
@@ -87,9 +88,13 @@ class FitsFile:
         import time
         t1 = time.time()
         for spec_ind, spectrum in enumerate(self.spectra):
-
-            sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
-            sys.stdout.flush()
+            
+            try:
+                sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
+                sys.stdout.flush()
+            except Exception as e:
+                print("e:", e)
+                print("spec_ind:", spec_ind, len(self.spectra))
 
             for peak in spectrum.peaks:
                 y1 = peak.y
@@ -118,10 +123,10 @@ class FitsFile:
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            if spec_ind in range(60, 121, 5):
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+            # if spec_ind in range(60, 121, 5):
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            if spec_ind == len(self.spectra) - 1:
+            if spec_ind == len(self.spectra):
                 self.plot_spectra(show=True, num_to_plot=spec_ind)
 
 
