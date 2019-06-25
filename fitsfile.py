@@ -89,12 +89,8 @@ class FitsFile:
         t1 = time.time()
         for spec_ind, spectrum in enumerate(self.spectra):
             
-            try:
-                sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
-                sys.stdout.flush()
-            except Exception as e:
-                print("e:", e)
-                print("spec_ind:", spec_ind, len(self.spectra))
+            sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
+            sys.stdout.flush()
 
             for peak in spectrum.peaks:
                 y1 = peak.y
