@@ -62,11 +62,13 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # https://stackoverflow.com/questions/44398770/python-gaussian-curve-fitting-gives-straight-line-supplied-amplitude-of-y
     """TODO: (Q) What should we choose for our mean sigma and peak_value values?"""
     peak_value = y.max()
+    mean = sum(x*y)/sum(y)
+    sigma = sum(y*(x-mean)**2)/sum(y)
     # mean = sum(x*y)/sum(y)
-    n = len(y)
-    mean = sum(y)/n
+    # n = len(y)
+    # mean = sum(y)/n
     # sigma = sum((x-mean)**2)/sum(y)
-    sigma = (1/n * sum(y-mean)**2)**0.5
+    # sigma = (1/n * sum(y-mean)**2)**0.5
 
     # To determine the p0 values, we used the information here:
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.

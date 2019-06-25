@@ -84,6 +84,8 @@ class FitsFile:
         image_height = self.image_data.shape[1]
 
         print("Fitting gaussian...")
+        import time
+        t1 = time.time()
         for spec_ind, spectrum in enumerate(self.spectra):
 
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
@@ -103,28 +105,21 @@ class FitsFile:
                 rng = (y0, y2)
 
                 # This does the fitting and the peak.true_center setting.
-                if spec_ind == 57:
-                    gaussfit.fit_gaussian(self, rng, peak, show=True)
-                else:
-                    gaussfit.fit_gaussian(self, rng, peak, show=False)
+                # if spec_ind == 57:
+                #     gaussfit.fit_gaussian(self, rng, peak, show=True)
+                # else:
+                gaussfit.fit_gaussian(self, rng, peak, show=False)
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
-            if spec_ind == 5:
+            if spec_ind == 55:
+                t2 = time.time()
+                print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            if spec_ind == 60:
+            if spec_ind in range(60, 121, 5):
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
-
-            if spec_ind == 65:
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
-
-            if spec_ind == 100:
-                self.plot_spectra(show=True, num_to_plot=spec_ind)
-
-            if spec_ind == 120:
-                self.plot_spectra(show=True, num_to_plot=spec_ind)
 
             if spec_ind == len(self.spectra) - 1:
                 self.plot_spectra(show=True, num_to_plot=spec_ind)
