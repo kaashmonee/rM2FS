@@ -16,6 +16,11 @@ def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
 def gauss(x, amp, cen, wid):
+    """
+    Gauss fitting function. Using the precision (tau) to define the width of the
+    distribution, as mentioned here: 
+    https://en.wikipedia.org/wiki/Normal_distribution.
+    """
     return (amp / ((2*math.pi)**0.5 * wid)) * scipy.exp(-(x-cen)**2 / (2*wid**2))
 
 
