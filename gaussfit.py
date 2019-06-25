@@ -3,6 +3,7 @@ import numpy as np
 import scipy
 from astropy import modeling
 import matplotlib.pyplot as plt
+import math
 
 class Peak:
     def __init__(self, x, y):
@@ -14,15 +15,18 @@ class Peak:
 def non_int_to_int(iterable):
     return [int(x) for x in iterable]
 
-def gauss(x, a, x0, sigma):
-    """
-    This is the Gaussian function. This takes the following parameters:
-    x: xvalues
-    a: yvalues
-    x0: ?
-    sigma: standard deviation
-    """
-    return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
+# def gauss(x, a, x0, sigma):
+#     """
+#     This is the Gaussian function. This takes the following parameters:
+#     x: xvalues
+#     a: yvalues
+#     x0: ?
+#     sigma: standard deviation
+#     """
+#     return a*scipy.exp(-x*(x-x0)**2/(2*sigma**2))
+
+def gauss(x, amp, cen, wid):
+    return (amp / ((2*math.pi)**0.5 * wid)) * scipy.exp(-(x-cen)**2 / (2*wid**2))
 
 
 def fit_gaussian(fits_file, rng, peak, show=False):
