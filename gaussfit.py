@@ -67,7 +67,7 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.
     popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
                                           p0=[peak_value, mean, sigma], 
-                                          maxfev=100000)
+                                          maxfev=10000)
 
 
     mean_intensity = popt[0]
