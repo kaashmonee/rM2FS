@@ -27,7 +27,7 @@ class Spectrum:
         self.__remove_overlapping_spectrum() 
 
         # Narrow the spectrum immediately upon initialization.
-        self.narrow_spectrum()
+        # self.narrow_spectrum()
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
