@@ -4,4 +4,5 @@ __pycache__
 *.fits
 *.pkl
 questions.txt
+*.txt
 
