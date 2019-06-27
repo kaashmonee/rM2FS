@@ -109,7 +109,7 @@ class FitsFile:
                 gaussfit.fit_gaussian(self, rng, peak, show=False)
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
-            # spectrum.narrow_spectrum()
+            spectrum.narrow_spectrum()
 
             if spec_ind == 60:
                 t2 = time.time()

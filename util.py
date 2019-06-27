@@ -28,6 +28,8 @@ def export_spectra(file_name, spectra):
     np.savetxt(file_name, polynomials, delimiter=",")
 
 def perform_fits(fits_file):
+    # plt.imshow(np.log(fits_file.image_data), cmap="gray")
+    # plt.show()
     fits_file.get_true_peaks()
     fits_file.plot_spectra(show=True)
 

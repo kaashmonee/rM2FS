@@ -71,16 +71,24 @@ class Spectrum:
         other.
         """
 
+        # Selects which spectrum to narrow
         yvals = self.yvalues
         if self.true_yvals is not None:
             yvals = self.true_yvals
 
+        # Obtains the first pixel as the previous pixel to compare to.
         prev_y_pixel = yvals[0]
+
+        # Keeps a list of x and y value pixels that we will use that aren't
+        # too far deviant from the continuum. 
         narrowed_y = []
         narrowed_x = []
 
         for ind, ypixel in enumerate(yvals):
-            if ypixel >= prev_y_pixel - 1 and ypixel <= prev_y_pixel + 1:
+            lim = 3
+            # If the next pixel is too far from the previous one, then ignore it
+            # This is to avoid incorrectly detected outliers.
+            if ypixel >= prev_y_pixel - lim and ypixel <= prev_y_pixel + lim:
                 narrowed_y.append(ypixel)
                 narrowed_x.append(self.xvalues[ind])
 
