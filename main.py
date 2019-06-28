@@ -17,7 +17,7 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    directory = "fits_files/"
+    directory = "spectrum_fits_files/"
     fn = "r0760_stitched.fits"
     default_path = directory + fn
 

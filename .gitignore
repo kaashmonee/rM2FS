@@ -1,7 +1,7 @@
 online_fits_files/
 questions.md
 __pycache__
-*.fits
+fits
 *.pkl
 questions.txt
 *.txt
