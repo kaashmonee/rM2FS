@@ -18,4 +18,4 @@ added which will save all the spectra to an output text file.
 The current way to save files is via the Python pickling tool. This, however, poses a substantial security vulnerability as cited in: https://nvd.nist.gov/vuln/detail/CVE-2019-12760. This is not a concern if it accepts trusted pickle files, but should be of serious concern if this code is used over a network to accept unknown pickle files, which could lead to arbitrary code execution.
 
 ## Authors
-(c) Skanda Kaashyap, Carnegie Mellon University
+Skanda Kaashyap, Carnegie Mellon University
