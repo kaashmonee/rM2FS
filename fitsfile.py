@@ -117,7 +117,7 @@ class FitsFile:
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
             if spec_ind == 21:
-                import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
