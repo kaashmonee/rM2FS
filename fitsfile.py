@@ -111,7 +111,18 @@ class FitsFile:
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
-            if spec_ind == 60:
+            if spec_ind == 20:
+                t2 = time.time()
+                print("time taken:", t2-t1)
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+            if spec_ind == 21:
+                import pdb; pdb.set_trace()
+                t2 = time.time()
+                print("time taken:", t2-t1)
+                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+            if spec_ind == 40:
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
