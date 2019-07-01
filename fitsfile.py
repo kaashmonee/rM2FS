@@ -112,6 +112,12 @@ class FitsFile:
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
+            # After obtaining the true y values and narrowing the spectrum,
+            # we want to fit the spectrum with a UnivariateSpline, which is 
+            # what this function does.
+            degree = 3
+            spectrum.fit_spectrum(np.arange(0, self.cols), degree)
+
             if spec_ind == 20:
                 t2 = time.time()
                 print("time taken:", t2-t1)
@@ -123,8 +129,6 @@ class FitsFile:
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            degree = 3
-            spectrum.fit_spectrum(np.arange(0, self.cols), degree)
 
             if spec_ind == 60:
                 t2 = time.time()
