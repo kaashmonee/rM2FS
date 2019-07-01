@@ -59,7 +59,6 @@ class FitsFile:
         for spectrum in self.spectra[:num_to_plot]:
 
             spectrum_scatter = spectrum.plot()
-            spectrum.fit_spectrum(np.arange(0, image_cols), degree)
             fit_plot = spectrum.plot_fit()
 
             spectrum_scatter_plots.append(spectrum_scatter)
@@ -108,6 +107,8 @@ class FitsFile:
                 # This does the fitting and the peak.true_center setting.
                 gaussfit.fit_gaussian(self, rng, peak, show=False)
 
+            # The following 3 lines of code set the true yvalues, narrow the
+            # spectrum, and fit a UnivariateSpline to the spectrum. 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.narrow_spectrum()
 
@@ -122,7 +123,10 @@ class FitsFile:
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            if spec_ind == 40:
+            degree = 3
+            spectrum.fit_spectrum(np.arange(0, self.cols), degree)
+
+            if spec_ind == 60:
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
@@ -130,6 +134,7 @@ class FitsFile:
 
             if spec_ind == len(self.spectra):
                 self.plot_spectra(show=True, num_to_plot=spec_ind)
+
 
 
 
