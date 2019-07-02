@@ -93,6 +93,9 @@ class FitsFile:
 
             for peak in spectrum.peaks:
                 y1 = peak.y
+                
+                # This is just an arbitrary range that has been chosen.
+                # This might have to be tweaked for various spectra.
                 left_range = 5
                 right_range = 6
                 y0 = y1-left_range
@@ -105,7 +108,11 @@ class FitsFile:
                 rng = (y0, y2)
 
                 # This does the fitting and the peak.true_center setting.
-                gaussfit.fit_gaussian(self, rng, peak, show=False)
+                show = False
+                if spec_ind == 20:
+                    show = True
+
+                gaussfit.fit_gaussian(self, rng, peak, show=show)
 
             # The following 3 lines of code set the true yvalues, narrow the
             # spectrum, and fit a UnivariateSpline to the spectrum. 
@@ -123,17 +130,17 @@ class FitsFile:
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
-            if spec_ind == 21:
-                # import pdb; pdb.set_trace()
-                t2 = time.time()
-                print("time taken:", t2-t1)
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+            # if spec_ind == 21:
+            #     # import pdb; pdb.set_trace()
+            #     t2 = time.time()
+            #     print("time taken:", t2-t1)
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
 
-            if spec_ind == 60:
-                t2 = time.time()
-                print("time taken:", t2-t1)
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+            # if spec_ind == 60:
+            #     t2 = time.time()
+            #     print("time taken:", t2-t1)
+            #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
 
             if spec_ind == len(self.spectra):

@@ -75,6 +75,7 @@ class Spectrum:
         if self.true_yvals is not None:
             yvals = self.true_yvals
 
+        print("\nyvals:", yvals)
         # Obtains the first pixel as the previous pixel to compare to.
         prev_y_pixel = yvals[0]
 
