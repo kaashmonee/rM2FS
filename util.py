@@ -1,3 +1,4 @@
+import astropy.stats
 from astropy.io import fits
 from astropy.io.misc import fnpickle
 from astropy.io.misc import fnunpickle
@@ -18,6 +19,35 @@ def load(fits_file_path):
     fits_file = fnunpickle(fits_file_path)
     return fits_file
 
+def sigma_clip(xvalues, yvalues):
+    """
+    Returns a 3 sigma clipped dataset that will perform sigma clipping on 10 
+    adjacent x and y values.
+    """
+
+    length = len(xvalues)
+    
+    # Correctness check
+    assert(len(xvalues) == len(yvalues))
+    sample_size = 10
+
+    new_xvals = []
+    new_yvals = []
+
+    for i in range(0, length, sample_size):
+        domain = xvalues[i:i+sample_size]
+        data = yvalues[i:i+sample_size]
+
+        # Performs a 3sigma clipping on every 10 pixels.
+        output = astropy.stats.sigma_clip(data)
+
+        new_xvals.extend(domain[~output.mask])
+        new_yvals.extend(data[~output.mask])
+
+    return np.array(new_xvals), np.array(new_yvals)
+
+
+
 
 def export_spectra(file_name, spectra):
     """
@@ -30,6 +60,7 @@ def export_spectra(file_name, spectra):
 def perform_fits(fits_file):
     # plt.imshow(np.log(fits_file.image_data), cmap="gray")
     # plt.show()
+    print("Fitting:", fits_file.get_file_name())
     fits_file.get_true_peaks()
     fits_file.plot_spectra(show=True)
 

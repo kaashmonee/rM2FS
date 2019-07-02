@@ -18,7 +18,7 @@ def main():
     # can change so that it does work.
 
     directory = "spectrum_fits_files/"
-    fn = "r0760_stitched.fits"
+    fn = "b0760_stitched.fits"
     default_path = directory + fn
 
     if args.l is not False:
@@ -45,3 +45,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

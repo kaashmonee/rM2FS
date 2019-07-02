@@ -27,7 +27,6 @@ class Spectrum:
         self.__remove_overlapping_spectrum() 
 
         # Narrow the spectrum immediately upon initialization.
-        # self.narrow_spectrum()
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
@@ -63,6 +62,10 @@ class Spectrum:
         fit_plot = plt.plot(self.output)
         return fit_plot
 
+    def remove_outliers(self):
+        import util
+        self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+
     
     def narrow_spectrum(self):
         """
@@ -76,6 +79,7 @@ class Spectrum:
         if self.true_yvals is not None:
             yvals = self.true_yvals
 
+        print("\nyvals:", yvals)
         # Obtains the first pixel as the previous pixel to compare to.
         prev_y_pixel = yvals[0]
 
@@ -122,6 +126,11 @@ class Spectrum:
         for ind, diff in enumerate(diff_array):
             if diff >= diff_threshold:
                 diff_ind_list.append(ind)
+
+        # No part of the spectrum is overlapping, so there is no need to ensure
+        # remove anything.
+        if len(diff_ind_list) < 2:
+            return
 
         # Starting and ending indices of the self.xvalues that we ought consider
         startx = diff_ind_list[0] + 1

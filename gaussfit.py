@@ -73,12 +73,15 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     mean_intensity = popt[0]
     mean_y = popt[1]
     peak.true_center = mean_y
+    
+
+    fit = gauss(x_continuous, *popt)
 
     if show:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.scatter(yrange, intensity, color="red")
-        ax.plot(x_continuous, gauss(x_continuous, *popt), label="fit")
+        ax.plot(x_continuous, fit, label="fit")
 
         ax.annotate(
             "gaussian peak:(" + str(mean_y) + "," + str(mean_intensity) + ")", 
