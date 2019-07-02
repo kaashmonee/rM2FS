@@ -123,6 +123,11 @@ class Spectrum:
             if diff >= diff_threshold:
                 diff_ind_list.append(ind)
 
+        # No part of the spectrum is overlapping, so there is no need to ensure
+        # remove anything.
+        if len(diff_ind_list) < 2:
+            return
+
         # Starting and ending indices of the self.xvalues that we ought consider
         startx = diff_ind_list[0] + 1
         endx = diff_ind_list[1]
