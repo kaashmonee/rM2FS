@@ -62,6 +62,10 @@ class Spectrum:
         fit_plot = plt.plot(self.output)
         return fit_plot
 
+    def remove_outliers(self):
+        import util
+        self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+
     
     def narrow_spectrum(self):
         """

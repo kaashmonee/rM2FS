@@ -109,15 +109,13 @@ class FitsFile:
 
                 # This does the fitting and the peak.true_center setting.
                 show = False
-                if spec_ind == 20:
-                    show = True
 
                 gaussfit.fit_gaussian(self, rng, peak, show=show)
 
             # The following 3 lines of code set the true yvalues, narrow the
             # spectrum, and fit a UnivariateSpline to the spectrum. 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
-            spectrum.narrow_spectrum()
+            spectrum.remove_outliers()
 
             # After obtaining the true y values and narrowing the spectrum,
             # we want to fit the spectrum with a UnivariateSpline, which is 
