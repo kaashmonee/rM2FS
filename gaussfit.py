@@ -10,6 +10,7 @@ class Peak:
         self.x = x
         self.y = y
         self.true_center = None
+        self.width = None # the sigma value of the fitted Gaussian
 
 
 def non_int_to_int(iterable):
@@ -73,6 +74,7 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     mean_intensity = popt[0]
     mean_y = popt[1]
     peak.true_center = mean_y
+    peak.width = popt[2]
     
 
     fit = gauss(x_continuous, *popt)
