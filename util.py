@@ -52,6 +52,14 @@ def sigma_clip(xvalues, yvalues):
     return np.array(new_xvals), np.array(new_yvals)
 
 
+
+def rms(peaks, fitted_peaks):
+    """
+    Calculates the RMS given the peaks and the fitted peaks. 
+    """
+    return np.sqrt(np.mean(np.square(peaks - fitted_peaks)))
+
+
 def print_warning(message):
     warning_string = """
     ==========================
