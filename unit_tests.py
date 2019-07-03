@@ -42,9 +42,6 @@ class SpectrumUnitTest(unittest.TestCase):
         xvalues = np.delete(xvalues, [4, 55, 80])
         yvalues = np.delete(yvalues, [4, 55, 80])
 
-        # print("yvalues:", yvalues)
-        # print("new_yvals:", new_yvals)
-
         self.assertTrue(np.array_equal(xvalues, new_xvals))
         self.assertTrue(np.array_equal(yvalues, new_yvals))
 
@@ -61,9 +58,6 @@ class SpectrumUnitTest(unittest.TestCase):
 
         xvalues = np.delete(xvalues, [0,len(xvalues)-1])
         yvalues = np.delete(yvalues, [0,len(yvalues)-1])
-
-        # print("yvals:", yvalues)
-        # print("new_yvals:", new_yvals)
 
         self.assertTrue(len(xvalues) == len(new_xvals))
         self.assertTrue(len(yvalues) == len(new_yvals))
