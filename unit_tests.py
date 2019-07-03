@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from spectrum import Spectrum
 import util
+import sys
 
 class SpectrumUnitTest(unittest.TestCase):
     """
@@ -81,6 +82,34 @@ class SpectrumUnitTest(unittest.TestCase):
         self.assertTrue(len(yvalues) == len(new_yvals))
         self.assertTrue(np.array_equal(xvalues, new_xvals))
         self.assertTrue(np.array_equal(yvalues, new_yvals))
+
+    # def test_sigma_clipping_failures3(self):
+    #     """
+    #     This ensures that the alert message is displayed if over 10% of 
+    #     the pixels are removed.
+    #     """
+    #     xvalues = np.arange(10)
+    #     yvalues = np.random.normal(10, 3, 10)
+    #     yvalues[3] = -5
+    #     yvalues[5] = 100
+
+    #     new_xvals, new_yvals = util.sigma_clip(xvalues, yvalues)
+
+    #     xvalues = np.delete(xvalues, [3, 5])
+    #     yvalues = np.delete(yvalues, [3, 5])
+
+    #     message = "Over 10% of pixels have been rejected in the sigma_clip routine."
+
+    #     expected = """
+    #     ==========================
+    #     Warning: %s
+    #     ==========================
+    #     """
+    #     captured = sys.__stdout__
+    #     print(sys.__stdout__)
+    #     print(expected % message)
+
+    #     self.assertEqual(expected, captured)
 
 
 if __name__ == "__main__":

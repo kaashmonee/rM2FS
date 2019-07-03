@@ -44,9 +44,21 @@ def sigma_clip(xvalues, yvalues):
         new_xvals.extend(domain[~output.mask])
         new_yvals.extend(data[~output.mask])
 
+    new_len = len(new_xvals)
+
+    if (length-new_len) / length >= 0.1:
+        print_warning("Over 10% of pixels have been rejected in the sigma_clip routine.")
+
     return np.array(new_xvals), np.array(new_yvals)
 
 
+def print_warning(message):
+    warning_string = """
+    ==========================
+    Warning: %s
+    ==========================
+    """
+    print(warning_string % message)
 
 
 def export_spectra(file_name, spectra):
