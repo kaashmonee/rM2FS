@@ -26,8 +26,6 @@ class Spectrum:
         # Removes overlapping portions of the spectrum
         self.__remove_overlapping_spectrum() 
 
-        # Narrow the spectrum immediately upon initialization.
-
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
@@ -49,13 +47,20 @@ class Spectrum:
 
     def fit_spectrum(self, domain, degree):
         """
-        This function fits a polynomial of degree `degree` and returns the 
-        output on the input domain. 
+        This function fits a polynomial of degree `degree` and saves
+        the output on the input domain. It then saves the RMS goodness of fit
+        value.
         """
+        import util
         yvals = self.true_yvals if self.true_yvals is not None else self.yvalues
         f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
 
         self.output = f(domain)
+
+        # Calculate the RMS goodness of fit and display to the user if the 
+        # fit is very bad.
+        spline_yvals = f(self.xvalues)
+        self.rms_value = util.rms(spline_yvals, yvals)
 
 
     def plot_fit(self):
