@@ -123,7 +123,7 @@ class FitsFile:
             degree = 3
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
 
-            if spec_ind == 10:
+            if spec_ind == 20:
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
