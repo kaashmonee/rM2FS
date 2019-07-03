@@ -70,6 +70,11 @@ class Spectrum:
     def remove_outliers(self):
         import util
         self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+        xvalue_set = set(self.xvalues)
+        self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]
+
+        # Safety check to ensure there are no duplicate x pixels.
+        assert(len(self.peaks) == len(self.xvalues))
 
     
     def __remove_overlapping_spectrum(self):
@@ -104,5 +109,28 @@ class Spectrum:
 
         self.xvalues = self.xvalues[startx:endx]
         self.yvalues = self.yvalues[startx:endx]
+
+
+    def plot_peak_widths(self):
+        """
+        Plotting function to plot the peak widths. This can only be called after
+        gaussfit.fit_gaussian is called. It then fits a univariate spline to it. 
+        """
+        import util
+        xvalues = self.xvalues
+        widths = np.array([peak.width for peak in self.peaks])
+        print("widths:", widths)        
+        f = scipy.interpolate.UnivariateSpline(xvalues, widths)
+        widths_spline = f(xvalues)
+
+        rms_value = util.rms(widths_spline, widths)
+
+        plt.scatter(xvalues, widths)
+        plt.plot(xvalues, widths_spline, color="red")
+        plt.xlabel("xpixel")
+        plt.ylabel("width")
+        plt.title("gaussian width v. peak")
+        print("rms of width spline fit:", rms_value)
+        plt.show()
 
 
