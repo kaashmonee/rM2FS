@@ -67,45 +67,6 @@ class Spectrum:
         self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
 
     
-    def narrow_spectrum(self):
-        """
-        This function narrows the spectrum down from a naive peak finding method
-        to ensuring that the peaks are no more than 2 pixels away from each
-        other.
-        """
-
-        # Selects which spectrum to narrow
-        yvals = self.yvalues
-        if self.true_yvals is not None:
-            yvals = self.true_yvals
-
-        print("\nyvals:", yvals)
-        # Obtains the first pixel as the previous pixel to compare to.
-        prev_y_pixel = yvals[0]
-
-        # Keeps a list of x and y value pixels that we will use that aren't
-        # too far deviant from the continuum. 
-        narrowed_y = []
-        narrowed_x = []
-
-        for ind, ypixel in enumerate(yvals):
-            lim = 3
-            # If the next pixel is too far from the previous one, then ignore it
-            # This is to avoid incorrectly detected outliers.
-            if ypixel >= prev_y_pixel - lim and ypixel <= prev_y_pixel + lim:
-                narrowed_y.append(ypixel)
-                narrowed_x.append(self.xvalues[ind])
-
-                prev_y_pixel = ypixel
-
-        self.xvalues = np.array(narrowed_x)
-
-        if self.true_yvals is not None: 
-            self.true_yvals = np.array(narrowed_y)
-        else: 
-            self.yvalues = np.array(narrowed_y)
-
-
     def __remove_overlapping_spectrum(self):
         """
         This routine removes the part of the spectrum on either side that is 
