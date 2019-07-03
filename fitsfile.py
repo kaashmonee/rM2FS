@@ -123,10 +123,11 @@ class FitsFile:
             degree = 3
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
 
-            if spec_ind == 20:
+            if spec_ind == 10:
                 t2 = time.time()
                 print("time taken:", t2-t1)
                 self.plot_spectra(show=True, num_to_plot=spec_ind) 
+                spectrum.plot_peak_widths()
 
             # if spec_ind == 21:
             #     # import pdb; pdb.set_trace()
@@ -175,7 +176,6 @@ class FitsFile:
         # This is the pixel we use to determine how many spectra there are
         prime_pixel = 1000 
         xpixels = np.arange(self.image_data.shape[1])
-        print("xpixels:", xpixels)
 
         list_of_IA = [] # list of intensity arrays
         list_of_peaks = []  
