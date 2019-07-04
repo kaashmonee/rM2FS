@@ -114,8 +114,8 @@ class FitsFile:
                 y0 = y1-left_range
                 y2 = y1+right_range
 
-                # Ensure that the ranges do not exceed the width and height of the 
-                # image
+                # Ensure that the ranges do not exceed the width and height of 
+                # the image
                 if y0 <= 0: y0 = 0
                 if y2 >= image_height: y2 = image_height
                 rng = (y0, y2)

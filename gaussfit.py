@@ -4,6 +4,7 @@ import scipy
 from astropy import modeling
 import matplotlib.pyplot as plt
 import math
+import warnings
 
 class Peak:
     def __init__(self, x, y):
@@ -66,9 +67,11 @@ def fit_gaussian(fits_file, rng, peak, show=False):
 
     # To determine the p0 values, we used the information here:
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.
-    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
-                                          p0=[peak_value, mean, sigma], 
-                                          maxfev=10000)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
+                                            p0=[peak_value, mean, sigma], 
+                                            maxfev=10000)
 
 
     mean_intensity = popt[0]
