@@ -18,7 +18,7 @@ def main():
     # can change so that it does work.
 
     directory = "spectrum_fits_files/"
-    fn = "b0760_stitched.fits"
+    fn = "r0760_stitched.fits"
     default_path = directory + fn
 
     if args.l is not False:
@@ -35,6 +35,7 @@ def main():
         # perform_fits pipeline.
         import time
         util.perform_fits(fits_file)
+        # util.save(fits_file)
         print("\nDone")
 
     if args.export is not None:

@@ -30,10 +30,15 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, show=False, num_to_plot=None):
+    def plot_spectra(self, show=False, num_to_plot=None, save=False):
         """
         Plots the spectra on top of the image.
         """
+
+        # Ensure that the user either wants to show the spectra or save the 
+        # spectra
+        if not show and not save:
+            raise ValueError("Either the save or show paramter must be true.")
 
         if num_to_plot is None: 
             num_to_plot = len(self.spectra)
@@ -42,7 +47,6 @@ class FitsFile:
         import util
 
         # Setting up plotting...
-        fig = plt.figure()
         thresholded_im = util.threshold_image(self.image_data)
 
         plt.imshow(thresholded_im, origin="lower", cmap="gray")
@@ -65,13 +69,22 @@ class FitsFile:
             fit_plots.append(fit_plot)
 
 
-        if show: 
+        if show or save: 
             plt.xlabel("xpixel")
             plt.ylabel("ypixel") 
             plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
             plt.xlim(0, self.get_dimensions()[1])
             plt.ylim(0, self.get_dimensions()[0])
-            plt.show()
+
+            current_fig = plt.gcf()
+            if show:
+                plt.show()
+
+            if save:
+                directory = "completed_images/"
+                image_file_name = self.get_file_name() + "_fitted.png"
+                print("Saving " + image_file_name + " to disk...")
+                current_fig.savefig(directory + image_file_name)
 
 
     def get_true_peaks(self, show=False):
@@ -143,7 +156,7 @@ class FitsFile:
 
 
             if spec_ind == len(self.spectra):
-                self.plot_spectra(show=True, num_to_plot=spec_ind)
+                self.plot_spectra(show=False, num_to_plot=spec_ind, save=True)
 
 
 
