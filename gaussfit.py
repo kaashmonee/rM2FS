@@ -14,9 +14,6 @@ class Peak:
         self.width = None # the sigma value of the fitted Gaussian
 
 
-def non_int_to_int(iterable):
-    return [int(x) for x in iterable]
-
 def gauss(x, amp, cen, wid):
     """
     Gauss fitting function. Using the precision (tau) to define the width of the
