@@ -13,7 +13,8 @@ from spectrum import Spectrum
 # Using built in Python serializers as adding some custom functionality to save 
 # and load fits_files.
 def save(fits_file):
-    fnpickle(fits_file, fits_file.get_file_name() + ".pkl")
+    save_directory = "fitted_files/"
+    fnpickle(fits_file, save_directory + fits_file.get_file_name() + ".pkl")
 
 def load(fits_file_path):
     fits_file = fnunpickle(fits_file_path)
@@ -78,11 +79,10 @@ def export_spectra(file_name, spectra):
     np.savetxt(file_name, polynomials, delimiter=",")
 
 def perform_fits(fits_file):
-    # plt.imshow(np.log(fits_file.image_data), cmap="gray")
-    # plt.show()
-    print("Fitting:", fits_file.get_file_name())
+    # Check if this file exists in the fitted_files/ directory
     fits_file.get_true_peaks()
-    fits_file.plot_spectra(show=True)
+    fits_file.plot_spectra(show=True, save=True)
+    save(fits_file)
 
 def display_centers(fits_file):
     """
