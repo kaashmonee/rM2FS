@@ -7,7 +7,6 @@ import gaussfit
 def main():
     # Doing brief cmd line parsing.
     parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
-    parser.add_argument("--export", help="--export <outputfile>")
     parser.add_argument("-l", 
        help="use this flag to loop through all fits files", action="store_true")
     args = parser.parse_args()
@@ -17,8 +16,8 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    directory = "new_fits/"
-    fn = "r0136_stitched.fits"
+    directory = "fits_batch_1/"
+    fn = "r0760_stitched.fits"
     default_path = directory + fn
 
     if args.l is not False:
@@ -26,21 +25,25 @@ def main():
             fits_file = FitsFile(directory+fits_path)
             util.perform_fits(fits_file)
     else:
-        fits_file = FitsFile(default_path)
+        # Check if the file already exists in the directory first
+        pickle_directory = "fitted_files/"
+        pickle_fp = pickle_directory + fn + ".pkl"
+        pickled_fits_file = None
 
-        ## Proof of concept for pickling
-        # TODO: incorporate command line parsing to allow user to manually input
-        # this information
-        # TODO: ensure that the fits are still there, without going through the 
-        # perform_fits pipeline.
-        import time
-        util.perform_fits(fits_file)
-        # util.save(fits_file)
+        try:
+            with open(pickle_fp) as f:
+                print("Found pickled file in fitted_files/. Plotting spectra...")
+                fits_file = util.load(pickle_fp)
+                fits_file.plot_spectra()
+        except FileNotFoundError as e:
+            error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
+            print(error_message)
+
+            fits_file = FitsFile(default_path) 
+            util.perform_fits(fits_file)
+
         print("\nDone")
 
-    if args.export is not None:
-        file_name = args.export
-        export_spectra(file_name, spectra) # exports the spectrum to a txt.
 
 
 
