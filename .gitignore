@@ -1,5 +1,6 @@
-online_fits_files/
-questions.md
+fits_files/
+new_fits/
+spectrum_fits_files/
 __pycache__
 *.fits
 *.pkl
