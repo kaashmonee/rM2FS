@@ -96,14 +96,15 @@ class FitsFile:
             
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
+            success_counter = 0
 
             for peak in spectrum.peaks:
                 y1 = peak.y
                 
                 # This is just an arbitrary range that has been chosen.
                 # This might have to be tweaked for various spectra.
-                left_range = 5
-                right_range = 6
+                left_range = 4
+                right_range = 4
                 y0 = y1-left_range
                 y2 = y1+right_range
 
@@ -115,8 +116,10 @@ class FitsFile:
 
                 # This does the fitting and the peak.true_center setting.
                 show = False
+                success = gaussfit.fit_gaussian(self, rng, peak, show=show, spec_ind=spec_ind)
+                success_counter += success
 
-                gaussfit.fit_gaussian(self, rng, peak, show=show)
+            print("\nSpectrum %d had %d/%d points with a successful Gaussian fit." % (spec_ind, success_counter, len(spectrum.peaks)))
 
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
@@ -148,7 +151,7 @@ class FitsFile:
 
 
             if spec_ind == len(self.spectra):
-                self.plot_spectra(show=False, num_to_plot=spec_ind, save=True)
+                self.plot_spectra(num_to_plot=spec_ind, save=True)
 
 
 

@@ -81,7 +81,8 @@ def export_spectra(file_name, spectra):
 def perform_fits(fits_file):
     # Check if this file exists in the fitted_files/ directory
     fits_file.get_true_peaks()
-    fits_file.plot_spectra(show=True, save=True)
+    fits_file.plot_spectra(save=True)
+    print("Saving %s to disk..." % (fits_file.get_file_name() + ".pkl"))
     save(fits_file)
 
 def display_centers(fits_file):

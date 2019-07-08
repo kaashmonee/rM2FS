@@ -38,6 +38,7 @@ def is_data_gaussian(data, peak):
 
     # Shapiro-Wilk test
     shapiro_stat, shapiro_p = scipy.stats.shapiro(data)
+    print("shapiro p value:", shapiro_p)
 
     if shapiro_p <= alpha:
         # print("Data point not Gaussian, as determined by Shapiro-Wilk test.")
@@ -45,6 +46,7 @@ def is_data_gaussian(data, peak):
 
     # Dagostino's K^2 test
     dagostino_stat, dagostino_p = scipy.stats.normaltest(data)
+    print("dagostino p value:", dagostino_p)
     if dagostino_p <= alpha:
         # print("Data not Gaussian, as determined by Shapiro-Wilk test.")
         dagostino_test = False
@@ -52,14 +54,17 @@ def is_data_gaussian(data, peak):
     # Anderson-Darling test
     anderson_result = scipy.stats.anderson(data)
     reject_H0_list = []
-    for i in range(len(anderson_result.critical_values)):
-        sl, cv = anderson_result.significance_level[i], anderson_result.critical_values[i]
-        if anderson_result.statistic < anderson_result.critical_values[i]:
-            reject_H0_list.append(False)
-        else:
-            reject_H0_list.append(True)
+    print("anderson statistic:", anderson_result.statistic)
+    if anderson_result.statistic < anderson_result.critical_values[2]:
+        anderson_test = False
+    # for i in range(len(anderson_result.critical_values)):
+    #     sl, cv = anderson_result.significance_level[i], anderson_result.critical_values[i]
+    #     if anderson_result.statistic < anderson_result.critical_values[i]:
+    #         reject_H0_list.append(False)
+    #     else:
+    #         reject_H0_list.append(True)
 
-    anderson_test = reject_H0_list[2] # this is the p = 0.05 value
+    # anderson_test = reject_H0_list[2] # this is the p = 0.05 value
 
     # Encompassing the nature of the test in the peak value
     peak.anderson = anderson_test
@@ -80,7 +85,7 @@ def is_data_gaussian(data, peak):
 
 
 
-def fit_gaussian(fits_file, rng, peak, show=False):
+def fit_gaussian(fits_file, rng, peak, show=False, spec_ind=0):
     """
     This function obtains the fitting parameters for each Gaussian profile. 
     This includes the mean, expected max, and the standard deviation. It then 
@@ -106,6 +111,9 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     # if is_data_gaussian(intensity, peak) != "success":
     #     peak.true_center = "failed"
     #     return
+    # spec_ind=21
+    if spec_ind == 21:
+        is_data_gaussian(intensity, peak)
 
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
@@ -126,22 +134,32 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     mean = sum(x*y)/sum(y)
     sigma = sum(y*(x-mean)**2)/sum(y)
 
+    # Flag that determines if the fit was successful
+    fit_successful = True
+
     # To determine the p0 values, we used the information here:
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
-                                            p0=[peak_value, mean, sigma], 
-                                            maxfev=10000)
+        try:
+            popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
+                                                p0=[peak_value, mean, sigma], 
+                                                maxfev=10000)
+        
 
 
-    mean_intensity = popt[0]
-    mean_y = popt[1]
-    peak.true_center = mean_y
-    peak.width = popt[2]
-    
+            mean_intensity = popt[0]
+            mean_y = popt[1]
+            peak.true_center = mean_y
+            peak.width = popt[2]
+            
 
-    fit = gauss(x_continuous, *popt)
+            fit = gauss(x_continuous, *popt)
+
+        except:
+            peak.true_center = peak.y
+            peak.width = "failed"
+            fit_successful = False
 
     if show:
         fig = plt.figure()
@@ -161,3 +179,4 @@ def fit_gaussian(fits_file, rng, peak, show=False):
         plt.title("Intensity v. ypixel for " + fits_file.get_file_name() + " at x=" + str(peak.x))
         plt.show()
 
+    return fit_successful
