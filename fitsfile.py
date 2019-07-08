@@ -118,8 +118,7 @@ class FitsFile:
 
                 gaussfit.fit_gaussian(self, rng, peak, show=show)
 
-            # The following 3 lines of code set the true yvalues, narrow the
-            # spectrum, and fit a UnivariateSpline to the spectrum. 
+
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.remove_outliers()
 
@@ -132,7 +131,7 @@ class FitsFile:
             if spec_ind == 20:
                 t2 = time.time()
                 print("time taken:", t2-t1)
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+                self.plot_spectra(num_to_plot=spec_ind) 
                 spectrum.plot_peak_widths()
 
             # if spec_ind == 21:

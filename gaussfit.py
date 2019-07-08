@@ -5,6 +5,7 @@ from astropy import modeling
 import matplotlib.pyplot as plt
 import math
 import warnings
+import scipy.stats
 
 class Peak:
     def __init__(self, x, y):
@@ -12,6 +13,9 @@ class Peak:
         self.y = y
         self.true_center = None
         self.width = None # the sigma value of the fitted Gaussian
+        self.anderson_test = None
+        self.dagostino_test = None
+        self.shapiro_test = None
 
 
 def gauss(x, amp, cen, wid):
@@ -21,6 +25,59 @@ def gauss(x, amp, cen, wid):
     https://en.wikipedia.org/wiki/Normal_distribution.
     """
     return (amp / ((2*math.pi)**0.5 * wid)) * scipy.exp(-(x-cen)**2 / (2*wid**2))
+
+
+def is_data_gaussian(data, peak):
+    """
+    This function determines if the data is Gaussian using the Shapiro-Wilk test,
+    D'Agostino's K^2 test, and the Anderson-Darling test, as suggested in 
+    https://machinelearningmastery.com/a-gentle-introduction-to-normality-tests-in-python/.
+    """
+    shapiro_test, dagostino_test, anderson_test = True, True, True
+    alpha = 0.05
+
+    # Shapiro-Wilk test
+    shapiro_stat, shapiro_p = scipy.stats.shapiro(data)
+
+    if shapiro_p <= alpha:
+        # print("Data point not Gaussian, as determined by Shapiro-Wilk test.")
+        shapiro_test = False
+
+    # Dagostino's K^2 test
+    dagostino_stat, dagostino_p = scipy.stats.normaltest(data)
+    if dagostino_p <= alpha:
+        # print("Data not Gaussian, as determined by Shapiro-Wilk test.")
+        dagostino_test = False
+
+    # Anderson-Darling test
+    anderson_result = scipy.stats.anderson(data)
+    reject_H0_list = []
+    for i in range(len(anderson_result.critical_values)):
+        sl, cv = anderson_result.significance_level[i], anderson_result.critical_values[i]
+        if anderson_result.statistic < anderson_result.critical_values[i]:
+            reject_H0_list.append(False)
+        else:
+            reject_H0_list.append(True)
+
+    anderson_test = reject_H0_list[2] # this is the p = 0.05 value
+
+    # Encompassing the nature of the test in the peak value
+    peak.anderson = anderson_test
+    peak.dagostino = dagostino_test
+    peak.shapiro = shapiro_test
+
+    # All tests fail
+    if not dagostino_test and not shapiro_test and not anderson_test:
+        return "hard_fail"
+
+    # All tests succeed
+    elif dagostino_test and shapiro_test and anderson_test:
+        return "success"
+
+    # Some tests fail and some tests succeed
+    else:
+        return "soft_fail"
+
 
 
 def fit_gaussian(fits_file, rng, peak, show=False):
@@ -42,7 +99,14 @@ def fit_gaussian(fits_file, rng, peak, show=False):
 
     # Grabs the intensity at each y value and the given x value
     intensity = fits_image[yrange, peak.x]
-    
+
+    # Determing if the intensity array is Gaussian. If it is not, then there is 
+    # no reason to do a Gaussian fit, so we will just not modify the peak 
+    # object.
+    # if is_data_gaussian(intensity, peak) != "success":
+    #     peak.true_center = "failed"
+    #     return
+
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
 
