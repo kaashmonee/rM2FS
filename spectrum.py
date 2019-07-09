@@ -10,8 +10,12 @@ class Spectrum:
     This is a class that represents each white spot on the image.
     """
     def __init__(self, xvalues, yvalues):
+        import util
         self.xvalues = xvalues
         self.yvalues = yvalues
+
+        # Remove very obvious outliers
+        # util.sigma_clip(self.xvalues, self.yvalues, sample_size=100)
 
         self.true_yvals = None
 
@@ -24,10 +28,13 @@ class Spectrum:
 
 
         # Removes overlapping portions of the spectrum
-        self.__remove_overlapping_spectrum() 
+        # self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
+
+        # Peaks for which a Gaussian was unable to be fit
+        self.unfittable_peaks = []
 
         # In order to establish a width profile, each fitted Gaussian also 
         # contains a standard deviation/width value that is stored and fitted
@@ -124,8 +131,21 @@ class Spectrum:
         deviation fitted Gaussian to the x value.
         """
         import util
-        xvalues = self.xvalues
-        self.widths = np.array([peak.width for peak in self.peaks])
+        # self.widths = np.array([peak.width for peak in self.peaks])
+        self.widths = []
+        xvalues = []
+
+        # Ensuring that the peaks with unfittable Gaussians won't be included
+        for peak in self.peaks:
+            if peak.width == "failed":
+                self.unfittable_peaks.append(peak)
+                continue
+            self.widths.append(peak.width)
+            xvalues.append(peak.x)
+
+        self.widths = np.array(self.widths)
+        xvalues = np.array(xvalues)
+
         f = scipy.interpolate.UnivariateSpline(xvalues, self.widths)
         widths_spline = f(xvalues)
         self.peak_width_spline_function = f
