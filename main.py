@@ -16,13 +16,12 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    directory = "fits_batch_2/"
-    fn = "r0136_stitched.fits"
-    test_file1 = directory + fn
-    test_file2 = "fits_batch_1/r0760_stitched.fits"
+    # directory = "fits_batch_2/"
+    # fn = "r0136_stitched.fits"
+    directory = "fits_batch_1/"
+    fn = "r0760_stitched.fits"
 
     default_path = directory + fn
-    # default_path = test_file2
 
     if args.l is not False:
         for fits_path in os.listdir(directory):

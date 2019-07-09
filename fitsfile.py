@@ -130,6 +130,7 @@ class FitsFile:
             # what this function does.
             degree = 3
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
+            spectrum.fit_peak_widths()
 
             if spec_ind == 20:
                 t2 = time.time()

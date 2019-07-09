@@ -24,10 +24,17 @@ class Spectrum:
 
 
         # Removes overlapping portions of the spectrum
-        # self.__remove_overlapping_spectrum() 
+        self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
+
+        # In order to establish a width profile, each fitted Gaussian also 
+        # contains a standard deviation/width value that is stored and fitted
+        # a spline.
+        self.peak_width_spline_function = None
+        self.peak_width_spline_rms = None
+        self.widths = None
 
 
 
@@ -110,27 +117,49 @@ class Spectrum:
         self.xvalues = self.xvalues[startx:endx]
         self.yvalues = self.yvalues[startx:endx]
 
+    
+    def fit_peak_widths(self):
+        """
+        For each peak, fits a spline to a plot to the function of the standard
+        deviation fitted Gaussian to the x value.
+        """
+        import util
+        xvalues = self.xvalues
+        self.widths = np.array([peak.width for peak in self.peaks])
+        f = scipy.interpolate.UnivariateSpline(xvalues, self.widths)
+        widths_spline = f(xvalues)
+        self.peak_width_spline_function = f
+        self.peak_width_spline_rms = util.rms(widths_spline, self.widths)
+
 
     def plot_peak_widths(self):
         """
         Plotting function to plot the peak widths. This can only be called after
         gaussfit.fit_gaussian is called. It then fits a univariate spline to it. 
+        The fit_peak_widths function must be called in order for this function
+        to run.
         """
-        import util
         xvalues = self.xvalues
-        widths = np.array([peak.width for peak in self.peaks])
-        print("widths:", widths)        
-        f = scipy.interpolate.UnivariateSpline(xvalues, widths)
-        widths_spline = f(xvalues)
 
-        rms_value = util.rms(widths_spline, widths)
+        # Safety check to ensure that the user fits the peak widths before 
+        # trying to plot them.
+        if self.widths is None:
+            raise RuntimeError("The plot_peak_widths function was called before the fit_peak_widths function was called.")
+
+        widths = self.widths
+        widths_spline = self.peak_width_spline_function(xvalues)
 
         plt.scatter(xvalues, widths)
         plt.plot(xvalues, widths_spline, color="red")
         plt.xlabel("xpixel")
         plt.ylabel("width")
         plt.title("gaussian width v. peak")
-        print("rms of width spline fit:", rms_value)
+        
+        # Adding the rms of the spline fit to the plot.
+        ax = plt.gca()
+        rms_text = "rms: " + str(self.peak_width_spline_rms)
+        ax.text(5, 5, rms_text)
+
         plt.show()
 
 
