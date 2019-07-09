@@ -20,7 +20,7 @@ def load(fits_file_path):
     fits_file = fnunpickle(fits_file_path)
     return fits_file
 
-def sigma_clip(xvalues, yvalues):
+def sigma_clip(xvalues, yvalues, sample_size=10):
     """
     Returns a 3 sigma clipped dataset that will perform sigma clipping on 10 
     adjacent x and y values.
@@ -30,7 +30,6 @@ def sigma_clip(xvalues, yvalues):
     
     # Correctness check
     assert(len(xvalues) == len(yvalues))
-    sample_size = 10
 
     new_xvals = []
     new_yvals = []

@@ -16,10 +16,10 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    # directory = "fits_batch_2/"
-    # fn = "r0136_stitched.fits"
-    directory = "fits_batch_1/"
-    fn = "r0760_stitched.fits"
+    directory = "fits_batch_2/"
+    fn = "r0136_stitched.fits"
+    # directory = "fits_batch_1/"
+    # fn = "r0760_stitched.fits"
 
     default_path = directory + fn
 
