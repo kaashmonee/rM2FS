@@ -25,8 +25,12 @@ def main():
 
     if args.l is not False:
         for fits_path in os.listdir(directory):
-            fits_file = FitsFile(directory+fits_path)
-            util.perform_fits(fits_file)
+            try:
+                fits_file = FitsFile(directory+fits_path)
+                util.perform_fits(fits_file)
+            except Exception as e:
+                print("exception: ", e)
+                print(fits_file.get_file_name() + " failed")
     else:
         # Check if the file already exists in the directory first
         pickle_directory = "fitted_files/"

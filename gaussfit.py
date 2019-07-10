@@ -38,7 +38,7 @@ def is_data_gaussian(data, peak):
 
     # Shapiro-Wilk test
     shapiro_stat, shapiro_p = scipy.stats.shapiro(data)
-    print("shapiro p value:", shapiro_p)
+    # print("shapiro p value:", shapiro_p)
 
     if shapiro_p <= alpha:
         # print("Data point not Gaussian, as determined by Shapiro-Wilk test.")
@@ -46,7 +46,7 @@ def is_data_gaussian(data, peak):
 
     # Dagostino's K^2 test
     dagostino_stat, dagostino_p = scipy.stats.normaltest(data)
-    print("dagostino p value:", dagostino_p)
+    # print("dagostino p value:", dagostino_p)
     if dagostino_p <= alpha:
         # print("Data not Gaussian, as determined by Shapiro-Wilk test.")
         dagostino_test = False
@@ -54,7 +54,7 @@ def is_data_gaussian(data, peak):
     # Anderson-Darling test
     anderson_result = scipy.stats.anderson(data)
     reject_H0_list = []
-    print("anderson statistic:", anderson_result.statistic)
+    # print("anderson statistic:", anderson_result.statistic)
     if anderson_result.statistic < anderson_result.critical_values[2]:
         anderson_test = False
     # for i in range(len(anderson_result.critical_values)):

@@ -119,7 +119,8 @@ class FitsFile:
                 success = gaussfit.fit_gaussian(self, rng, peak, show=show, spec_ind=spec_ind)
                 success_counter += success
 
-            print("\nSpectrum %d had %d/%d points with a successful Gaussian fit." % (spec_ind, success_counter, len(spectrum.peaks)))
+            if success_counter != len(spectrum.peaks):
+                print("\nSpectrum %d had %d/%d points with a successful Gaussian fit." % (spec_ind, success_counter, len(spectrum.peaks)))
 
 
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
