@@ -9,7 +9,7 @@ class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    spectrum_number = 0
+    spectrum_number = 1
 
     def __init__(self, xvalues, yvalues, fits_file):
         import util
@@ -104,39 +104,41 @@ class Spectrum:
         our analysis.
         """
 
-        # Finds the differences between 2 adjacent elements in the array.
-        diff_array = np.ediff1d(self.xvalues) 
+        # # Finds the differences between 2 adjacent elements in the array.
+        # diff_array = np.ediff1d(self.xvalues) 
 
-        # Diff threshold to detect overlapping spectra
-        diff_threshold = 20
+        # # Diff threshold to detect overlapping spectra
+        # diff_threshold = 20
 
-        # Contains list of indices where next index differs by more than 
-        # diff_threshold
-        diff_ind_list = [] 
+        # # Contains list of indices where next index differs by more than 
+        # # diff_threshold
+        # diff_ind_list = [] 
 
-        for ind, diff in enumerate(diff_array):
-            if diff >= diff_threshold:
-                diff_ind_list.append(ind)
+        # for ind, diff in enumerate(diff_array):
+        #     if diff >= diff_threshold:
+        #         diff_ind_list.append(ind)
 
-        # No part of the spectrum is overlapping, so there is no need to ensure
-        # remove anything.
-        if len(diff_ind_list) < 2:
-            return
+        # # No part of the spectrum is overlapping, so there is no need to ensure
+        # # remove anything.
+        # if len(diff_ind_list) < 2:
+        #     return
 
-        # Starting and ending indices of the self.xvalues that we ought consider
-        startx = diff_ind_list[0] + 1
-        endx = diff_ind_list[1]
+        # # Starting and ending indices of the self.xvalues that we ought consider
+        # startx = diff_ind_list[0] + 1
+        # endx = diff_ind_list[1]
 
-        self.xvalues = self.xvalues[startx:endx]
-        self.yvalues = self.yvalues[startx:endx]
+        # self.xvalues = self.xvalues[startx:endx]
+        # self.yvalues = self.yvalues[startx:endx]
         
-        # # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
-        # brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
-        # title = "spectrum: " + str(Spectrum.spectrum_number)
-        # print(title)
-        # plt.title(title)
-        # plt.scatter(self.xvalues, brightness)
-        # plt.show()
+        # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
+        brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
+        title = "spectrum: " + str(Spectrum.spectrum_number)
+        print(title)
+        plt.title(title)
+        plt.xlabel("xpixel")
+        plt.ylabel("intensity")
+        plt.scatter(self.xvalues, brightness)
+        plt.show()
 
 
     
