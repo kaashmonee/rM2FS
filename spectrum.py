@@ -9,13 +9,16 @@ class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    def __init__(self, xvalues, yvalues):
+    spectrum_number = 0
+
+    def __init__(self, xvalues, yvalues, fits_file):
         import util
         self.xvalues = xvalues
         self.yvalues = yvalues
+        self.fits_file = fits_file
 
         # Remove very obvious outliers
-        # util.sigma_clip(self.xvalues, self.yvalues, sample_size=100)
+        # self.xvalues, self.yvalues = util.sigma_clip(self.xvalues, self.yvalues, sample_size=30)
 
         self.true_yvals = None
 
@@ -28,7 +31,7 @@ class Spectrum:
 
 
         # Removes overlapping portions of the spectrum
-        # self.__remove_overlapping_spectrum() 
+        self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
@@ -42,6 +45,9 @@ class Spectrum:
         self.peak_width_spline_function = None
         self.peak_width_spline_rms = None
         self.widths = None
+        
+        # Increment the spectrum number after creation of a spectrum.
+        Spectrum.spectrum_number += 1
 
 
 
@@ -99,30 +105,39 @@ class Spectrum:
         """
 
         # Finds the differences between 2 adjacent elements in the array.
-        diff_array = np.ediff1d(self.xvalues) 
+        # diff_array = np.ediff1d(self.xvalues) 
 
-        # Diff threshold to detect overlapping spectra
-        diff_threshold = 20
+        # # Diff threshold to detect overlapping spectra
+        # diff_threshold = 20
 
-        # Contains list of indices where next index differs by more than 
-        # diff_threshold
-        diff_ind_list = [] 
+        # # Contains list of indices where next index differs by more than 
+        # # diff_threshold
+        # diff_ind_list = [] 
 
-        for ind, diff in enumerate(diff_array):
-            if diff >= diff_threshold:
-                diff_ind_list.append(ind)
+        # for ind, diff in enumerate(diff_array):
+        #     if diff >= diff_threshold:
+        #         diff_ind_list.append(ind)
 
-        # No part of the spectrum is overlapping, so there is no need to ensure
-        # remove anything.
-        if len(diff_ind_list) < 2:
-            return
+        # # No part of the spectrum is overlapping, so there is no need to ensure
+        # # remove anything.
+        # if len(diff_ind_list) < 2:
+        #     return
 
-        # Starting and ending indices of the self.xvalues that we ought consider
-        startx = diff_ind_list[0] + 1
-        endx = diff_ind_list[1]
+        # # Starting and ending indices of the self.xvalues that we ought consider
+        # startx = diff_ind_list[0] + 1
+        # endx = diff_ind_list[1]
 
-        self.xvalues = self.xvalues[startx:endx]
-        self.yvalues = self.yvalues[startx:endx]
+        # self.xvalues = self.xvalues[startx:endx]
+        # self.yvalues = self.yvalues[startx:endx]
+        
+        # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
+        brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
+        title = "spectrum: " + str(Spectrum.spectrum_number)
+        print(title)
+        plt.title(title)
+        plt.scatter(self.xvalues, brightness)
+        plt.show()
+
 
     
     def fit_peak_widths(self):
