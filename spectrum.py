@@ -133,12 +133,32 @@ class Spectrum:
         # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
         brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
         title = "spectrum: " + str(Spectrum.spectrum_number)
-        print(title)
+        # print(title)
+
+        xy = np.vstack([self.xvalues, np.log(brightness)])
+        z = scipy.stats.gaussian_kde(xy)(xy)
+        z_thresh = np.log(z)**2
+        z_thresh_masked = np.ma.masked_where(z_thresh <= 50, z_thresh)
+
+        z_plot = z_thresh[z_thresh_masked.mask]
+        xvalues_umodified, yvalues_umondified = self.xvalues, self.yvalues
+
+        xvalues = self.xvalues[z_thresh_masked.mask]
+        yvalues = self.yvalues[z_thresh_masked.mask]
+
+        self.xvalues, self.yvalues = xvalues, yvalues
+
         plt.title(title)
         plt.xlabel("xpixel")
         plt.ylabel("intensity")
-        plt.scatter(self.xvalues, brightness)
+
+        plot_brightness = brightness[z_thresh_masked.mask]
+        plt.scatter(xvalues, np.log(plot_brightness), c=z_thresh)
+        plt.colorbar()
         plt.show()
+
+
+
 
 
     
