@@ -24,9 +24,13 @@ def main():
     default_path = directory + fn
 
     if args.l is not False:
-        for fits_path in os.listdir(directory):
+        for num, fits_path in enumerate(os.listdir(directory)):
             try:
                 fits_file = FitsFile(directory+fits_path)
+
+                num_files = len(os.listdir(directory))
+                print("Fitting %s (%d/%d)" % (fits_file.get_file_name(), num+1, num_files))
+
                 util.perform_fits(fits_file)
             except Exception as e:
                 print("exception: ", e)
