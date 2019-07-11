@@ -30,10 +30,13 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, num_to_plot=None, save=False):
+    def plot_spectra(self, num_to_plot=None, save=False, show=True):
         """
         Plots the spectra on top of the image.
         """
+
+        if not show and not save:
+            raise ValueError("You must either choose to save or show the spectra.")
 
         if num_to_plot is None: 
             num_to_plot = len(self.spectra)
@@ -70,8 +73,9 @@ class FitsFile:
         plt.ylim(0, self.get_dimensions()[0])
 
         current_fig = plt.gcf()
-
-        plt.show()
+        
+        if show: 
+            plt.show()
 
         if save: 
             directory = "completed_images/"
@@ -133,11 +137,11 @@ class FitsFile:
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
             spectrum.fit_peak_widths()
 
-            if spec_ind == 20:
-                t2 = time.time()
-                print("time taken:", t2-t1)
-                self.plot_spectra(num_to_plot=spec_ind) 
-                spectrum.plot_peak_widths()
+            # if spec_ind == 20:
+            #     t2 = time.time()
+            #     print("time taken:", t2-t1)
+            #     self.plot_spectra(num_to_plot=spec_ind, show=False, save=True) 
+            #     spectrum.plot_peak_widths()
 
             # if spec_ind == 21:
             #     # import pdb; pdb.set_trace()
@@ -153,7 +157,7 @@ class FitsFile:
 
 
             if spec_ind == len(self.spectra):
-                self.plot_spectra(num_to_plot=spec_ind, save=True)
+                self.plot_spectra(num_to_plot=spec_ind, save=True, show=False)
 
 
 
