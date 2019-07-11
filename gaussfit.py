@@ -112,8 +112,8 @@ def fit_gaussian(fits_file, rng, peak, show=False, spec_ind=0):
     #     peak.true_center = "failed"
     #     return
     # spec_ind=21
-    if spec_ind == 21:
-        is_data_gaussian(intensity, peak)
+    # if spec_ind == 21:
+    #     is_data_gaussian(intensity, peak)
 
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
