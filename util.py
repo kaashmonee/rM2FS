@@ -20,7 +20,7 @@ def load(fits_file_path):
     fits_file = fnunpickle(fits_file_path)
     return fits_file
 
-def sigma_clip(xvalues, yvalues, sample_size=10):
+def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
     """
     Returns a 3 sigma clipped dataset that will perform sigma clipping on 10 
     adjacent x and y values.
@@ -39,7 +39,7 @@ def sigma_clip(xvalues, yvalues, sample_size=10):
         data = yvalues[i:i+sample_size]
 
         # Performs a 3sigma clipping on every 10 pixels.
-        output = astropy.stats.sigma_clip(data)
+        output = astropy.stats.sigma_clip(data, sigma=sigma)
 
         new_xvals.extend(domain[~output.mask])
         new_yvals.extend(data[~output.mask])
