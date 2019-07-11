@@ -90,6 +90,7 @@ class Spectrum:
     def remove_outliers(self):
         import util
         self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+
         xvalue_set = set(self.xvalues)
         self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]
 
@@ -131,6 +132,8 @@ class Spectrum:
         # self.yvalues = self.yvalues[startx:endx]
         
         # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
+
+
         brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
         title = "spectrum: " + str(Spectrum.spectrum_number)
         # print(title)
@@ -148,14 +151,14 @@ class Spectrum:
 
         self.xvalues, self.yvalues = xvalues, yvalues
 
-        plt.title(title)
-        plt.xlabel("xpixel")
-        plt.ylabel("intensity")
+        # plt.title(title)
+        # plt.xlabel("xpixel")
+        # plt.ylabel("intensity")
 
-        plot_brightness = brightness[z_thresh_masked.mask]
-        plt.scatter(xvalues, np.log(plot_brightness), c=z_thresh)
-        plt.colorbar()
-        plt.show()
+        # plot_brightness = brightness[z_thresh_masked.mask]
+        # plt.scatter(xvalues, np.log(plot_brightness), c=z_thresh)
+        # plt.colorbar()
+        # plt.show()
 
 
 
