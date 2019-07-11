@@ -30,7 +30,7 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, num_to_plot=None, save=False, show=True):
+    def plot_spectra(self, num_to_plot=None, save=False, show=False):
         """
         Plots the spectra on top of the image.
         """
@@ -73,15 +73,16 @@ class FitsFile:
         plt.ylim(0, self.get_dimensions()[0])
 
         current_fig = plt.gcf()
-        
-        if show: 
-            plt.show()
 
         if save: 
             directory = "completed_images/"
             image_file_name = self.get_file_name() + "_fitted.png"
             print("Saving " + image_file_name + " to disk...")
             current_fig.savefig(directory + image_file_name)
+
+        if show: 
+            plt.show()
+
 
 
     def get_true_peaks(self, show=False):
@@ -156,11 +157,8 @@ class FitsFile:
             #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
 
-            if spec_ind == len(self.spectra):
-                self.plot_spectra(num_to_plot=spec_ind, save=True, show=False)
-
-
-
+            # if spec_ind == len(self.spectra):
+            #     self.plot_spectra(num_to_plot=spec_ind, save=True)
 
 
     def __get_intensity_array(self, xpixel=1000):
