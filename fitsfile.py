@@ -132,7 +132,7 @@ class FitsFile:
             if spec_ind == 20:
                 t2 = time.time()
                 print("time taken:", t2-t1)
-                self.plot_spectra(show=True, num_to_plot=spec_ind) 
+                self.plot_spectra(num_to_plot=spec_ind) 
                 spectrum.plot_peak_widths()
 
             # if spec_ind == 21:

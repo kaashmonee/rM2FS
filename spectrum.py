@@ -35,12 +35,12 @@ class Spectrum:
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-
+        size = 5
         if self.true_yvals is not None:
-            scatter_plot = plt.scatter(self.xvalues, self.true_yvals)
+            scatter_plot = plt.scatter(self.xvalues, self.true_yvals, s=size)
 
         else:
-            scatter_plot = plt.scatter(self.xvalues, self.yvalues)
+            scatter_plot = plt.scatter(self.xvalues, self.yvalues, s=size)
         
         return scatter_plot
 
@@ -64,7 +64,7 @@ class Spectrum:
 
 
     def plot_fit(self):
-        fit_plot = plt.plot(self.output)
+        fit_plot = plt.plot(self.output, linewidth=0.3)
         return fit_plot
 
     def remove_outliers(self):
