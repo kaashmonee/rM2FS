@@ -56,11 +56,13 @@ class FitsFile:
         print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
 
         for spectrum in self.spectra[:num_to_plot]:
+            
+            # Uncomment this section if the scatter plot portion of the spectrum
+            # is desired.
+            # spectrum_scatter = spectrum.plot()
+            # spectrum_scatter_plots.append(spectrum_scatter)
 
-            spectrum_scatter = spectrum.plot()
             fit_plot = spectrum.plot_fit()
-
-            spectrum_scatter_plots.append(spectrum_scatter)
             fit_plots.append(fit_plot)
 
         plt.xlabel("xpixel")
