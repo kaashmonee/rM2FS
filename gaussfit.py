@@ -13,9 +13,9 @@ class Peak:
         self.y = y
         self.true_center = None
         self.width = None # the sigma value of the fitted Gaussian
-        self.anderson_test = None
-        self.dagostino_test = None
-        self.shapiro_test = None
+        # self.anderson_test = None
+        # self.dagostino_test = None
+        # self.shapiro_test = None
 
 
 def gauss(x, amp, cen, wid):
@@ -108,12 +108,12 @@ def fit_gaussian(fits_file, rng, peak, show=False, spec_ind=0):
     # Determing if the intensity array is Gaussian. If it is not, then there is 
     # no reason to do a Gaussian fit, so we will just not modify the peak 
     # object.
+    # TODO: Determine what statistics are actually valid and should be used for
+    # the various statistical tests. However, these might not even be useful.
+    # It will be left here.
     # if is_data_gaussian(intensity, peak) != "success":
     #     peak.true_center = "failed"
     #     return
-    # spec_ind=21
-    # if spec_ind == 21:
-    #     is_data_gaussian(intensity, peak)
 
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
