@@ -73,13 +73,12 @@ class FitsFile:
         plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
         plt.xlim(0, self.get_dimensions()[1])
         plt.ylim(0, self.get_dimensions()[0])
-        plt.axis("scaled")
 
         current_fig = plt.gcf()
 
         if save: 
             directory = "completed_images/"
-            image_file_name = self.get_file_name() + "_fitted.png"
+            image_file_name = self.get_file_name() + "_fitted.svg"
             print("Saving " + image_file_name + " to disk...")
             current_fig.savefig(directory + image_file_name, dpi=1500)
 
