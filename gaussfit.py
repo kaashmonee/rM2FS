@@ -57,14 +57,6 @@ def is_data_gaussian(data, peak):
     # print("anderson statistic:", anderson_result.statistic)
     if anderson_result.statistic < anderson_result.critical_values[2]:
         anderson_test = False
-    # for i in range(len(anderson_result.critical_values)):
-    #     sl, cv = anderson_result.significance_level[i], anderson_result.critical_values[i]
-    #     if anderson_result.statistic < anderson_result.critical_values[i]:
-    #         reject_H0_list.append(False)
-    #     else:
-    #         reject_H0_list.append(True)
-
-    # anderson_test = reject_H0_list[2] # this is the p = 0.05 value
 
     # Encompassing the nature of the test in the peak value
     peak.anderson = anderson_test
