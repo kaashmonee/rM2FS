@@ -138,6 +138,12 @@ class FitsFile:
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
             spectrum.fit_peak_widths()
 
+            #############################################################
+            # This is for testing purposes only --- this code should be #
+            # deleted after testing is complete because no plotting sh- #
+            # ould be taking place here.                                # 
+            #############################################################
+
             # if spec_ind == 20:
             #     t2 = time.time()
             #     print("time taken:", t2-t1)
