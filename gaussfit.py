@@ -5,6 +5,7 @@ from astropy import modeling
 import matplotlib.pyplot as plt
 import math
 import warnings
+import scipy.stats
 
 class Peak:
     def __init__(self, x, y):
@@ -12,6 +13,9 @@ class Peak:
         self.y = y
         self.true_center = None
         self.width = None # the sigma value of the fitted Gaussian
+        # self.anderson_test = None
+        # self.dagostino_test = None
+        # self.shapiro_test = None
 
 
 def gauss(x, amp, cen, wid):
@@ -23,7 +27,57 @@ def gauss(x, amp, cen, wid):
     return (amp / ((2*math.pi)**0.5 * wid)) * scipy.exp(-(x-cen)**2 / (2*wid**2))
 
 
-def fit_gaussian(fits_file, rng, peak, show=False):
+def is_data_gaussian(data, peak):
+    """
+    This function determines if the data is Gaussian using the Shapiro-Wilk test,
+    D'Agostino's K^2 test, and the Anderson-Darling test, as suggested in 
+    https://machinelearningmastery.com/a-gentle-introduction-to-normality-tests-in-python/.
+    """
+    shapiro_test, dagostino_test, anderson_test = True, True, True
+    alpha = 0.05
+
+    # Shapiro-Wilk test
+    shapiro_stat, shapiro_p = scipy.stats.shapiro(data)
+    # print("shapiro p value:", shapiro_p)
+
+    if shapiro_p <= alpha:
+        # print("Data point not Gaussian, as determined by Shapiro-Wilk test.")
+        shapiro_test = False
+
+    # Dagostino's K^2 test
+    dagostino_stat, dagostino_p = scipy.stats.normaltest(data)
+    # print("dagostino p value:", dagostino_p)
+    if dagostino_p <= alpha:
+        # print("Data not Gaussian, as determined by Shapiro-Wilk test.")
+        dagostino_test = False
+
+    # Anderson-Darling test
+    anderson_result = scipy.stats.anderson(data)
+    reject_H0_list = []
+    # print("anderson statistic:", anderson_result.statistic)
+    if anderson_result.statistic < anderson_result.critical_values[2]:
+        anderson_test = False
+
+    # Encompassing the nature of the test in the peak value
+    peak.anderson = anderson_test
+    peak.dagostino = dagostino_test
+    peak.shapiro = shapiro_test
+
+    # All tests fail
+    if not dagostino_test and not shapiro_test and not anderson_test:
+        return "hard_fail"
+
+    # All tests succeed
+    elif dagostino_test and shapiro_test and anderson_test:
+        return "success"
+
+    # Some tests fail and some tests succeed
+    else:
+        return "soft_fail"
+
+
+
+def fit_gaussian(fits_file, rng, peak, show=False, spec_ind=0):
     """
     This function obtains the fitting parameters for each Gaussian profile. 
     This includes the mean, expected max, and the standard deviation. It then 
@@ -42,7 +96,17 @@ def fit_gaussian(fits_file, rng, peak, show=False):
 
     # Grabs the intensity at each y value and the given x value
     intensity = fits_image[yrange, peak.x]
-    
+
+    # Determing if the intensity array is Gaussian. If it is not, then there is 
+    # no reason to do a Gaussian fit, so we will just not modify the peak 
+    # object.
+    # TODO: Determine what statistics are actually valid and should be used for
+    # the various statistical tests. However, these might not even be useful.
+    # It will be left here.
+    # if is_data_gaussian(intensity, peak) != "success":
+    #     peak.true_center = "failed"
+    #     return
+
     # safety check to ensure same number of my points
     assert(len(intensity) == len(yrange))
 
@@ -62,22 +126,32 @@ def fit_gaussian(fits_file, rng, peak, show=False):
     mean = sum(x*y)/sum(y)
     sigma = sum(y*(x-mean)**2)/sum(y)
 
+    # Flag that determines if the fit was successful
+    fit_successful = True
+
     # To determine the p0 values, we used the information here:
     # https://stackoverflow.com/questions/29599227/fitting-a-gaussian-getting-a-straight-line-python-2-7.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
-                                            p0=[peak_value, mean, sigma], 
-                                            maxfev=10000)
+        try:
+            popt, pcov = scipy.optimize.curve_fit(gauss, x, y, 
+                                                p0=[peak_value, mean, sigma], 
+                                                maxfev=10000)
+        
 
 
-    mean_intensity = popt[0]
-    mean_y = popt[1]
-    peak.true_center = mean_y
-    peak.width = popt[2]
-    
+            mean_intensity = popt[0]
+            mean_y = popt[1]
+            peak.true_center = mean_y
+            peak.width = popt[2]
+            
 
-    fit = gauss(x_continuous, *popt)
+            fit = gauss(x_continuous, *popt)
+
+        except:
+            peak.true_center = peak.y
+            peak.width = "failed"
+            fit_successful = False
 
     if show:
         fig = plt.figure()
@@ -97,3 +171,4 @@ def fit_gaussian(fits_file, rng, peak, show=False):
         plt.title("Intensity v. ypixel for " + fits_file.get_file_name() + " at x=" + str(peak.x))
         plt.show()
 
+    return fit_successful

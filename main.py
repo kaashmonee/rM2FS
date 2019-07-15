@@ -16,14 +16,25 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    directory = "fits_batch_1/"
-    fn = "r0760_stitched.fits"
+    directory = "fits_batch_2/"
+    fn = "r0136_stitched.fits"
+    # directory = "fits_batch_1/"
+    # fn = "r0760_stitched.fits"
+
     default_path = directory + fn
 
     if args.l is not False:
-        for fits_path in os.listdir(directory):
-            fits_file = FitsFile(directory+fits_path)
-            util.perform_fits(fits_file)
+        for num, fits_path in enumerate(os.listdir(directory)):
+            try:
+                fits_file = FitsFile(directory+fits_path)
+
+                num_files = len(os.listdir(directory))
+                print("Fitting %s (%d/%d)" % (fits_file.get_file_name(), num+1, num_files))
+
+                util.perform_fits(fits_file)
+            except Exception as e:
+                print("exception: ", e)
+                print(fits_file.get_file_name() + " failed")
     else:
         # Check if the file already exists in the directory first
         pickle_directory = "fitted_files/"
@@ -34,7 +45,7 @@ def main():
             with open(pickle_fp) as f:
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
-                fits_file.plot_spectra()
+                fits_file.plot_spectra(show=True, save=True)
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)

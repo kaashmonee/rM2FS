@@ -30,10 +30,13 @@ class FitsFile:
     def get_dimensions(self):
         return (self.rows, self.cols)
 
-    def plot_spectra(self, num_to_plot=None, save=False):
+    def plot_spectra(self, num_to_plot=None, save=False, show=False):
         """
         Plots the spectra on top of the image.
         """
+
+        if not show and not save:
+            raise ValueError("You must either choose to save or show the spectra.")
 
         if num_to_plot is None: 
             num_to_plot = len(self.spectra)
@@ -70,17 +73,18 @@ class FitsFile:
         plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
         plt.xlim(0, self.get_dimensions()[1])
         plt.ylim(0, self.get_dimensions()[0])
-        plt.axis("scaled")
 
         current_fig = plt.gcf()
 
-        plt.show()
-
         if save: 
             directory = "completed_images/"
-            image_file_name = self.get_file_name() + "_fitted.png"
+            image_file_name = self.get_file_name() + "_fitted.svg"
             print("Saving " + image_file_name + " to disk...")
             current_fig.savefig(directory + image_file_name, dpi=1500)
+
+        if show: 
+            plt.show()
+
 
 
     def get_true_peaks(self, show=False):
@@ -99,14 +103,15 @@ class FitsFile:
             
             sys.stdout.write("\rFitting spectrum %i/%i" % (spec_ind, len(self.spectra)))
             sys.stdout.flush()
+            success_counter = 0
 
             for peak in spectrum.peaks:
                 y1 = peak.y
                 
                 # This is just an arbitrary range that has been chosen.
                 # This might have to be tweaked for various spectra.
-                left_range = 5
-                right_range = 6
+                left_range = 4
+                right_range = 4
                 y0 = y1-left_range
                 y2 = y1+right_range
 
@@ -118,11 +123,13 @@ class FitsFile:
 
                 # This does the fitting and the peak.true_center setting.
                 show = False
+                success = gaussfit.fit_gaussian(self, rng, peak, show=show, spec_ind=spec_ind)
+                success_counter += success
 
-                gaussfit.fit_gaussian(self, rng, peak, show=show)
+            if success_counter != len(spectrum.peaks):
+                print("\nSpectrum %d had %d/%d points with a successful Gaussian fit." % (spec_ind, success_counter, len(spectrum.peaks)))
 
-            # The following 3 lines of code set the true yvalues, narrow the
-            # spectrum, and fit a UnivariateSpline to the spectrum. 
+
             spectrum.true_yvals = np.array([peak.true_center for peak in spectrum.peaks])
             spectrum.remove_outliers()
 
@@ -131,12 +138,19 @@ class FitsFile:
             # what this function does.
             degree = 3
             spectrum.fit_spectrum(np.arange(0, self.cols), degree)
+            spectrum.fit_peak_widths()
 
-            if spec_ind == 20:
-                t2 = time.time()
-                print("time taken:", t2-t1)
-                self.plot_spectra(num_to_plot=spec_ind) 
-                spectrum.plot_peak_widths()
+            #############################################################
+            # This is for testing purposes only --- this code should be #
+            # deleted after testing is complete because no plotting sh- #
+            # ould be taking place here.                                # 
+            #############################################################
+
+            # if spec_ind == 20:
+            #     t2 = time.time()
+            #     print("time taken:", t2-t1)
+            #     self.plot_spectra(num_to_plot=spec_ind, show=False, save=True) 
+            #     spectrum.plot_peak_widths()
 
             # if spec_ind == 21:
             #     # import pdb; pdb.set_trace()
@@ -151,11 +165,8 @@ class FitsFile:
             #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
 
 
-            if spec_ind == len(self.spectra):
-                self.plot_spectra(show=False, num_to_plot=spec_ind, save=True)
-
-
-
+            # if spec_ind == len(self.spectra):
+            #     self.plot_spectra(num_to_plot=spec_ind, save=True)
 
 
     def __get_intensity_array(self, xpixel=1000):
@@ -240,7 +251,7 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
-            spectra.append(Spectrum(xvalues, yvalues))
+            spectra.append(Spectrum(xvalues, yvalues, self))
 
         self.spectra = spectra
 

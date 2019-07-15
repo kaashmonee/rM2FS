@@ -9,9 +9,16 @@ class Spectrum:
     """
     This is a class that represents each white spot on the image.
     """
-    def __init__(self, xvalues, yvalues):
+    spectrum_number = 1
+
+    def __init__(self, xvalues, yvalues, fits_file):
+        import util
         self.xvalues = xvalues
         self.yvalues = yvalues
+        self.fits_file = fits_file
+
+        # Remove very obvious outliers
+        # self.xvalues, self.yvalues = util.sigma_clip(self.xvalues, self.yvalues, sample_size=30)
 
         self.true_yvals = None
 
@@ -28,6 +35,19 @@ class Spectrum:
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
+
+        # Peaks for which a Gaussian was unable to be fit
+        self.unfittable_peaks = []
+
+        # In order to establish a width profile, each fitted Gaussian also 
+        # contains a standard deviation/width value that is stored and fitted
+        # a spline.
+        self.peak_width_spline_function = None
+        self.peak_width_spline_rms = None
+        self.widths = None
+        
+        # Increment the spectrum number after creation of a spectrum.
+        Spectrum.spectrum_number += 1
 
 
 
@@ -70,6 +90,7 @@ class Spectrum:
     def remove_outliers(self):
         import util
         self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+
         xvalue_set = set(self.xvalues)
         self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]
 
@@ -88,7 +109,7 @@ class Spectrum:
         diff_array = np.ediff1d(self.xvalues) 
 
         # Diff threshold to detect overlapping spectra
-        diff_threshold = 20
+        diff_threshold = 30
 
         # Contains list of indices where next index differs by more than 
         # diff_threshold
@@ -98,39 +119,86 @@ class Spectrum:
             if diff >= diff_threshold:
                 diff_ind_list.append(ind)
 
+
         # No part of the spectrum is overlapping, so there is no need to ensure
         # remove anything.
         if len(diff_ind_list) < 2:
             return
 
-        # Starting and ending indices of the self.xvalues that we ought consider
-        startx = diff_ind_list[0] + 1
-        endx = diff_ind_list[1]
+        # Finds the largest difference between indices that differ by 
+        # diff_threshold pixels.
+        diff_between_difs = np.ediff1d(diff_ind_list)
+        max_diff_ind = np.argmax(diff_between_difs)
+
+        # This is so that we can obtain the starting and ending index of the 
+        # x values in the diff_ind_list[] list.
+        startx_ind = max_diff_ind
+        endx_ind = max_diff_ind + 1
+
+        startx = diff_ind_list[startx_ind]
+        endx = diff_ind_list[endx_ind]
 
         self.xvalues = self.xvalues[startx:endx]
         self.yvalues = self.yvalues[startx:endx]
+        
+
+
+    
+    def fit_peak_widths(self):
+        """
+        For each peak, fits a spline to a plot to the function of the standard
+        deviation fitted Gaussian to the x value.
+        """
+        import util
+        # self.widths = np.array([peak.width for peak in self.peaks])
+        self.widths = []
+        xvalues = []
+
+        # Ensuring that the peaks with unfittable Gaussians won't be included
+        for peak in self.peaks:
+            if peak.width == "failed":
+                self.unfittable_peaks.append(peak)
+                continue
+            self.widths.append(peak.width)
+            xvalues.append(peak.x)
+
+        self.widths = np.array(self.widths)
+        xvalues = np.array(xvalues)
+
+        f = scipy.interpolate.UnivariateSpline(xvalues, self.widths)
+        widths_spline = f(xvalues)
+        self.peak_width_spline_function = f
+        self.peak_width_spline_rms = util.rms(widths_spline, self.widths)
 
 
     def plot_peak_widths(self):
         """
         Plotting function to plot the peak widths. This can only be called after
         gaussfit.fit_gaussian is called. It then fits a univariate spline to it. 
+        The fit_peak_widths function must be called in order for this function
+        to run.
         """
-        import util
         xvalues = self.xvalues
-        widths = np.array([peak.width for peak in self.peaks])
-        print("widths:", widths)        
-        f = scipy.interpolate.UnivariateSpline(xvalues, widths)
-        widths_spline = f(xvalues)
 
-        rms_value = util.rms(widths_spline, widths)
+        # Safety check to ensure that the user fits the peak widths before 
+        # trying to plot them.
+        if self.widths is None:
+            raise RuntimeError("The plot_peak_widths function was called before the fit_peak_widths function was called.")
+
+        widths = self.widths
+        widths_spline = self.peak_width_spline_function(xvalues)
 
         plt.scatter(xvalues, widths)
         plt.plot(xvalues, widths_spline, color="red")
         plt.xlabel("xpixel")
         plt.ylabel("width")
         plt.title("gaussian width v. peak")
-        print("rms of width spline fit:", rms_value)
+        
+        # Adding the rms of the spline fit to the plot.
+        ax = plt.gca()
+        rms_text = "rms: " + str(self.peak_width_spline_rms)
+        ax.text(5, 5, rms_text)
+
         plt.show()
 
 
