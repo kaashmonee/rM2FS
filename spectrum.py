@@ -105,63 +105,39 @@ class Spectrum:
         our analysis.
         """
 
-        # # Finds the differences between 2 adjacent elements in the array.
-        # diff_array = np.ediff1d(self.xvalues) 
+        # Finds the differences between 2 adjacent elements in the array.
+        diff_array = np.ediff1d(self.xvalues) 
 
-        # # Diff threshold to detect overlapping spectra
-        # diff_threshold = 20
+        # Diff threshold to detect overlapping spectra
+        diff_threshold = 30
 
-        # # Contains list of indices where next index differs by more than 
-        # # diff_threshold
-        # diff_ind_list = [] 
+        # Contains list of indices where next index differs by more than 
+        # diff_threshold
+        diff_ind_list = [] 
 
-        # for ind, diff in enumerate(diff_array):
-        #     if diff >= diff_threshold:
-        #         diff_ind_list.append(ind)
+        for ind, diff in enumerate(diff_array):
+            if diff >= diff_threshold:
+                diff_ind_list.append(ind)
 
-        # # No part of the spectrum is overlapping, so there is no need to ensure
-        # # remove anything.
-        # if len(diff_ind_list) < 2:
-        #     return
 
-        # # Starting and ending indices of the self.xvalues that we ought consider
-        # startx = diff_ind_list[0] + 1
-        # endx = diff_ind_list[1]
+        # No part of the spectrum is overlapping, so there is no need to ensure
+        # remove anything.
+        if len(diff_ind_list) < 2:
+            return
 
-        # self.xvalues = self.xvalues[startx:endx]
-        # self.yvalues = self.yvalues[startx:endx]
+        # Finds the largest difference between indices that differ by 20 pixels.
+        diff_between_difs = np.ediff1d(diff_ind_list)
+        max_diff_ind = np.argmax(diff_between_difs)
+
+        startx_ind = max_diff_ind
+        endx_ind = max_diff_ind + 1
+
+        startx = diff_ind_list[startx_ind]
+        endx = diff_ind_list[endx_ind]
+
+        self.xvalues = self.xvalues[startx:endx]
+        self.yvalues = self.yvalues[startx:endx]
         
-        # brightness = self.fits_file.image_data[self.xvalues, self.yvalues]
-
-
-        brightness = self.fits_file.image_data[self.yvalues, self.xvalues]
-        title = "spectrum: " + str(Spectrum.spectrum_number)
-        # print(title)
-
-        xy = np.vstack([self.xvalues, np.log(brightness)])
-        z = scipy.stats.gaussian_kde(xy)(xy)
-        z_thresh = np.log(z)**2
-        z_thresh_masked = np.ma.masked_where(z_thresh <= 50, z_thresh)
-
-        z_plot = z_thresh[z_thresh_masked.mask]
-        xvalues_umodified, yvalues_umondified = self.xvalues, self.yvalues
-
-        xvalues = self.xvalues[z_thresh_masked.mask]
-        yvalues = self.yvalues[z_thresh_masked.mask]
-
-        self.xvalues, self.yvalues = xvalues, yvalues
-
-        # plt.title(title)
-        # plt.xlabel("xpixel")
-        # plt.ylabel("intensity")
-
-        # plot_brightness = brightness[z_thresh_masked.mask]
-        # plt.scatter(xvalues, np.log(plot_brightness), c=z_thresh)
-        # plt.colorbar()
-        # plt.show()
-
-
-
 
 
     
