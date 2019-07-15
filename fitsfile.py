@@ -59,11 +59,13 @@ class FitsFile:
         print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
 
         for spectrum in self.spectra[:num_to_plot]:
+            
+            # Uncomment this section if the scatter plot portion of the spectrum
+            # is desired.
+            # spectrum_scatter = spectrum.plot()
+            # spectrum_scatter_plots.append(spectrum_scatter)
 
-            spectrum_scatter = spectrum.plot()
             fit_plot = spectrum.plot_fit()
-
-            spectrum_scatter_plots.append(spectrum_scatter)
             fit_plots.append(fit_plot)
 
         plt.xlabel("xpixel")
@@ -71,6 +73,7 @@ class FitsFile:
         plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
         plt.xlim(0, self.get_dimensions()[1])
         plt.ylim(0, self.get_dimensions()[0])
+        plt.axis("scaled")
 
         current_fig = plt.gcf()
 
@@ -78,7 +81,7 @@ class FitsFile:
             directory = "completed_images/"
             image_file_name = self.get_file_name() + "_fitted.png"
             print("Saving " + image_file_name + " to disk...")
-            current_fig.savefig(directory + image_file_name)
+            current_fig.savefig(directory + image_file_name, dpi=1500)
 
         if show: 
             plt.show()
