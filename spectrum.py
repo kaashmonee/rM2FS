@@ -64,7 +64,7 @@ class Spectrum:
 
 
     def plot_fit(self):
-        fit_plot = plt.plot(self.output, linewidth=0.3)
+        fit_plot = plt.plot(self.output, linewidth=0.1)
         return fit_plot
 
     def remove_outliers(self):
