@@ -125,10 +125,13 @@ class Spectrum:
         if len(diff_ind_list) < 2:
             return
 
-        # Finds the largest difference between indices that differ by 20 pixels.
+        # Finds the largest difference between indices that differ by 
+        # diff_threshold pixels.
         diff_between_difs = np.ediff1d(diff_ind_list)
         max_diff_ind = np.argmax(diff_between_difs)
 
+        # This is so that we can obtain the starting and ending index of the 
+        # x values in the diff_ind_list[] list.
         startx_ind = max_diff_ind
         endx_ind = max_diff_ind + 1
 
