@@ -7,3 +7,4 @@ __pycache__
 questions.txt
 *.txt
 .vscode
+remove_pickle.sh
