@@ -89,7 +89,10 @@ class Spectrum:
 
     def remove_outliers(self):
         import util
-        self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+        sample_iterations = [10, 100]
+        self.xvalues, self.true_yvals = util.sigma_clip(
+            self.xvalues, self.true_yvals, sample_size=sample_iterations
+        )
 
         xvalue_set = set(self.xvalues)
         self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]

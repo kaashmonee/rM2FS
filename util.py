@@ -8,6 +8,7 @@ import scipy.signal
 import matplotlib.pyplot as plt
 from fitsfile import FitsFile
 from spectrum import Spectrum
+from collections import Iterable
 
 
 # Using built in Python serializers as adding some custom functionality to save 
@@ -26,30 +27,47 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
     adjacent x and y values.
     """
 
-    length = len(xvalues)
-    
-    # Correctness check
-    assert(len(xvalues) == len(yvalues))
 
-    new_xvals = []
-    new_yvals = []
+    def clip_helper(xvalues, yvalues, sample_size, sigma):
 
-    for i in range(0, length, sample_size):
-        domain = xvalues[i:i+sample_size]
-        data = yvalues[i:i+sample_size]
+        length = len(xvalues)
+        
+        # Correctness check
+        assert(len(xvalues) == len(yvalues))
 
-        # Performs a 3sigma clipping on every 10 pixels.
-        output = astropy.stats.sigma_clip(data, sigma=sigma)
+        new_xvals = []
+        new_yvals = []
 
-        new_xvals.extend(domain[~output.mask])
-        new_yvals.extend(data[~output.mask])
+        for i in range(0, length, sample_size):
+            domain = xvalues[i:i+sample_size]
+            data = yvalues[i:i+sample_size]
 
-    new_len = len(new_xvals)
+            # Performs a 3sigma clipping on every 10 pixels.
+            output = astropy.stats.sigma_clip(data, sigma=sigma)
 
-    if (length-new_len) / length >= 0.1:
-        print_warning("Over 10% of pixels have been rejected in the sigma_clip routine.")
+            new_xvals.extend(domain[~output.mask])
+            new_yvals.extend(data[~output.mask])
 
-    return np.array(new_xvals), np.array(new_yvals)
+        new_len = len(new_xvals)
+
+        if (length-new_len) / length >= 0.1:
+            print_warning("Over 10% of pixels have been rejected in the sigma_clip routine.")
+
+        return np.array(new_xvals), np.array(new_yvals)
+
+
+    new_xvals, new_yvals = xvalues, yvalues
+
+    if isinstance(sample_size, Iterable):
+        for sample in sample_size:
+            new_xvals, new_yvals = clip_helper(new_xvals, new_yvals, sample, sigma)
+        
+        return new_xvals, new_yvals
+
+    else:
+        return clip_helper(xvalues, yvalues, sample_size, sigma)
+
+
 
 
 
