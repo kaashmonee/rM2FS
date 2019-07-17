@@ -51,16 +51,21 @@ class Spectrum:
 
 
 
-    def plot(self):
+    def plot(self, only_endpoints=True):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        size = 5
-        if self.true_yvals is not None:
-            scatter_plot = plt.scatter(self.xvalues, self.true_yvals, s=size)
+        size = 1
 
-        else:
-            scatter_plot = plt.scatter(self.xvalues, self.yvalues, s=size)
+        xvalues_to_plot = self.xvalues
+        yvalues_to_plot = self.yvalues
+
+        if only_endpoints:
+            xvalues_to_plot = [self.xvalues[0], self.xvalues[-1]]
+            yvalues_to_plot = [self.yvalues[0], self.yvalues[-1]]
+
+        scatter_plot = plt.scatter(xvalues_to_plot, yvalues_to_plot, s=size)
+
         
         return scatter_plot
 
@@ -84,7 +89,9 @@ class Spectrum:
 
 
     def plot_fit(self):
-        fit_plot = plt.plot(self.output, linewidth=0.1)
+        linewidth = 0.25
+
+        fit_plot = plt.plot(self.output, linewidth=linewidth)
         return fit_plot
 
     def remove_outliers(self):
