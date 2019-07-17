@@ -59,7 +59,7 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
     new_xvals, new_yvals = xvalues, yvalues
 
     if isinstance(sample_size, Iterable):
-        for sample in sample_size:
+        for sample in sorted(sample_size, reverse=True):
             new_xvals, new_yvals = clip_helper(new_xvals, new_yvals, sample, sigma)
         
         return new_xvals, new_yvals

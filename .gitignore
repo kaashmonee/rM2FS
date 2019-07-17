@@ -8,3 +8,4 @@ questions.txt
 *.txt
 .vscode
 remove_pickle.sh
+whatsnotworking.md
