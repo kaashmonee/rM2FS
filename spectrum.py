@@ -58,7 +58,7 @@ class Spectrum:
         size = 1
 
         xvalues_to_plot = self.xvalues
-        yvalues_to_plot = self.yvalues
+        yvalues_to_plot = self.true_yvals
 
         if only_endpoints:
             xvalues_to_plot = [self.xvalues[0], self.xvalues[-1]]
@@ -96,7 +96,7 @@ class Spectrum:
 
     def remove_outliers(self):
         import util
-        sample_sizes = [10, 20, 50, 70, 100]
+        sample_sizes = [10, 20, 50, 70, 100, 300]
         self.xvalues, self.true_yvals = util.sigma_clip(
             self.xvalues, self.true_yvals, sample_size=sample_sizes, sigma=2
         )
@@ -150,6 +150,8 @@ class Spectrum:
 
         self.xvalues = self.xvalues[startx:endx]
         self.yvalues = self.yvalues[startx:endx]
+
+        assert len(self.xvalues) == len(self.yvalues)
         
 
 
