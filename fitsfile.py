@@ -77,8 +77,7 @@ class FitsFile:
         current_fig = plt.gcf()
 
         if save: 
-            # directory = "completed_images/"
-            directory = ""
+            directory = "completed_images/"
             image_file_name = self.get_file_name() + "_fitted.svg"
             print("Saving " + image_file_name + " to disk...")
             current_fig.savefig(directory + image_file_name, dpi=1500)
