@@ -61,8 +61,8 @@ class Spectrum:
         yvalues_to_plot = self.true_yvals
 
         if only_endpoints:
-            xvalues_to_plot = [self.xvalues[0], self.xvalues[-1]]
-            yvalues_to_plot = [self.yvalues[0], self.yvalues[-1]]
+            xvalues_to_plot = [xvalues_to_plot[0], xvalues_to_plot[-1]]
+            yvalues_to_plot = [yvalues_to_plot[0], yvalues_to_plot[-1]]
 
         scatter_plot = plt.scatter(xvalues_to_plot, yvalues_to_plot, s=size)
 
@@ -98,7 +98,7 @@ class Spectrum:
         import util
         sample_sizes = [10, 20, 50, 70, 100, 300]
         self.xvalues, self.true_yvals = util.sigma_clip(
-            self.xvalues, self.true_yvals, sample_size=sample_sizes, sigma=2
+            self.xvalues, self.true_yvals, sample_size=sample_sizes, sigma=3
         )
 
         xvalue_set = set(self.xvalues)
