@@ -186,11 +186,11 @@ class FitsFile:
         """
         Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
         """
-        noise_metric = 5
+        dist = 5
 
         # ignores peaks with intensities less than 100
         peaks = scipy.signal.find_peaks(intensity_array, height=100, 
-                                                         distance=noise_metric) 
+                                                         distance=dist) 
         
         return peaks[0]
 
