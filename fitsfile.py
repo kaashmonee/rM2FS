@@ -62,7 +62,7 @@ class FitsFile:
             
             # Uncomment this section if the scatter plot portion of the spectrum
             # is desired.
-            spectrum_scatter = spectrum.plot()
+            spectrum_scatter = spectrum.plot(only_endpoints=True)
             spectrum_scatter_plots.append(spectrum_scatter)
 
             fit_plot = spectrum.plot_fit()
@@ -150,8 +150,8 @@ class FitsFile:
             # if spec_ind == 20:
             #     t2 = time.time()
             #     print("time taken:", t2-t1)
-            #     self.plot_spectra(num_to_plot=spec_ind, show=False, save=True) 
-            #     spectrum.plot_peak_widths()
+            #     self.plot_spectra(num_to_plot=spec_ind, show=True, save=False) 
+                # spectrum.plot_peak_widths()
 
             # if spec_ind == 21:
             #     # import pdb; pdb.set_trace()
@@ -255,6 +255,7 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
+            assert len(xvalues) == len(yvalues)
             spectra.append(Spectrum(xvalues, yvalues, self))
 
         self.spectra = spectra

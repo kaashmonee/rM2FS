@@ -53,16 +53,18 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         if (length-new_len) / length >= 0.1:
             print_warning("Over 10% of pixels have been rejected in the sigma_clip routine.")
 
+        assert len(new_xvals) == len(new_yvals)
+
         return np.array(new_xvals), np.array(new_yvals)
 
 
-    new_xvals, new_yvals = xvalues, yvalues
+    new_x, new_y = xvalues, yvalues
 
     if isinstance(sample_size, Iterable):
         for sample in sorted(sample_size, reverse=True):
-            new_xvals, new_yvals = clip_helper(new_xvals, new_yvals, sample, sigma)
+            new_x, new_y = clip_helper(new_x, new_y, sample, sigma)
         
-        return new_xvals, new_yvals
+        return new_x, new_y
 
     else:
         return clip_helper(xvalues, yvalues, sample_size, sigma)
