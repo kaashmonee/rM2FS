@@ -34,6 +34,8 @@ class FitsFile:
         """
         Plots the spectra on top of the image.
         """
+        # Clear the figure.
+        plt.clf()
 
         if not show and not save:
             raise ValueError("You must either choose to save or show the spectra.")
