@@ -34,6 +34,8 @@ class FitsFile:
         """
         Plots the spectra on top of the image.
         """
+        # Clear the figure.
+        plt.clf()
 
         if not show and not save:
             raise ValueError("You must either choose to save or show the spectra.")
@@ -62,8 +64,8 @@ class FitsFile:
             
             # Uncomment this section if the scatter plot portion of the spectrum
             # is desired.
-            # spectrum_scatter = spectrum.plot()
-            # spectrum_scatter_plots.append(spectrum_scatter)
+            spectrum_scatter = spectrum.plot(only_endpoints=True)
+            spectrum_scatter_plots.append(spectrum_scatter)
 
             fit_plot = spectrum.plot_fit()
             fit_plots.append(fit_plot)
@@ -149,8 +151,8 @@ class FitsFile:
             # if spec_ind == 20:
             #     t2 = time.time()
             #     print("time taken:", t2-t1)
-            #     self.plot_spectra(num_to_plot=spec_ind, show=False, save=True) 
-            #     spectrum.plot_peak_widths()
+            #     self.plot_spectra(num_to_plot=spec_ind, show=True, save=False) 
+                # spectrum.plot_peak_widths()
 
             # if spec_ind == 21:
             #     # import pdb; pdb.set_trace()
@@ -185,8 +187,11 @@ class FitsFile:
         """
         Find peaks in the intensity array. The peaks correspond to each order of the spectrograph.
         """
+        dist = 5
+
         # ignores peaks with intensities less than 100
-        peaks = scipy.signal.find_peaks(intensity_array, height=100) 
+        peaks = scipy.signal.find_peaks(intensity_array, height=100, 
+                                                         distance=dist) 
         
         return peaks[0]
 
@@ -251,6 +256,7 @@ class FitsFile:
         for i in range(num_cols):
             xvalues = xvals[:, i]
             yvalues = list_of_peaks[:, i]
+            assert len(xvalues) == len(yvalues)
             spectra.append(Spectrum(xvalues, yvalues, self))
 
         self.spectra = spectra

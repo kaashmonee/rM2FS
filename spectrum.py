@@ -51,16 +51,21 @@ class Spectrum:
 
 
 
-    def plot(self):
+    def plot(self, only_endpoints=True):
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        size = 5
-        if self.true_yvals is not None:
-            scatter_plot = plt.scatter(self.xvalues, self.true_yvals, s=size)
+        size = 1
 
-        else:
-            scatter_plot = plt.scatter(self.xvalues, self.yvalues, s=size)
+        xvalues_to_plot = self.xvalues
+        yvalues_to_plot = self.true_yvals
+
+        if only_endpoints:
+            xvalues_to_plot = [xvalues_to_plot[0], xvalues_to_plot[-1]]
+            yvalues_to_plot = [yvalues_to_plot[0], yvalues_to_plot[-1]]
+
+        scatter_plot = plt.scatter(xvalues_to_plot, yvalues_to_plot, s=size)
+
         
         return scatter_plot
 
@@ -84,12 +89,17 @@ class Spectrum:
 
 
     def plot_fit(self):
-        fit_plot = plt.plot(self.output, linewidth=0.1)
+        linewidth = 0.25
+
+        fit_plot = plt.plot(self.output, linewidth=linewidth)
         return fit_plot
 
     def remove_outliers(self):
         import util
-        self.xvalues, self.true_yvals = util.sigma_clip(self.xvalues, self.true_yvals)
+        sample_sizes = [10, 20, 50, 70, 100, 300]
+        self.xvalues, self.true_yvals = util.sigma_clip(
+            self.xvalues, self.true_yvals, sample_size=sample_sizes, sigma=3
+        )
 
         xvalue_set = set(self.xvalues)
         self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]
@@ -140,6 +150,8 @@ class Spectrum:
 
         self.xvalues = self.xvalues[startx:endx]
         self.yvalues = self.yvalues[startx:endx]
+
+        assert len(self.xvalues) == len(self.yvalues)
         
 
 

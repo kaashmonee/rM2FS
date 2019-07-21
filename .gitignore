@@ -7,3 +7,6 @@ __pycache__
 questions.txt
 *.txt
 .vscode
+remove_pickle.sh
+whatsnotworking.md
+completed_images_png/
