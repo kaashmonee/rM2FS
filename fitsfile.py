@@ -47,9 +47,8 @@ class FitsFile:
         import util
 
         # Setting up plotting...
-        thresholded_im = util.threshold_image(self.image_data)
-
-        plt.imshow(thresholded_im, origin="lower", cmap="gray")
+        vmin, vmax = util.get_vmin_vmax(self.image_data)
+        plt.imshow(self.image_data, origin="lower", cmap="gray", vmin=vmin, vmax=vmax)
         
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]

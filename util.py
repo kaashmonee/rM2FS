@@ -70,6 +70,12 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         return clip_helper(xvalues, yvalues, sample_size, sigma)
 
 
+def get_vmin_vmax(image):
+    flat_image = image.flatten()
+    fifth = np.percentile(flat_image, 5)
+    ninety_fifth = np.percentile(flat_image, 95)
+
+    return fifth, ninety_fifth
 
 
 
