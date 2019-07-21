@@ -9,6 +9,7 @@ def main():
     parser = argparse.ArgumentParser(description="Calculate continuum fits.") 
     parser.add_argument("-l", 
        help="use this flag to loop through all fits files", action="store_true")
+    parser.add_argument("-s", help="save", action="store_true")
     args = parser.parse_args()
 
     # We need to write a function that will automatically perform these routines
@@ -18,6 +19,7 @@ def main():
 
     directory = "fits_batch_2/"
     fn = "r0136_stitched.fits"
+    fn = "b2311_stitched.fits"
     # directory = "fits_batch_1/"
     # fn = "r0760_stitched.fits"
 
@@ -40,12 +42,13 @@ def main():
         pickle_directory = "fitted_files/"
         pickle_fp = pickle_directory + fn + ".pkl"
         pickled_fits_file = None
+        save = True if args.s is not False else False
 
         try:
             with open(pickle_fp) as f:
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
-                fits_file.plot_spectra(show=True, save=False)
+                fits_file.plot_spectra(show=True, save=save)
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)
