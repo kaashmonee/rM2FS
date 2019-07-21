@@ -1,6 +1,6 @@
 #!/bin/bash
 FILES=completed_images/*
-save_directory="completed_image_png/"
+save_directory="completed_images_png"
 
 for f in $FILES
 do
