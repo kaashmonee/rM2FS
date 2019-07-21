@@ -48,7 +48,8 @@ class FitsFile:
 
         # Setting up plotting...
         vmin, vmax = util.get_vmin_vmax(self.image_data)
-        plt.imshow(self.image_data, origin="lower", cmap="gray", vmin=vmin, vmax=vmax)
+        plt.imshow(self.image_data, origin="lower", cmap="gray", 
+                                    vmin=vmin, vmax=vmax)
         
         image_rows = self.image_data.shape[0]
         image_cols = self.image_data.shape[1]
