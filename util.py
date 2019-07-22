@@ -39,8 +39,8 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         new_yvals = []
 
         for i in range(0, length, sample_size):
-            domain = xvalues[i:i+sample_size]
-            data = yvalues[i:i+sample_size]
+            domain = np.array(xvalues[i:i+sample_size])
+            data = np.array(yvalues[i:i+sample_size])
 
             # Performs a 3sigma clipping on every 10 pixels.
             output = astropy.stats.sigma_clip(data, sigma=sigma)
@@ -70,11 +70,32 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         return clip_helper(xvalues, yvalues, sample_size, sigma)
 
 
+def sortxy(xvalues, yvalues):
+    """
+    Since these are coordinates, this function sorts the y values using the x
+    values as keys. 
+    https://www.geeksforgeeks.org/python-sort-values-first-list-using-second-list/
+    """
+    zipped_pairs = zip(xvalues, yvalues)
+    sorted_y = [y for _,y in sorted(zipped_pairs)]
+    
+    return sorted(xvalues), sorted_y
+
+
 def get_vmin_vmax(image):
     fifth = np.percentile(image, 5)
     ninety_fifth = np.percentile(image, 95)
 
     return fifth, ninety_fifth
+
+def find_int_peaks(intensity_array):
+    dist = 5
+
+    # ignores peaks with intensities less than 100
+    peaks = scipy.signal.find_peaks(intensity_array, height=100, 
+                                                        distance=dist) 
+    
+    return peaks[0]
 
 
 
@@ -104,7 +125,7 @@ def export_spectra(file_name, spectra):
 
 def perform_fits(fits_file):
     # Check if this file exists in the fitted_files/ directory
-    fits_file.get_true_peaks()
+    fits_file.get_spectra()
     fits_file.plot_spectra(save=True)
     print("Saving %s to disk..." % (fits_file.get_file_name() + ".pkl"))
     save(fits_file)

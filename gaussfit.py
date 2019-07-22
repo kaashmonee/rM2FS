@@ -77,7 +77,7 @@ def is_data_gaussian(data, peak):
 
 
 
-def fit_gaussian(fits_file, rng, peak, show=False, spec_ind=0):
+def fit_gaussian(fits_file, rng, peak, show=False):
     """
     This function obtains the fitting parameters for each Gaussian profile. 
     This includes the mean, expected max, and the standard deviation. It then 

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from astropy import modeling
+import gaussfit
 from gaussfit import Peak
 
 
@@ -10,31 +11,22 @@ class Spectrum:
     This is a class that represents each white spot on the image.
     """
     spectrum_number = 1
+    # total_spectra = 1
 
     def __init__(self, xvalues, yvalues, fits_file):
         import util
-        self.xvalues = xvalues
-        self.yvalues = yvalues
+        # These variables must be lists so that we can add spectra. They will
+        # be turned into numpy arrays after we call the `build` function.
+        self.xvalues = list(xvalues)
+        self.yvalues = list(yvalues)
         self.fits_file = fits_file
+        self.image_rows = self.fits_file.image_data[0]
+        self.image_cols = self.fits_file.image_data[1]
 
         # Remove very obvious outliers
         # self.xvalues, self.yvalues = util.sigma_clip(self.xvalues, self.yvalues, sample_size=30)
 
         self.true_yvals = None
-
-        xlen = len(xvalues)
-        ylen = len(yvalues)
-
-        # Adding a correctness check to ensure that the dimensions of each are correct.
-        if xlen != ylen:
-            raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
-
-
-        # Removes overlapping portions of the spectrum
-        self.__remove_overlapping_spectrum() 
-
-        # Generating peaks after the spectrum is cleaned and narrowed
-        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
 
         # Peaks for which a Gaussian was unable to be fit
         self.unfittable_peaks = []
@@ -45,9 +37,132 @@ class Spectrum:
         self.peak_width_spline_function = None
         self.peak_width_spline_rms = None
         self.widths = None
-        
+
+    
+    def add_peak(self, x, y):
+        """
+        Adds a peak to the spectrum.
+        """
+        self.xvalues.append(x)
+        self.yvalues.append(y)
+
+
+
+    def build(self):
+        import util
+        """
+        After all the points have been added to the spectrum, this function
+        must be called to 'build' the spectrum, which performs Gaussian fits of 
+        the integer peaks, removes outliers, removes the overlapping portions
+        of the spectra, and establishes a width profile.
+        """
+        xlen = len(self.xvalues)
+        ylen = len(self.yvalues)
+
+        # Sorting the x and y values
+        self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
+
+        # Adding a correctness check to ensure that the dimensions of each are correct.
+        if xlen != ylen:
+            raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
+
+
+        # Removes overlapping portions of the spectrum
+        # self.__remove_overlapping_spectrum() 
+
+        # Generating peaks after the spectrum is cleaned and narrowed
+        self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
+
+        # Fits a Gaussian to each of the peaks.
+        self.__fit_peak_gaussians()
+
+        # Removes outliers
+        self.__remove_outliers()
+
+        # After obtaining the true y values and narrowing the spectrum,
+        # we want to fit the spectrum with a UnivariateSpline, which is 
+        # what this function does.
+        degree = 3
+        self.__fit_spectrum(np.arange(0, len(self.image_cols)), degree)
+
+        # This function fits a spline to the peak widths and generates an rms 
+        # value.
+        self.__fit_peak_widths()
+
+
         # Increment the spectrum number after creation of a spectrum.
         Spectrum.spectrum_number += 1
+
+
+    def __fit_peak_gaussians(self):
+        """
+        This function fits a Gaussian to each spectrum in the .fitsfile. Then, 
+        it finds the center of the Gaussian and assigns it to the peak.true_center
+        parameter of each Peak object in each Spectrum. 
+        """
+        image = self.fits_file.image_data
+        image_height = image.shape[1]
+
+        print("Fitting gaussian...")
+        import time
+        t1 = time.time()
+        success_counter = 0
+
+        for peak in self.peaks:
+            y1 = peak.y
+            
+            # This is just an arbitrary range that has been chosen.
+            # This might have to be tweaked for various spectra.
+            left_range = 4
+            right_range = 4
+            y0 = y1 - left_range
+            y2 = y1 + right_range
+
+            # Ensure that the ranges do not exceed the width and height of 
+            # the image
+            if y0 <= 0: y0 = 0
+            if y2 >= image_height: y2 = image_height
+            rng = (y0, y2)
+
+            # This does the fitting and the peak.true_center setting.
+            show = False
+            success = gaussfit.fit_gaussian(self.fits_file, rng, peak,
+                                            show=show)
+            success_counter += success
+
+        if success_counter != len(self.peaks):
+            print("\nSpectrum %d had %d/%d points with a successful Gaussian fit." % (Spectrum.spectrum_number, success_counter, len(self.peaks)))
+
+
+        self.yvalues = np.array([peak.true_center for peak in self.peaks])
+
+        #############################################################
+        # This is for testing purposes only --- this code should be #
+        # deleted after testing is complete because no plotting sh- #
+        # ould be taking place here.                                # 
+        #############################################################
+
+        if Spectrum.spectrum_number == 15:
+            self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
+                                        show=True, save=False) 
+            # spectrum.plot_peak_widths()
+
+        # if spec_ind == 21:
+        #     # import pdb; pdb.set_trace()
+        #     t2 = time.time()
+        #     print("time taken:", t2-t1)
+        #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+
+        # if spec_ind == 60:
+        #     t2 = time.time()
+        #     print("time taken:", t2-t1)
+        #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
+
+
+        # if spec_ind == len(self.spectra):
+        #     self.plot_spectra(num_to_plot=spec_ind, save=True)
+
 
 
 
@@ -55,10 +170,10 @@ class Spectrum:
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        size = 1
+        size = 5
 
         xvalues_to_plot = self.xvalues
-        yvalues_to_plot = self.true_yvals
+        yvalues_to_plot = self.yvalues
 
         if only_endpoints:
             xvalues_to_plot = [xvalues_to_plot[0], xvalues_to_plot[-1]]
@@ -70,42 +185,35 @@ class Spectrum:
         return scatter_plot
 
 
-    def fit_spectrum(self, domain, degree):
+    def __fit_spectrum(self, domain, degree):
         """
         This function fits a polynomial of degree `degree` and saves
         the output on the input domain. It then saves the RMS goodness of fit
         value.
         """
         import util
-        yvals = self.true_yvals if self.true_yvals is not None else self.yvalues
-        f = scipy.interpolate.UnivariateSpline(self.xvalues, yvals)
+        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
 
         self.output = f(domain)
 
         # Calculate the RMS goodness of fit and display to the user if the 
         # fit is very bad.
         spline_yvals = f(self.xvalues)
-        self.rms_value = util.rms(spline_yvals, yvals)
+        self.rms_value = util.rms(spline_yvals, self.yvalues)
 
 
     def plot_fit(self):
-        linewidth = 0.25
+        linewidth = 1
 
         fit_plot = plt.plot(self.output, linewidth=linewidth)
         return fit_plot
 
-    def remove_outliers(self):
+    def __remove_outliers(self):
         import util
         sample_sizes = [10, 20, 50, 70, 100, 300]
-        self.xvalues, self.true_yvals = util.sigma_clip(
-            self.xvalues, self.true_yvals, sample_size=sample_sizes, sigma=3
+        self.xvalues, self.yvalues = util.sigma_clip(
+            self.xvalues, self.yvalues, sample_size=sample_sizes, sigma=3
         )
-
-        xvalue_set = set(self.xvalues)
-        self.peaks = [peak for peak in self.peaks if peak.x in xvalue_set]
-
-        # Safety check to ensure there are no duplicate x pixels.
-        assert(len(self.peaks) == len(self.xvalues))
 
     
     def __remove_overlapping_spectrum(self):
@@ -156,7 +264,7 @@ class Spectrum:
 
 
     
-    def fit_peak_widths(self):
+    def __fit_peak_widths(self):
         """
         For each peak, fits a spline to a plot to the function of the standard
         deviation fitted Gaussian to the x value.
