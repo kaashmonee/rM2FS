@@ -155,39 +155,48 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         num_spectra = len(yvalues_at_start)
+        xthreshold = 5
+        ythreshold = 3
         
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
             s = Spectrum([], [], self)
-
-            next_x = start_pixel
+            
+            next_spec_x = start_pixel
             for x in range(start_pixel, image_length):
+
                 check_y = xpeaks[x]
-                spec_indices = np.where(abs(y-check_y) <= 2)[0]
-                threshold = 30
+                # Check for xpixels to see if there exists a y pixel that's less
+                # than some value away.
+                spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
 
-                for ind in spec_indices:
-                    s.add_peak(x, check_y[ind])
-                    next_x = x
+                if len(spec_indices) > 0:
+                    next_ind = spec_indices[0]
+                    nexty = check_y[next_ind]
+                    next_spec_x = x
+                    s.add_peak(x, nexty)
 
-                if abs(next_x - x) >= threshold:
+                if abs(next_spec_x - x) >= xthreshold:
                     break
 
+            prev_spec_x = start_pixel
             for x in range(start_pixel-1, 0, -1):
                 check_y = xpeaks[x]
-                spec_indices = np.where(abs(y-check_y) <= 2)[0]
+                spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
 
-                prev_x = start_pixel - 1
-                for ind in spec_indices:
-                    s.add_peak(x, check_y[ind])
-                    prev_x = x
+                if len(spec_indices) > 0:
+                    prev_ind = spec_indices[0]
+                    prevy = check_y[prev_ind]
+                    prev_spec_x = x
+                    s.add_peak(x, prevy)
 
-                if abs(next_x - x) >= threshold:
+                if abs(prev_spec_x - x) >= xthreshold:
                     break
 
             print("Building spectrum %d/%d" % (num, num_spectra))
             print("points in spectra:", len(s.xvalues))
             s.build()
+            print("points in the spectrum:", s.xvalues)
             self.spectra.append(s)
         
         

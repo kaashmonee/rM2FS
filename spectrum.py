@@ -61,6 +61,10 @@ class Spectrum:
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
+        if np.diff(self.xvalues).all() <= 0:
+            print("self.xvalues:", self.xvalues)
+            plt.plot(self.xvalues)
+            plt.show()
 
         # Adding a correctness check to ensure that the dimensions of each are correct.
         if xlen != ylen:
