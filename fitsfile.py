@@ -162,10 +162,10 @@ class FitsFile:
         for num, y in enumerate(yvalues_at_start):
             s = Spectrum([], [], self)
             
-            next_spec_x = start_pixel
+            next_spec_x = start_pixel + 1
             for x in range(start_pixel, image_length):
 
-                check_y = xpeaks[x]
+                check_y = xpeaks[next_spec_x]
                 # Check for xpixels to see if there exists a y pixel that's less
                 # than some value away.
                 spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
@@ -173,7 +173,7 @@ class FitsFile:
                 if len(spec_indices) > 0:
                     next_ind = spec_indices[0]
                     nexty = check_y[next_ind]
-                    next_spec_x = x
+                    next_spec_x += 1
                     s.add_peak(x, nexty)
 
                 if abs(next_spec_x - x) >= xthreshold:
@@ -181,13 +181,13 @@ class FitsFile:
 
             prev_spec_x = start_pixel
             for x in range(start_pixel-1, 0, -1):
-                check_y = xpeaks[x]
+                check_y = xpeaks[prev_spec_x]
                 spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
 
                 if len(spec_indices) > 0:
                     prev_ind = spec_indices[0]
                     prevy = check_y[prev_ind]
-                    prev_spec_x = x
+                    prev_spec_x -= 1
                     s.add_peak(x, prevy)
 
                 if abs(prev_spec_x - x) >= xthreshold:
