@@ -65,7 +65,7 @@ class FitsFile:
             
             # Uncomment this section if the scatter plot portion of the spectrum
             # is desired.
-            spectrum_scatter = spectrum.plot(only_endpoints=True)
+            spectrum_scatter = spectrum.plot(only_endpoints=False)
             spectrum_scatter_plots.append(spectrum_scatter)
 
             fit_plot = spectrum.plot_fit()
@@ -155,11 +155,12 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         num_spectra = len(yvalues_at_start)
-        xthreshold = 5
-        ythreshold = 4
+        xthreshold = 1
+        ythreshold = 1
         
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
+            cur_y = y
             s = Spectrum([], [], self)
             
             cur_x = start_pixel
@@ -168,35 +169,38 @@ class FitsFile:
                 check_y = xpeaks[next_spec_x]
                 # Check for xpixels to see if there exists a y pixel that's less
                 # than some value away.
-                spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
+                spec_indices = np.where(abs(cur_y-check_y) <= ythreshold)[0]
 
                 if len(spec_indices) > 0:
                     next_ind = spec_indices[0]
                     nexty = check_y[next_ind]
                     s.add_peak(next_spec_x, nexty)
                     cur_x = next_spec_x
+                    cur_y = nexty
 
                 if abs(next_spec_x - cur_x) >= xthreshold:
                     break
 
             cur_x = start_pixel
+            cur_y = y
             for prev_spec_x in range(start_pixel-1, 0, -1):
+
                 check_y = xpeaks[prev_spec_x]
-                spec_indices = np.where(abs(y-check_y) <= ythreshold)[0]
+                spec_indices = np.where(abs(cur_y-check_y) <= ythreshold)[0]
 
                 if len(spec_indices) > 0:
                     prev_ind = spec_indices[0]
                     prevy = check_y[prev_ind]
                     s.add_peak(prev_spec_x, prevy)
                     cur_x = prev_spec_x
+                    cur_y = prevy
 
                 if abs(prev_spec_x - cur_x) >= xthreshold:
                     break
 
             print("Building spectrum %d/%d" % (num, num_spectra))
-            # print("points in spectra:", len(s.xvalues))
             s.build()
-            # print("points in the spectrum:", s.xvalues)
+            print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
             self.spectra.append(s)
         
         
