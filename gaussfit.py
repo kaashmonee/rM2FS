@@ -138,13 +138,10 @@ def fit_gaussian(fits_file, rng, peak, show=False):
                                                 p0=[peak_value, mean, sigma], 
                                                 maxfev=10000)
         
-
-
             mean_intensity = popt[0]
             mean_y = popt[1]
             peak.true_center = mean_y
             peak.width = popt[2]
-            
 
             fit = gauss(x_continuous, *popt)
 
@@ -172,3 +169,4 @@ def fit_gaussian(fits_file, rng, peak, show=False):
         plt.show()
 
     return fit_successful
+
