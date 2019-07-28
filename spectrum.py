@@ -87,11 +87,11 @@ class Spectrum:
         # we want to fit the spectrum with a UnivariateSpline, which is 
         # what this function does.
         degree = 3
-        self.__fit_spectrum(np.arange(0, len(self.image_cols)), degree)
+        # self.__fit_spectrum(np.arange(0, len(self.image_cols)), degree)
 
         # This function fits a spline to the peak widths and generates an rms 
         # value.
-        self.__fit_peak_widths()
+        # self.__fit_peak_widths()
 
 
         # Increment the spectrum number after creation of a spectrum.
@@ -146,23 +146,10 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        if Spectrum.spectrum_number == 15:
+        if Spectrum.spectrum_number in [15, 21]:
             self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
                                         show=True, save=False) 
             # spectrum.plot_peak_widths()
-
-        # if spec_ind == 21:
-        #     # import pdb; pdb.set_trace()
-        #     t2 = time.time()
-        #     print("time taken:", t2-t1)
-        #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
-
-
-        # if spec_ind == 60:
-        #     t2 = time.time()
-        #     print("time taken:", t2-t1)
-        #     self.plot_spectra(show=True, num_to_plot=spec_ind) 
-
 
         # if spec_ind == len(self.spectra):
         #     self.plot_spectra(num_to_plot=spec_ind, save=True)
