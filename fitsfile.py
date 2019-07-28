@@ -124,7 +124,7 @@ class FitsFile:
         # Obtain a dictionary of x pixels and the peaks at each x pixel.
         for xpixel in xpixels:
             ia = self.__get_intensity_array(xpixel=xpixel)
-            peaks = scipy.signal.find_peaks(ia, height=100)[0]
+            peaks = util.find_int_peaks(ia)
             xpeaks[xpixel] = peaks
 
         return xpeaks
