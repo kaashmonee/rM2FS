@@ -64,7 +64,7 @@ class FitsFile:
             
             # Uncomment this section if the scatter plot portion of the spectrum
             # is desired.
-            spectrum_scatter = spectrum.plot(only_endpoints=False)
+            spectrum_scatter = spectrum.plot(only_endpoints=True)
             spectrum_scatter_plots.append(spectrum_scatter)
 
             fit_plot = spectrum.plot_fit()

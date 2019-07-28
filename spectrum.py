@@ -170,7 +170,7 @@ class Spectrum:
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        size = 1
+        size = 0.25
 
         xvalues_to_plot = self.xvalues
         yvalues_to_plot = self.yvalues
