@@ -54,10 +54,17 @@ class Spectrum:
         After all the points have been added to the spectrum, this function
         must be called to 'build' the spectrum, which performs Gaussian fits of 
         the integer peaks, removes outliers, removes the overlapping portions
-        of the spectra, and establishes a width profile.
+        of the spectra, and establishes a width profile. If there are fewer than
+        100 points in the spectrum, then the build is rejected and False
+        is returned.
         """
         xlen = len(self.xvalues)
         ylen = len(self.yvalues)
+
+        assert xlen == ylen
+        if xlen <= 100:
+            print("Build rejected! Fewer than 100 points in the spectrum...")
+            return False
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
@@ -87,15 +94,17 @@ class Spectrum:
         # we want to fit the spectrum with a UnivariateSpline, which is 
         # what this function does.
         degree = 3
-        # self.__fit_spectrum(np.arange(0, len(self.image_cols)), degree)
+        self.__fit_spectrum(np.arange(0, len(self.image_cols)), degree)
 
         # This function fits a spline to the peak widths and generates an rms 
         # value.
-        # self.__fit_peak_widths()
+        self.__fit_peak_widths()
 
 
         # Increment the spectrum number after creation of a spectrum.
         Spectrum.spectrum_number += 1
+
+        return True
 
 
     def __fit_peak_gaussians(self):

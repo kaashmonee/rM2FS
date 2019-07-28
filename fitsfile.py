@@ -199,9 +199,9 @@ class FitsFile:
                     break
 
             print("Building spectrum %d/%d" % (num, num_spectra))
-            s.build()
+            build_success = s.build()
             print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
-            self.spectra.append(s)
+            if build_success: self.spectra.append(s)
         
 
     def get_file_name(self):
