@@ -24,6 +24,7 @@ class FitsFile:
         self.rows = self.image_data.shape[0]
         self.cols = self.image_data.shape[1]
         self.spectra = []
+        self.num_spectra = 0
 
         # self.__get_spectra()
 
@@ -59,8 +60,6 @@ class FitsFile:
         spectrum_scatter_plots = []
         fit_plots = []
 
-        print("Plotting %i of %i spectra" % (num_to_plot, len(self.spectra)))
-
         for spectrum in self.spectra[:num_to_plot]:
             
             # Uncomment this section if the scatter plot portion of the spectrum
@@ -73,7 +72,7 @@ class FitsFile:
 
         plt.xlabel("xpixel")
         plt.ylabel("ypixel") 
-        plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(len(self.spectra)))
+        plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(self.num_spectra))
         plt.xlim(0, self.get_dimensions()[1])
         plt.ylim(0, self.get_dimensions()[0])
 
@@ -154,9 +153,10 @@ class FitsFile:
 
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
-        num_spectra = len(yvalues_at_start)
-        xthreshold = 3
-        ythreshold = 2
+        self.num_spectra = len(yvalues_at_start)
+        xthreshold = 1
+        ythreshold = 1
+        cur_num_spectra = 0
         
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
@@ -198,11 +198,14 @@ class FitsFile:
                 if abs(prev_spec_x - cur_x) >= xthreshold:
                     break
 
-            print("Building spectrum %d/%d" % (num, num_spectra))
             build_success = s.build()
             if build_success: 
+                cur_num_spectra += 1
+                print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
                 self.spectra.append(s)
                 print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
+            else:
+                self.num_spectra -= 1
         
 
     def get_file_name(self):
