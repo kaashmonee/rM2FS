@@ -88,11 +88,9 @@ def get_vmin_vmax(image):
 
     return fifth, ninety_fifth
 
-def find_int_peaks(intensity_array):
-    dist = 5
-
+def find_int_peaks(intensity_array, height=100, dist=5):
     # ignores peaks with intensities less than 100
-    peaks = scipy.signal.find_peaks(intensity_array, height=100, 
+    peaks = scipy.signal.find_peaks(intensity_array, height=height, 
                                                         distance=dist) 
     
     return peaks[0]
