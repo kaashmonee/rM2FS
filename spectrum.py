@@ -79,7 +79,7 @@ class Spectrum:
 
 
         # Removes overlapping portions of the spectrum
-        # self.__remove_overlapping_spectrum() 
+        self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
