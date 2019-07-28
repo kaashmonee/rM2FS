@@ -9,7 +9,7 @@ if [ ! -z "$1" ]
     basename "$f"
     filename="$(basename -- $f)"
     filename=$filename".png"
-    inkscape -z -e $save_directory/$filename $f
+    inkscape -z -e $save_directory/$filename -d 1000 $f
 fi
 
 if [ $# -eq 0 ]
@@ -21,7 +21,7 @@ if [ $# -eq 0 ]
         basename "$f"
         filename="$(basename -- $f)"
         filename=$filename".png"
-        inkscape -z -e $save_directory/$filename $f
+        inkscape -z -e $save_directory/$filename -d 1000 $f
         echo "Finished"
     done
 fi
