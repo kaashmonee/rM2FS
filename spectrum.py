@@ -170,7 +170,7 @@ class Spectrum:
         """
         Takes in an optional parameter `show` that shows the plot as well.
         """
-        size = 5
+        size = 1
 
         xvalues_to_plot = self.xvalues
         yvalues_to_plot = self.yvalues
@@ -203,7 +203,7 @@ class Spectrum:
 
 
     def plot_fit(self):
-        linewidth = 1
+        linewidth = 0.25
 
         fit_plot = plt.plot(self.output, linewidth=linewidth)
         return fit_plot
