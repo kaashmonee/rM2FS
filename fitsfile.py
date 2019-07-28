@@ -155,8 +155,8 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         num_spectra = len(yvalues_at_start)
-        xthreshold = 1
-        ythreshold = 1
+        xthreshold = 3
+        ythreshold = 2
         
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
