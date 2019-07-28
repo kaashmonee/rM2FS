@@ -68,8 +68,8 @@ class FitsFile:
             spectrum_scatter = spectrum.plot(only_endpoints=False)
             spectrum_scatter_plots.append(spectrum_scatter)
 
-            # fit_plot = spectrum.plot_fit()
-            # fit_plots.append(fit_plot)
+            fit_plot = spectrum.plot_fit()
+            fit_plots.append(fit_plot)
 
         plt.xlabel("xpixel")
         plt.ylabel("ypixel") 
