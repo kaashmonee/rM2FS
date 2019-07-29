@@ -11,7 +11,6 @@ class Spectrum:
     This is a class that represents each white spot on the image.
     """
     spectrum_number = 1
-    # total_spectra = 1
 
     def __init__(self, xvalues, yvalues, fits_file):
         import util
