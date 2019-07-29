@@ -206,6 +206,24 @@ class FitsFile:
                 print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
             else:
                 self.num_spectra -= 1
+
+
+    def plot_spectra_brightness(self):
+        """
+        Plots the brightness of each spectra against the xvalue.
+        """
+        plt.clf()
+        image_name = self.get_file_name()
+        plt.title("brightness vs. xvalues in %s" % (image_name))
+        plt.xlabel("xpixel")
+        plt.ylabel("brightness")
+
+        for spectrum in self.spectra:
+            brightness_array = self.image_data[spectrum.int_yvalues, spectrum.int_xvalues]
+            plt.scatter(spectrum.int_xvalues, brightness_array)
+        
+            plt.show()
+
         
 
     def get_file_name(self):

@@ -68,6 +68,13 @@ class Spectrum:
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
+
+        # Ensuring that we keep track of the integer yvalues
+        # This is useful for when we want to plot the brightness vs. x value of
+        # the peaks.
+        self.int_xvalues = np.array(self.xvalues)
+        self.int_yvalues = np.array(self.yvalues)
+
         if np.diff(self.xvalues).all() <= 0:
             print("self.xvalues:", self.xvalues)
             plt.plot(self.xvalues)
