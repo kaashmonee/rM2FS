@@ -154,8 +154,8 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         self.num_spectra = len(yvalues_at_start)
-        xthreshold = 2
-        ythreshold = 1
+        xthreshold = 3
+        ythreshold = 3
         cur_num_spectra = 0
         
         # Going from right to left
@@ -222,7 +222,7 @@ class FitsFile:
             brightness_array = self.image_data[spectrum.int_yvalues, spectrum.int_xvalues]
             plt.scatter(spectrum.int_xvalues, brightness_array)
         
-            plt.show()
+        plt.show()
 
         
 
