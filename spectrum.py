@@ -23,11 +23,6 @@ class Spectrum:
         self.image_rows = self.fits_file.image_data[0]
         self.image_cols = self.fits_file.image_data[1]
 
-        # Remove very obvious outliers
-        # self.xvalues, self.yvalues = util.sigma_clip(self.xvalues, self.yvalues, sample_size=30)
-
-        self.true_yvals = None
-
         # Peaks for which a Gaussian was unable to be fit
         self.unfittable_peaks = []
 
