@@ -19,7 +19,7 @@ def main():
 
     directory = "fits_batch_2/"
     fn = "r0136_stitched.fits"
-    fn = "b2311_stitched.fits"
+    # fn = "b2311_stitched.fits"
     # directory = "fits_batch_1/"
     # fn = "r0760_stitched.fits"
 
