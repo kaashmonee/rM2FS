@@ -23,6 +23,29 @@ class SpectrumUnitTest(unittest.TestCase):
         self.assertTrue(new_xvals.all() == xvalues.all()
                         and new_yvals.all() == yvalues.all())
 
+    
+    def test_sortxy(self):
+        """
+        Unit testing the sortxy function.
+        """
+        xvalues = list(range(100, 0, -1))
+        yvalues = list(range(100, 0, -1))
+        sorted_xvalues, sorted_yvalues = util.sortxy(xvalues, yvalues)
+
+        self.assertTrue(list(sorted_xvalues) == list(range(1, 101)))
+        self.assertTrue(list(sorted_yvalues) == list(range(1, 101)))
+
+        yvalues = list(range(500, 400, -1))
+        sortedx, sortedy = util.sortxy(xvalues, yvalues)
+
+        self.assertTrue(list(sortedx) == list(range(1, 101)))
+        self.assertTrue(list(sortedy) == list(range(401, 501)))
+
+
+
+
+
+
 
 
 
