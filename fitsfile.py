@@ -220,10 +220,8 @@ class FitsFile:
             plt.scatter(spectrum.int_xvalues, brightness_array)
             
             
-            # xpeaks, brightness_peaks = util.find_xy_peaks(spectrum.int_xvalues, brightness_array)
-            smoothed_brightness = util.smooth(brightness_array)
-            for _  in range(100):
-                smoothed_brightness = util.smooth(smoothed_brightness)
+            smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 201, 5)
+            assert len(smoothed_brightness) == len(spectrum.int_xvalues)
             
             print("length brightness:", len(smoothed_brightness))
             plt.plot(smoothed_brightness, color="red")
