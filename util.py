@@ -97,10 +97,26 @@ def find_int_peaks(intensity_array, height=100, dist=5):
 
 
 def find_xy_peaks(x, y):
+    """
+    Finds peaks in a distribution given the x values and the yvalues. Returns
+    the (x, y) coordinates of the peaks.
+    """
     peaks,_ = scipy.signal.find_peaks(y)
     xpeaks = np.take(x, peaks)
     ypeaks = np.take(y, peaks)
     return xpeaks, ypeaks
+
+
+def fit_spline(x, y, domain, degree=3):
+    """
+    Fits a smoothing spline to the x-y values. Then applies to the domain and
+    returns an `output` array where the function is applied to `domain`.
+    """
+    f = scipy.interpolate.UnivariateSpline(x, y, k=degree)
+    output = f(domain)
+    spline_yvals = f(x)
+    rms_val = rms(spline_yvals, y)
+    return output, rms_val
 
 
 

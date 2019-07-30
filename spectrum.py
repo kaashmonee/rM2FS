@@ -193,14 +193,8 @@ class Spectrum:
         value.
         """
         import util
-        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
-
-        self.output = f(domain)
-
-        # Calculate the RMS goodness of fit and display to the user if the 
-        # fit is very bad.
-        spline_yvals = f(self.xvalues)
-        self.rms_value = util.rms(spline_yvals, self.yvalues)
+        self.output, self.rms_value = util.fit_spline(self.xvalues, self.yvalues,
+                                                      degree=degree)
 
 
     def plot_fit(self):
