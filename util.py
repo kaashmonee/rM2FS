@@ -96,6 +96,14 @@ def find_int_peaks(intensity_array, height=100, dist=5):
     return peaks[0]
 
 
+def find_xy_peaks(x, y):
+    peaks,_ = scipy.signal.find_peaks(y)
+    xpeaks = np.take(x, peaks)
+    ypeaks = np.take(y, peaks)
+    return xpeaks, ypeaks
+
+
+
 
 def rms(peaks, fitted_peaks):
     """

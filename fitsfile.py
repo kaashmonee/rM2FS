@@ -212,11 +212,16 @@ class FitsFile:
         """
         Plots the brightness of each spectra against the xvalue.
         """
+        import util
         plt.clf()
 
         for spectrum in self.spectra:
             brightness_array = self.image_data[spectrum.int_yvalues, spectrum.int_xvalues]
             plt.scatter(spectrum.int_xvalues, brightness_array)
+            
+            
+            xpeaks, brightness_peaks = util.find_xy_peaks(spectrum.int_xvalues, brightness_array)
+            plt.scatter(xpeaks, brightness_peaks)
 
             image_name = self.get_file_name()
             plt.title("brightness vs. xvalues in %s" % (image_name))
