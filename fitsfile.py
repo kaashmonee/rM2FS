@@ -207,35 +207,9 @@ class FitsFile:
             else:
                 self.num_spectra -= 1
 
-
     def plot_spectra_brightness(self):
-        """
-        Plots the brightness of each spectra against the xvalue.
-        """
-        import util
-        plt.clf()
-
         for spectrum in self.spectra:
-            brightness_array = self.image_data[spectrum.int_yvalues, spectrum.int_xvalues]
-            plt.scatter(spectrum.int_xvalues, brightness_array)
-            
-            
-            smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 201, 5)
-            assert len(smoothed_brightness) == len(spectrum.int_xvalues)
-            
-            print("length brightness:", len(smoothed_brightness))
-            plt.plot(smoothed_brightness, color="red")
-            
-            # domain = np.arange(spectrum.int_xvalues[0], spectrum.int_xvalues[-1])
-            # output, rms = util.fit_spline(xpeaks, brightness_peaks, domain)
-            # plt.plot(output, color="red")
-
-            image_name = self.get_file_name()
-            plt.title("brightness vs. xvalues in %s" % (image_name))
-            plt.xlabel("xpixel")
-            plt.ylabel("brightness")
-            
-            plt.show()
+            spectrum.plot_spectrum_brightness()
 
         
 

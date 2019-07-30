@@ -197,6 +197,48 @@ class Spectrum:
                                                       domain, degree=degree)
 
 
+
+
+    def plot_spectrum_brightness(self):
+        """
+        Plots the brightness of each spectra against the xvalue.
+        """
+        import util
+        plt.clf()
+
+        brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
+        plt.scatter(self.int_xvalues, brightness_array)
+        
+        
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 501, 5)
+        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
+
+        extremax = self.int_xvalues[extrema_indices]
+        extremabright = smoothed_brightness[extrema_indices]
+        # plt.clf()
+        # plt.scatter(np.arange(len(extremabright)), extremabright)
+        # plt.show()
+        plt.scatter(extremax, extremabright)
+
+        assert len(smoothed_brightness) == len(self.int_xvalues)
+        
+        print("length brightness:", len(smoothed_brightness))
+        plt.plot(smoothed_brightness, color="red")
+        
+        # domain = np.arange(spectrum.int_xvalues[0], spectrum.int_xvalues[-1])
+        # output, rms = util.fit_spline(xpeaks, brightness_peaks, domain)
+        # plt.plot(output, color="red")
+
+        image_name = self.fits_file.get_file_name()
+        plt.title("brightness vs. xvalues in %s" % (image_name))
+        plt.xlabel("xpixel")
+        plt.ylabel("brightness")
+        
+        plt.show()
+
+
+
+
     def plot_fit(self):
         linewidth = 0.25
 
