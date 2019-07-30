@@ -194,7 +194,7 @@ class Spectrum:
         """
         import util
         self.output, self.rms_value = util.fit_spline(self.xvalues, self.yvalues,
-                                                      degree=degree)
+                                                      domain, degree=degree)
 
 
     def plot_fit(self):
