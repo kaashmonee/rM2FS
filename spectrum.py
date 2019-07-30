@@ -280,6 +280,9 @@ class Spectrum:
         self.widths = np.array(self.widths)
         xvalues = np.array(xvalues)
 
+        # TODO: This should be replaced with the more abstract util.fit_spline
+        # function --- that is the function that should be used for all spline
+        # fitting in this codebase. This is addressed in #93.
         f = scipy.interpolate.UnivariateSpline(xvalues, self.widths)
         widths_spline = f(xvalues)
         self.peak_width_spline_function = f
