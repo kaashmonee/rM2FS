@@ -220,8 +220,18 @@ class FitsFile:
             plt.scatter(spectrum.int_xvalues, brightness_array)
             
             
-            xpeaks, brightness_peaks = util.find_xy_peaks(spectrum.int_xvalues, brightness_array)
-            plt.scatter(xpeaks, brightness_peaks)
+            # xpeaks, brightness_peaks = util.find_xy_peaks(spectrum.int_xvalues, brightness_array)
+            width_array = np.arange(1, 500)
+            smoothed_brightness = util.smooth(brightness_array)
+            for _  in range(100):
+                smoothed_brightness = util.smooth(smoothed_brightness)
+            
+            print("length brightness:", len(smoothed_brightness))
+            plt.plot(smoothed_brightness, color="red")
+            
+            # domain = np.arange(spectrum.int_xvalues[0], spectrum.int_xvalues[-1])
+            # output, rms = util.fit_spline(xpeaks, brightness_peaks, domain)
+            # plt.plot(output, color="red")
 
             image_name = self.get_file_name()
             plt.title("brightness vs. xvalues in %s" % (image_name))
