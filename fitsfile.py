@@ -221,7 +221,6 @@ class FitsFile:
             
             
             # xpeaks, brightness_peaks = util.find_xy_peaks(spectrum.int_xvalues, brightness_array)
-            width_array = np.arange(1, 500)
             smoothed_brightness = util.smooth(brightness_array)
             for _  in range(100):
                 smoothed_brightness = util.smooth(smoothed_brightness)
