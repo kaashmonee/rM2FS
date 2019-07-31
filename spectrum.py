@@ -310,9 +310,13 @@ class Spectrum:
         extremax = self.int_xvalues[extrema_indices]
         extremabright = smoothed_brightness[extrema_indices]
 
-        # Case on the 3 different possible scenarios:
-        
+        # Case on the 3 different possible scenarios as described in the
+        # docstring...
 
+        # Correctness check
+        assert len(extremax) == len(extremabright)
+
+        pass
 
     
     def __fit_peak_widths(self):
