@@ -236,7 +236,7 @@ class Spectrum:
         plt.xlabel("xpixel")
         plt.ylabel("brightness")
         
-        plt.show()
+        # plt.show()
 
 
 

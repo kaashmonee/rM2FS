@@ -207,10 +207,15 @@ class FitsFile:
             else:
                 self.num_spectra -= 1
 
+
+
     def plot_spectra_brightness(self):
         for ind, spectrum in enumerate(self.spectra):
             num = ind + 1 
             spectrum.plot_spectrum_brightness(num)
+            print("ind:", ind)
+
+        plt.show()
 
         
 
