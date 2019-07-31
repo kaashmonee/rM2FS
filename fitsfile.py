@@ -211,11 +211,11 @@ class FitsFile:
 
     def plot_spectra_brightness(self):
         for ind, spectrum in enumerate(self.spectra):
+            # if ind != 80: continue
             num = ind + 1 
             spectrum.plot_spectrum_brightness(num)
-            print("ind:", ind)
 
-        plt.show()
+        # plt.show()
 
         
 

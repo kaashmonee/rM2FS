@@ -212,7 +212,14 @@ class Spectrum:
         plt.scatter(self.int_xvalues, brightness_array)
         
         # Smoothing the brightness array
-        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 501, 5)
+        # Obtain window size
+        window_size = len(self.int_xvalues) // 6
+
+        if window_size % 2 == 0:
+            window_size -= 1
+        
+        order = 3
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, window_size, order)
 
         # Obtaining the minima of the smoothed function and the x indices of the
         # minima
@@ -236,7 +243,7 @@ class Spectrum:
         plt.xlabel("xpixel")
         plt.ylabel("brightness")
         
-        # plt.show()
+        plt.show()
 
 
 
