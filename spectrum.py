@@ -71,6 +71,12 @@ class Spectrum:
         self.int_xvalues = np.array(self.xvalues)
         self.int_yvalues = np.array(self.yvalues)
 
+        # Run the remove overlapping spectra method, which will update the 
+        # self.int_xvalues and self.int_yvalues variables. We will use those
+        # to update the self.xvalues and self.yvalues variables.
+        self.__remove_overlapping_spectrum()
+        self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+
         if np.diff(self.xvalues).all() <= 0:
             print("self.xvalues:", self.xvalues)
             plt.plot(self.xvalues)
@@ -79,10 +85,6 @@ class Spectrum:
         # Adding a correctness check to ensure that the dimensions of each are correct.
         if xlen != ylen:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
-
-
-        # Removes overlapping portions of the spectrum
-        self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
@@ -316,7 +318,60 @@ class Spectrum:
         # Correctness check
         assert len(extremax) == len(extremabright)
 
-        pass
+        # If there are greater than 2 minima, keep removing the ones closest
+        # to the edges until there are exactly 2 left
+        extremax, extremabright = util.sortxy(extremax, extremabright)
+        if len(extremax) > 2:
+            while len(extremax) == 2:
+                if extremax[0] <= abs(extremax[-1] - image_width):
+                    extremax.pop(0)
+                    extremabright.pop(0)
+                else:
+                    extremax.pop()
+                    extremabright.pop()
+
+        # Just another correctness check
+        assert len(extremax) == len(extremabright)
+
+        # If there are exactly 2 maxima
+        halfway_point = image_width/2
+        if len(extremax) == 2:
+            x1 = extremax[0]
+            x2 = extremax[1]
+
+            if x1 <= halfway_point and x2 <= halfway_point:
+                extremax.pop(0)
+                extremabright.pop(0)
+            elif x1 >= halfway_point and x2 >= halfway_point:
+                extremax.pop()
+                extremabright.pop()
+            else:
+                # The minima should not be in the middle of the image
+                raise ValueError("Bad spectrum --- minima are at middle of image")
+
+            
+
+        # The minima points should now represent the starting and ending
+        # points of the spectra
+        assert len(extremax) == len(extremabright)
+        assert len(extremax) <= 2
+
+        if len(extremax) == 2:
+            startx = self.int_xvalues[extremax[0]]
+            endx = self.int_xvalues[extremax[1]]
+            self.int_xvalues = self.int_xvalues[startx:endx+1]
+            self.int_yvalues = self.int_yvalues[startx:endx+1]
+
+        elif len(extremax) == 1:
+            if extremax[0] <= halfway_point:
+                self.int_xvalues = self.int_xvalues[extremax[0]:]
+                self.int_yvalues = self.int_yvalues[extremax[0]:]
+            elif extremax[0] >= halfway_point:
+                self.int_xvalues = self.int_xvalues[:extremax[0]+1]
+                self.int_yvalues = self.int_yvalues[:extremay[0]+1]
+
+
+
 
     
     def __fit_peak_widths(self):
