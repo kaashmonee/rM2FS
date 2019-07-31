@@ -268,46 +268,49 @@ class Spectrum:
         """
         This routine removes the part of the spectrum on either side that is 
         responsible that overlaps. This way, we only use the middle spectrum for 
-        our analysis.
+        our analysis. This routine works as follows:
+        1. It obtains the brightness vs. x plots for each spectrum. 
+        2. It then uses a Savitzky-Golay filter to smooth the scatter. 
+        3. It obtains the local minima in the smoothed scatter. After finding 
+        the local minima, there are 3 things on which to case:
+            a. Greater than 2 local minima
+                If there are more than 2 local minima, then remove the minima
+                closest to the edges until there are only 2 remaining.
+            b. Two minima detected
+                Ensure that the two minima are not in the same half of image.
+                If they are, then remove the minimum closest to the edge.
+            c. Fewer than two minima detected
+                Do nothing
         """
 
-        # Finds the differences between 2 adjacent elements in the array.
-        diff_array = np.ediff1d(self.xvalues) 
+        # Obtaining all the brightness values and plotting them against x
+        brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
-        # Diff threshold to detect overlapping spectra
-        diff_threshold = 30
+        # Sigma clipping the brightness array to get rid of the extreme values
+        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, 
+                                            brightness_array, sample_size=100)
 
-        # Contains list of indices where next index differs by more than 
-        # diff_threshold
-        diff_ind_list = [] 
+        plt.scatter(self.int_xvalues, brightness_array)
+        
+        # Smoothing the brightness array
+        # Obtain window size
+        window_size = len(self.int_xvalues) // 6
 
-        for ind, diff in enumerate(diff_array):
-            if diff >= diff_threshold:
-                diff_ind_list.append(ind)
+        if window_size % 2 == 0:
+            window_size -= 1
+        
+        order = 3
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, window_size, order)
 
+        # Obtaining the minima of the smoothed function and the x indices of the
+        # minima
+        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
 
-        # No part of the spectrum is overlapping, so there is no need to ensure
-        # remove anything.
-        if len(diff_ind_list) < 2:
-            return
+        # Plotting the minima
+        extremax = self.int_xvalues[extrema_indices]
+        extremabright = smoothed_brightness[extrema_indices]
 
-        # Finds the largest difference between indices that differ by 
-        # diff_threshold pixels.
-        diff_between_difs = np.ediff1d(diff_ind_list)
-        max_diff_ind = np.argmax(diff_between_difs)
-
-        # This is so that we can obtain the starting and ending index of the 
-        # x values in the diff_ind_list[] list.
-        startx_ind = max_diff_ind
-        endx_ind = max_diff_ind + 1
-
-        startx = diff_ind_list[startx_ind]
-        endx = diff_ind_list[endx_ind]
-
-        self.xvalues = self.xvalues[startx:endx]
-        self.yvalues = self.yvalues[startx:endx]
-
-        assert len(self.xvalues) == len(self.yvalues)
+        # Case on the 3 different possible scenarios:
         
 
 
