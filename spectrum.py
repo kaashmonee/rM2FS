@@ -204,29 +204,33 @@ class Spectrum:
         import util
         plt.clf()
 
+        # Obtaining all the brightness values and plotting them against x
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
         plt.scatter(self.int_xvalues, brightness_array)
-        
-        
-        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 501, 5)
-        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
 
+        # Sigma clipping the brightness array to get rid of the extreme values
+        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, brightness_array, sample_size=100)
+        
+        # Smoothing the brightness array
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 501, 5)
+
+        # Obtaining the minima of the smoothed function and the x indices of the
+        # minima
+        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
         extremax = self.int_xvalues[extrema_indices]
+
+        # Plotting the minima
         extremabright = smoothed_brightness[extrema_indices]
-        # plt.clf()
-        # plt.scatter(np.arange(len(extremabright)), extremabright)
-        # plt.show()
         plt.scatter(extremax, extremabright)
 
+        # Correctness check to ensure that the smoothed brightness array is the 
+        # same length as the original array
         assert len(smoothed_brightness) == len(self.int_xvalues)
-        
-        print("length brightness:", len(smoothed_brightness))
-        plt.plot(self.int_xvalues, smoothed_brightness, color="red")
-        
-        # domain = np.arange(spectrum.int_xvalues[0], spectrum.int_xvalues[-1])
-        # output, rms = util.fit_spline(xpeaks, brightness_peaks, domain)
-        # plt.plot(output, color="red")
 
+        # Plotting the smoothed brightness on top of everything        
+        plt.plot(self.int_xvalues, smoothed_brightness, color="red")
+
+        # Setting up plotting... 
         image_name = self.fits_file.get_file_name()
         plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
         plt.xlabel("xpixel")
