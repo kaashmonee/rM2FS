@@ -206,10 +206,10 @@ class Spectrum:
 
         # Obtaining all the brightness values and plotting them against x
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
-        plt.scatter(self.int_xvalues, brightness_array)
 
         # Sigma clipping the brightness array to get rid of the extreme values
         self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, brightness_array, sample_size=100)
+        plt.scatter(self.int_xvalues, brightness_array)
         
         # Smoothing the brightness array
         smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 501, 5)
