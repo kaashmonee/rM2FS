@@ -208,7 +208,9 @@ class Spectrum:
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
         # Sigma clipping the brightness array to get rid of the extreme values
-        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, brightness_array, sample_size=100)
+        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, 
+                                            brightness_array, sample_size=100)
+
         plt.scatter(self.int_xvalues, brightness_array)
         
         # Smoothing the brightness array
