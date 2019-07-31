@@ -208,8 +208,8 @@ class FitsFile:
                 self.num_spectra -= 1
 
     def plot_spectra_brightness(self):
-        for spectrum in self.spectra:
-            spectrum.plot_spectrum_brightness()
+        for num, spectrum in enumerate(self.spectra):
+            spectrum.plot_spectrum_brightness(num+1)
 
         
 

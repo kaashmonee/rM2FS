@@ -32,6 +32,8 @@ class Spectrum:
         self.peak_width_spline_rms = None
         self.widths = None
 
+        Spectrum.spectrum_number += 1
+
     
     def add_peak(self, x, y):
         """
@@ -100,10 +102,6 @@ class Spectrum:
         # This function fits a spline to the peak widths and generates an rms 
         # value.
         self.__fit_peak_widths()
-
-
-        # Increment the spectrum number after creation of a spectrum.
-        Spectrum.spectrum_number += 1
 
         return True
 
@@ -199,7 +197,7 @@ class Spectrum:
 
 
 
-    def plot_spectrum_brightness(self):
+    def plot_spectrum_brightness(self, num):
         """
         Plots the brightness of each spectra against the xvalue.
         """
@@ -223,14 +221,14 @@ class Spectrum:
         assert len(smoothed_brightness) == len(self.int_xvalues)
         
         print("length brightness:", len(smoothed_brightness))
-        plt.plot(smoothed_brightness, color="red")
+        plt.plot(self.int_xvalues, smoothed_brightness, color="red")
         
         # domain = np.arange(spectrum.int_xvalues[0], spectrum.int_xvalues[-1])
         # output, rms = util.fit_spline(xpeaks, brightness_peaks, domain)
         # plt.plot(output, color="red")
 
         image_name = self.fits_file.get_file_name()
-        plt.title("brightness vs. xvalues in %s" % (image_name))
+        plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
         plt.xlabel("xpixel")
         plt.ylabel("brightness")
         
