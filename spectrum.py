@@ -70,6 +70,7 @@ class Spectrum:
         # the peaks.
         self.int_xvalues = np.array(self.xvalues)
         self.int_yvalues = np.array(self.yvalues)
+        assert len(self.int_xvalues) == len(self.int_yvalues)
 
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
@@ -206,42 +207,9 @@ class Spectrum:
         import util
         plt.clf()
 
-        # Obtaining all the brightness values and plotting them against x
-        brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
+        assert len(self.int_xvalues) == len(self.brightness_array)
+        plt.scatter(self.int_xvalues, self.brightness_array)
 
-        # Sigma clipping the brightness array to get rid of the extreme values
-        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, 
-                                            brightness_array, sample_size=100)
-
-        plt.scatter(self.int_xvalues, brightness_array)
-        
-        # Smoothing the brightness array
-        # Obtain window size
-        window_size = len(self.int_xvalues) // 6
-
-        if window_size % 2 == 0:
-            window_size -= 1
-        
-        order = 3
-        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, window_size, order)
-
-        # Obtaining the minima of the smoothed function and the x indices of the
-        # minima
-        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
-        extremax = self.int_xvalues[extrema_indices]
-
-        # Plotting the minima
-        extremabright = smoothed_brightness[extrema_indices]
-        plt.scatter(extremax, extremabright)
-
-        # Correctness check to ensure that the smoothed brightness array is the 
-        # same length as the original array
-        assert len(smoothed_brightness) == len(self.int_xvalues)
-
-        # Plotting the smoothed brightness on top of everything        
-        plt.plot(self.int_xvalues, smoothed_brightness, color="red")
-
-        # Setting up plotting... 
         image_name = self.fits_file.get_file_name()
         plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
         plt.xlabel("xpixel")
@@ -285,18 +253,28 @@ class Spectrum:
 
         import util
 
-        # Obtaining all the brightness values and plotting them against x
+        # Obtaining an array of brightness values for each spectrum
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
-        # Sigma clipping the brightness array to get rid of the extreme values
-        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues, 
-                                            brightness_array, sample_size=100)
+        # This dictionary is for restoring the yvalues after the xvalues with
+        # pixels that are too bright are clipped out
+        brightness_dict = {x: y for (x, y) in zip(self.int_xvalues, self.int_yvalues)}
 
-        plt.scatter(self.int_xvalues, brightness_array)
-        
+        # Sigma clipping the brightness array to get rid of the extreme values
+        # Ensures that the next line restores the yvalues and that the x and y
+        # correspond
+        clip_window = 100
+        temp_xvalues, brightness_array = util.sigma_clip(self.int_xvalues,
+                                            brightness_array, 
+                                            sample_size=clip_window)
+        temp_yvalues = [brightness_dict[x] for x in temp_xvalues]
+
+        # Correctness check
+        assert len(temp_xvalues) == len(temp_yvalues)
+
         # Smoothing the brightness array
         # Obtain window size
-        window_size = len(self.int_xvalues) // 6
+        window_size = len(temp_xvalues) // 6
 
         if window_size % 2 == 0:
             window_size -= 1
@@ -309,7 +287,7 @@ class Spectrum:
         extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
 
         # Plotting the minima
-        extremax = self.int_xvalues[extrema_indices]
+        extremax = temp_xvalues[extrema_indices]
         extremabright = smoothed_brightness[extrema_indices]
 
         # Case on the 3 different possible scenarios as described in the
@@ -318,7 +296,7 @@ class Spectrum:
         # Correctness check
         assert len(extremax) == len(extremabright)
 
-        image_width = self.fits_file.image_data.shape[1]
+        image_width = len(self.image_cols)
 
         # If there are greater than 2 minima, keep removing the ones closest
         # to the edges until there are exactly 2 left
@@ -347,33 +325,44 @@ class Spectrum:
             elif x1 >= halfway_point and x2 >= halfway_point:
                 extremax.pop()
                 extremabright.pop()
-            # else:
-                # The minima should not be in the middle of the image
-                # raise ValueError("Bad spectrum --- minima are at middle of image")
 
-
-            
 
         # The minima points should now represent the starting and ending
         # points of the spectra
         assert len(extremax) == len(extremabright)
         assert len(extremax) <= 2
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+        assert len(temp_xvalues) == len(temp_yvalues)
 
         if len(extremax) == 2:
-            startx = self.int_xvalues[extremax[0]]
-            endx = self.int_xvalues[extremax[1]]
+            startx = temp_xvalues[extremax[0]]
+            endx = temp_xvalues[extremax[1]]
             self.int_xvalues = self.int_xvalues[startx:endx+1]
             self.int_yvalues = self.int_yvalues[startx:endx+1]
 
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+
         elif len(extremax) == 1:
+            assert len(self.int_xvalues) == len(self.int_yvalues)
             if extremax[0] <= halfway_point:
-                self.int_xvalues = self.int_xvalues[extremax[0]:]
-                self.int_yvalues = self.int_yvalues[extremax[0]:]
+                self.int_xvalues = self.int_xvalues[temp_xvalues[extremax[0]]:]
+                self.int_yvalues = self.int_yvalues[temp_yvalues[extremax[0]]:]
             elif extremax[0] >= halfway_point:
-                self.int_xvalues = self.int_xvalues[:extremax[0]+1]
-                self.int_yvalues = self.int_yvalues[:extremax[0]+1]
+                assert len(self.int_xvalues) == len(self.int_yvalues)
+                self.int_xvalues = self.int_xvalues[:temp_xvalues[extremax[0]+1]]
+                self.int_yvalues = self.int_yvalues[:temp_yvalues[extremax[0]+1]]
+                assert len(self.int_xvalues) == len(self.int_yvalues)
 
+            assert len(self.int_xvalues) == len(self.int_yvalues)
 
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+        assert len(temp_xvalues) == len(temp_yvalues)        
+
+        # Setting instance variables so that they can be used in the plotting
+        # function
+        # TODO: get plotting to work basically
+        self.smoothed_brightness = smoothed_brightness
+        self.brightness_array = brightness_array
 
 
     

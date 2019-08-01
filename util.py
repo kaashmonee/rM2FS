@@ -24,7 +24,8 @@ def load(fits_file_path):
 def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
     """
     Returns a 3 sigma clipped dataset that will perform sigma clipping on 10 
-    adjacent x and y values.
+    adjacent x and y values. This does not modify the original xvalues and 
+    yvalues arrays.
     """
 
 
@@ -58,7 +59,7 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         return np.array(new_xvals), np.array(new_yvals)
 
 
-    new_x, new_y = xvalues, yvalues
+    new_x, new_y = np.array(xvalues), np.array(yvalues)
 
     if isinstance(sample_size, Iterable):
         for sample in sorted(sample_size, reverse=True):
@@ -76,8 +77,12 @@ def sortxy(xvalues, yvalues):
     values as keys. 
     https://www.geeksforgeeks.org/python-sort-values-first-list-using-second-list/
     """
+    assert len(xvalues) == len(yvalues)
     zipped_pairs = zip(xvalues, yvalues)
     sorted_y = [y for _,y in sorted(zipped_pairs)]
+
+    # Correctness check  
+    assert len(xvalues) == len(sorted_y)
     
     return sorted(xvalues), sorted_y
 
