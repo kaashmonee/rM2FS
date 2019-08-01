@@ -326,7 +326,7 @@ class Spectrum:
         # to the edges until there are exactly 2 left
         extremax, extremabright = util.sortxy(extremax, extremabright)
         if len(extremax) > 2:
-            while len(extremax) == 2:
+            while len(extremax) != 2:
                 if extremax[0] <= abs(extremax[-1] - image_width):
                     extremax.pop(0)
                     extremabright.pop(0)
@@ -349,9 +349,10 @@ class Spectrum:
             elif x1 >= halfway_point and x2 >= halfway_point:
                 extremax.pop()
                 extremabright.pop()
-            else:
+            # else:
                 # The minima should not be in the middle of the image
-                raise ValueError("Bad spectrum --- minima are at middle of image")
+                # raise ValueError("Bad spectrum --- minima are at middle of image")
+
 
             
 
@@ -372,7 +373,7 @@ class Spectrum:
                 self.int_yvalues = self.int_yvalues[extremax[0]:]
             elif extremax[0] >= halfway_point:
                 self.int_xvalues = self.int_xvalues[:extremax[0]+1]
-                self.int_yvalues = self.int_yvalues[:extremay[0]+1]
+                self.int_yvalues = self.int_yvalues[:extremax[0]+1]
 
 
 
