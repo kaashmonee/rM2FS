@@ -250,8 +250,6 @@ class Spectrum:
         plt.show()
 
 
-
-
     def plot_fit(self):
         linewidth = 0.25
 
