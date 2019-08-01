@@ -32,6 +32,12 @@ class Spectrum:
         self.peak_width_spline_rms = None
         self.widths = None
 
+        # When plotting the brightness of the spectrum, we are going to need 
+        # to store relevant information, which will be in the following varaible
+        # This should be of type SpectrumBrightnessPlotData and will be updated
+        # in the __remove_overlapping_spectra method.
+        self.spectrum_brightness_plot_data = None
+
         Spectrum.spectrum_number += 1
 
     
@@ -198,17 +204,17 @@ class Spectrum:
                                                       domain, degree=degree)
 
 
-
-
     def plot_spectrum_brightness(self, num):
         """
         Plots the brightness of each spectra against the xvalue.
         """
         import util
         plt.clf()
+        dat = self.spectrum_brightness_plot_data
 
-        assert len(self.int_xvalues) == len(self.brightness_array)
-        plt.scatter(self.int_xvalues, self.brightness_array)
+        plt.scatter(dat.brightness_xvals_to_plot, dat.brightness_array)
+        plt.plot(dat.brightness_xvals_to_plot, dat.smoothed_brightness, color="red")
+        plt.scatter(dat.extremax, dat.extremabright)
 
         image_name = self.fits_file.get_file_name()
         plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
@@ -286,9 +292,9 @@ class Spectrum:
         # minima
         extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
 
-        # Plotting the minima
+        # Obtaining the minima
         extremax = temp_xvalues[extrema_indices]
-        extremabright = smoothed_brightness[extrema_indices]
+        extremabright = smoothed_brightness[extrema_indices] 
 
         # Case on the 3 different possible scenarios as described in the
         # docstring...
@@ -347,15 +353,15 @@ class Spectrum:
             # If the point is on the left side of the image, take the values 
             # from the point to the end of the image
             if extremax[0] < halfway_point:
-                self.int_xvalues = self.int_xvalues[temp_xvalues[extremax[0]]:]
-                self.int_yvalues = self.int_yvalues[temp_yvalues[extremax[0]]:]
+                self.int_xvalues = temp_xvalues[extremax[0]:]
+                self.int_yvalues = temp_yvalues[extremax[0]:]
 
             # If the point is on the right, then take the values from the point
             # to the left of the image
             elif extremax[0] > halfway_point:
                 assert len(self.int_xvalues) == len(self.int_yvalues)
-                self.int_xvalues = self.int_xvalues[:temp_xvalues[extremax[0]+1]]
-                self.int_yvalues = self.int_yvalues[:temp_yvalues[extremax[0]+1]]
+                self.int_xvalues = temp_xvalues[:extremax[0]+1]
+                self.int_yvalues = temp_yvalues[:extremax[0]+1]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
             
             else:
@@ -368,9 +374,13 @@ class Spectrum:
 
         # Setting instance variables so that they can be used in the plotting
         # function
-        # TODO: get plotting to work basically
-        self.smoothed_brightness = smoothed_brightness
-        self.brightness_array = brightness_array
+        self.spectrum_brightness_plot_data = SpectrumBrightnessPlotData(
+            smoothed_brightness, 
+            brightness_array, 
+            temp_xvalues, 
+            extremax, 
+            extremabright
+        )
 
 
     
@@ -434,4 +444,17 @@ class Spectrum:
 
         plt.show()
 
+
+class SpectrumBrightnessPlotData:
+    """
+    This is a data class to hold the necessary data to plot the spectrum's 
+    brightness. We don't want to pollute the Spectrum namespace, so we 
+    are doing that in a separate class.
+    """
+    def __init__(self, smoothed_brightness, brightness_array, brightness_xvals, extremax, extremabright):
+        self.smoothed_brightness = smoothed_brightness
+        self.brightness_array = brightness_array
+        self.brightness_xvals_to_plot = brightness_xvals
+        self.extremax = extremax
+        self.extremabright = extremabright
 
