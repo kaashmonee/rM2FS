@@ -278,6 +278,7 @@ class Spectrum:
 
         # Correctness check
         assert len(temp_xvalues) == len(temp_yvalues)
+        assert len(temp_xvalues) == len(brightness_array)
 
         # Smoothing the brightness array
         # Obtain window size
@@ -323,6 +324,7 @@ class Spectrum:
         # If there are exactly 2 maxima
         halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) // 2
         if len(extremax) == 2:
+
             x1 = extremax[0]
             x2 = extremax[1]
 
@@ -334,35 +336,39 @@ class Spectrum:
                 extremabright.pop()
 
 
-        # The minima points should now represent the starting and ending
-        # points of the spectra
-        assert len(extremax) == len(extremabright)
-        assert len(extremax) <= 2
-        assert len(self.int_xvalues) == len(self.int_yvalues)
-        assert len(temp_xvalues) == len(temp_yvalues)
+            # The minima points should now represent the starting and ending
+            # points of the spectra
+            assert len(extremax) == len(extremabright)
+            assert len(extremax) <= 2
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+            assert len(temp_xvalues) == len(temp_yvalues)
 
-        if len(extremax) == 2:
-            startx = temp_xvalues[extremax[0]]
-            endx = temp_xvalues[extremax[1]]
-            self.int_xvalues = self.int_xvalues[startx:endx+1]
-            self.int_yvalues = self.int_yvalues[startx:endx+1]
+            # If no points were removed above
+            if len(extremax) == 2:
+                startx = temp_xvalues[extremax[0]]
+                endx = temp_xvalues[extremax[1]]
+                self.int_xvalues = self.int_xvalues[startx:endx+1]
+                self.int_yvalues = self.int_yvalues[startx:endx+1]
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
-        elif len(extremax) == 1:
+        if len(extremax) == 1:
 
             # If the point is on the left side of the image, take the values 
             # from the point to the end of the image
+            assert len(self.int_xvalues) == len(self.int_yvalues)
             if extremax[0] < halfway_point:
-                self.int_xvalues = temp_xvalues[extremax[0]:]
-                self.int_yvalues = temp_yvalues[extremax[0]:]
+                startx = temp_xvalues[extremax[0]]
+                self.int_xvalues = self.int_xvalues[startx:]
+                self.int_yvalues = self.int_yvalues[startx:]
+                assert len(self.int_xvalues) == len(self.int_yvalues)
 
             # If the point is on the right, then take the values from the point
             # to the left of the image
             elif extremax[0] > halfway_point:
-                assert len(self.int_xvalues) == len(self.int_yvalues)
-                self.int_xvalues = temp_xvalues[:extremax[0]+1]
-                self.int_yvalues = temp_yvalues[:extremax[0]+1]
+                endx = temp_xvalues[extremax[0]]
+                self.int_xvalues = self.int_xvalues[:endx]
+                self.int_yvalues = self.int_yvalues[:endx]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
             
             else:
