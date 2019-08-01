@@ -285,6 +285,8 @@ class Spectrum:
                 Do nothing
         """
 
+        import util
+
         # Obtaining all the brightness values and plotting them against x
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
@@ -317,6 +319,8 @@ class Spectrum:
 
         # Correctness check
         assert len(extremax) == len(extremabright)
+
+        image_width = self.fits_file.image_data.shape[1]
 
         # If there are greater than 2 minima, keep removing the ones closest
         # to the edges until there are exactly 2 left
