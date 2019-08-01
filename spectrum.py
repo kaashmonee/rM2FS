@@ -213,6 +213,7 @@ class Spectrum:
         dat = self.spectrum_brightness_plot_data
 
         plt.scatter(dat.brightness_xvals_to_plot, dat.brightness_array)
+        plt.scatter(self.int_xvalues, self.fits_file.image_data[self.int_yvalues, self.int_xvalues])
         plt.plot(dat.brightness_xvals_to_plot, dat.smoothed_brightness, color="red")
         plt.scatter(dat.extremax, dat.extremabright)
 
@@ -320,7 +321,7 @@ class Spectrum:
         assert len(extremax) == len(extremabright)
 
         # If there are exactly 2 maxima
-        halfway_point = image_width/2
+        halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) // 2
         if len(extremax) == 2:
             x1 = extremax[0]
             x2 = extremax[1]
