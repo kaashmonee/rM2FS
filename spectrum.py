@@ -343,15 +343,23 @@ class Spectrum:
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
         elif len(extremax) == 1:
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-            if extremax[0] <= halfway_point:
+
+            # If the point is on the left side of the image, take the values 
+            # from the point to the end of the image
+            if extremax[0] < halfway_point:
                 self.int_xvalues = self.int_xvalues[temp_xvalues[extremax[0]]:]
                 self.int_yvalues = self.int_yvalues[temp_yvalues[extremax[0]]:]
-            elif extremax[0] >= halfway_point:
+
+            # If the point is on the right, then take the values from the point
+            # to the left of the image
+            elif extremax[0] > halfway_point:
                 assert len(self.int_xvalues) == len(self.int_yvalues)
                 self.int_xvalues = self.int_xvalues[:temp_xvalues[extremax[0]+1]]
                 self.int_yvalues = self.int_yvalues[:temp_yvalues[extremax[0]+1]]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
+            
+            else:
+                raise ValueError("The extrema value should not be in the middle")
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
