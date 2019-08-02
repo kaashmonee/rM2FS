@@ -276,13 +276,16 @@ class Spectrum:
                                             sample_size=clip_window)
         self.int_yvalues = [brightness_dict[x] for x in self.int_xvalues]
 
+        # xvalues that will be used for plotting
+        to_plot_x = np.array(self.int_xvalues)
+
         # Correctness check
         assert len(self.int_xvalues) == len(self.int_yvalues)
         assert len(self.int_xvalues) == len(brightness_array)
 
         # Smoothing the brightness array
         # Obtain window size
-        window_size = len(self.int_xvalues) // 6
+        window_size = len(self.int_xvalues) // 8
 
         if window_size % 2 == 0:
             window_size -= 1
@@ -383,7 +386,7 @@ class Spectrum:
         self.spectrum_brightness_plot_data = SpectrumBrightnessPlotData(
             smoothed_brightness, 
             brightness_array, 
-            self.int_xvalues, 
+            to_plot_x, 
             extremax, 
             extremabright
         )
