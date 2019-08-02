@@ -271,18 +271,18 @@ class Spectrum:
         # Ensures that the next line restores the yvalues and that the x and y
         # correspond
         clip_window = 100
-        temp_xvalues, brightness_array = util.sigma_clip(self.int_xvalues,
+        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues,
                                             brightness_array, 
                                             sample_size=clip_window)
-        temp_yvalues = [brightness_dict[x] for x in temp_xvalues]
+        self.int_yvalues = [brightness_dict[x] for x in self.int_xvalues]
 
         # Correctness check
-        assert len(temp_xvalues) == len(temp_yvalues)
-        assert len(temp_xvalues) == len(brightness_array)
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+        assert len(self.int_xvalues) == len(brightness_array)
 
         # Smoothing the brightness array
         # Obtain window size
-        window_size = len(temp_xvalues) // 6
+        window_size = len(self.int_xvalues) // 6
 
         if window_size % 2 == 0:
             window_size -= 1
@@ -295,7 +295,7 @@ class Spectrum:
         extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
 
         # Obtaining the minima
-        extremax = temp_xvalues[extrema_indices]
+        extremax = self.int_xvalues[extrema_indices]
         extremabright = smoothed_brightness[extrema_indices] 
 
         # Case on the 3 different possible scenarios as described in the
@@ -341,12 +341,12 @@ class Spectrum:
             assert len(extremax) == len(extremabright)
             assert len(extremax) <= 2
             assert len(self.int_xvalues) == len(self.int_yvalues)
-            assert len(temp_xvalues) == len(temp_yvalues)
+            assert len(self.int_xvalues) == len(self.int_yvalues)
 
             # If no points were removed above
             if len(extremax) == 2:
-                startx = temp_xvalues[extremax[0]]
-                endx = temp_xvalues[extremax[1]]
+                startx = self.int_xvalues[extremax[0]]
+                endx = self.int_xvalues[extremax[1]]
                 self.int_xvalues = self.int_xvalues[startx:endx+1]
                 self.int_yvalues = self.int_yvalues[startx:endx+1]
 
@@ -358,7 +358,7 @@ class Spectrum:
             # from the point to the end of the image
             assert len(self.int_xvalues) == len(self.int_yvalues)
             if extremax[0] < halfway_point:
-                startx = temp_xvalues[extremax[0]]
+                startx = self.int_xvalues[extremax[0]]
                 self.int_xvalues = self.int_xvalues[startx:]
                 self.int_yvalues = self.int_yvalues[startx:]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
@@ -366,7 +366,7 @@ class Spectrum:
             # If the point is on the right, then take the values from the point
             # to the left of the image
             elif extremax[0] > halfway_point:
-                endx = temp_xvalues[extremax[0]]
+                endx = self.int_xvalues[extremax[0]]
                 self.int_xvalues = self.int_xvalues[:endx]
                 self.int_yvalues = self.int_yvalues[:endx]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
@@ -377,14 +377,14 @@ class Spectrum:
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
         assert len(self.int_xvalues) == len(self.int_yvalues)
-        assert len(temp_xvalues) == len(temp_yvalues)        
+        assert len(self.int_xvalues) == len(self.int_yvalues)        
 
         # Setting instance variables so that they can be used in the plotting
         # function
         self.spectrum_brightness_plot_data = SpectrumBrightnessPlotData(
             smoothed_brightness, 
             brightness_array, 
-            temp_xvalues, 
+            self.int_xvalues, 
             extremax, 
             extremabright
         )
