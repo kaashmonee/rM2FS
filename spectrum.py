@@ -344,8 +344,8 @@ class Spectrum:
 
             # If no points were removed above
             if len(extremax) == 2:
-                startx = self.int_xvalues[extremax[0]]
-                endx = self.int_xvalues[extremax[1]]
+                startx = list(self.int_xvalues).index(extremax[0])
+                endx = list(self.int_xvalues).index(extremax[1])
                 self.int_xvalues = self.int_xvalues[startx:endx+1]
                 self.int_yvalues = self.int_yvalues[startx:endx+1]
 
@@ -358,7 +358,7 @@ class Spectrum:
             # from the point to the end of the image
             assert len(self.int_xvalues) == len(self.int_yvalues)
             if extremax[0] < halfway_point:
-                startx = self.int_xvalues[extremax[0]]
+                startx = list(self.int_xvalues).index(extremax[0])
                 self.int_xvalues = self.int_xvalues[startx:]
                 self.int_yvalues = self.int_yvalues[startx:]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
@@ -366,7 +366,7 @@ class Spectrum:
             # If the point is on the right, then take the values from the point
             # to the left of the image
             elif extremax[0] > halfway_point:
-                endx = self.int_xvalues[extremax[0]]
+                endx = list(self.int_xvalues).index(extremax[0])
                 self.int_xvalues = self.int_xvalues[:endx]
                 self.int_yvalues = self.int_yvalues[:endx]
                 assert len(self.int_xvalues) == len(self.int_yvalues)
