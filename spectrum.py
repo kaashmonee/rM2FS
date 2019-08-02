@@ -60,13 +60,6 @@ class Spectrum:
         100 points in the spectrum, then the build is rejected and False
         is returned.
         """
-        xlen = len(self.xvalues)
-        ylen = len(self.yvalues)
-
-        assert xlen == ylen
-        if xlen <= 100:
-            print("Build rejected! Fewer than 100 points in the spectrum...")
-            return False
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
@@ -82,7 +75,15 @@ class Spectrum:
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
         self.__remove_overlapping_spectrum()
+
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+
+        # Ensuring that the spectrum has a reasonable size...
+        xlen = len(self.xvalues)
+        ylen = len(self.yvalues)
+        if xlen <= 100:
+            print("Build rejected! Fewer than 100 points in the spectrum...")
+            return False
 
         if np.diff(self.xvalues).all() <= 0:
             print("self.xvalues:", self.xvalues)
