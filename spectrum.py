@@ -341,7 +341,6 @@ class Spectrum:
             assert len(extremax) == len(extremabright)
             assert len(extremax) <= 2
             assert len(self.int_xvalues) == len(self.int_yvalues)
-            assert len(self.int_xvalues) == len(self.int_yvalues)
 
             # If no points were removed above
             if len(extremax) == 2:
@@ -351,6 +350,7 @@ class Spectrum:
                 self.int_yvalues = self.int_yvalues[startx:endx+1]
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
+
 
         if len(extremax) == 1:
 
@@ -376,7 +376,6 @@ class Spectrum:
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
-        assert len(self.int_xvalues) == len(self.int_yvalues)
         assert len(self.int_xvalues) == len(self.int_yvalues)        
 
         # Setting instance variables so that they can be used in the plotting
