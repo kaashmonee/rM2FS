@@ -286,7 +286,7 @@ class Spectrum:
 
         # Smoothing the brightness array
         # Obtain window size
-        window_size = len(self.int_xvalues) // 8
+        window_size = len(self.int_xvalues) // 6
 
         if window_size % 2 == 0:
             window_size -= 1
