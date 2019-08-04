@@ -42,14 +42,14 @@ def main():
         pickle_directory = "fitted_files/"
         pickle_fp = pickle_directory + fn + ".pkl"
         pickled_fits_file = None
-        save = True if args.s is not False else False
+        save = args.s
 
         try:
             with open(pickle_fp) as f:
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
                 fits_file.plot_spectra(show=True, save=save)
-                fits_file.plot_spectra_brightness()
+                # fits_file.plot_spectra_brightness()
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)
