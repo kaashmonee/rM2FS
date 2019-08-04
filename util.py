@@ -24,7 +24,8 @@ def load(fits_file_path):
 def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
     """
     Returns a 3 sigma clipped dataset that will perform sigma clipping on 10 
-    adjacent x and y values.
+    adjacent x and y values. This does not modify the original xvalues and 
+    yvalues arrays.
     """
 
 
@@ -58,7 +59,7 @@ def sigma_clip(xvalues, yvalues, sample_size=10, sigma=3):
         return np.array(new_xvals), np.array(new_yvals)
 
 
-    new_x, new_y = xvalues, yvalues
+    new_x, new_y = np.array(xvalues), np.array(yvalues)
 
     if isinstance(sample_size, Iterable):
         for sample in sorted(sample_size, reverse=True):
@@ -76,10 +77,73 @@ def sortxy(xvalues, yvalues):
     values as keys. 
     https://www.geeksforgeeks.org/python-sort-values-first-list-using-second-list/
     """
+    assert len(xvalues) == len(yvalues)
     zipped_pairs = zip(xvalues, yvalues)
     sorted_y = [y for _,y in sorted(zipped_pairs)]
+
+    # Correctness check  
+    assert len(xvalues) == len(sorted_y)
     
     return sorted(xvalues), sorted_y
+
+
+def smooth(x,window_len=11,window='hanning'):
+    """smooth the data using a window with requested size.
+    
+    This method is based on the convolution of a scaled window with the signal.
+    The signal is prepared by introducing reflected copies of the signal 
+    (with the window size) in both ends so that transient parts are minimized
+    in the begining and end part of the output signal.
+    
+    input:
+        x: the input signal 
+        window_len: the dimension of the smoothing window; should be an odd integer
+        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+            flat window will produce a moving average smoothing.
+
+    output:
+        the smoothed signal
+        
+    example:
+
+    t=linspace(-2,2,0.1)
+    x=sin(t)+randn(len(t))*0.1
+    y=smooth(x)
+    
+    see also: 
+    
+    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
+    scipy.signal.lfilter
+ 
+    TODO: the window parameter could be the window itself if an array instead of a string
+    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
+    """
+
+    if x.ndim != 1:
+        raise ValueError("smooth only accepts 1 dimension arrays.")
+
+    if x.size < window_len:
+        raise ValueError("Input vector needs to be bigger than window size.")
+
+
+    if window_len<3:
+        return x
+
+
+    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+
+
+    s=np.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
+    #print(len(s))
+    if window == 'flat': #moving average
+        w=np.ones(window_len,'d')
+    else:
+        w=eval('np.'+window+'(window_len)')
+
+    y=np.convolve(w/w.sum(),s,mode='valid')
+    return y
+
 
 
 def get_vmin_vmax(image):
@@ -94,6 +158,37 @@ def find_int_peaks(intensity_array, height=100, dist=5):
                                                         distance=dist) 
     
     return peaks[0]
+
+
+def find_xy_peaks(x, y):
+    """
+    Finds peaks in a distribution given the x values and the yvalues. Returns
+    the (x, y) coordinates of the peaks.
+    """
+    peaks,_ = scipy.signal.find_peaks(y)
+    xpeaks = np.take(x, peaks)
+    ypeaks = np.take(y, peaks)
+    return xpeaks, ypeaks
+
+
+def find_cwt_peaks(x, y, width_array):
+    peakind = scipy.signal.find_peaks(y, width_array)
+    xpeaks = np.take(x, peakind)
+    ypeaks = np.take(y, peakind)
+    return xpeaks, ypeaks
+
+
+def fit_spline(x, y, domain, degree=3):
+    """
+    Fits a smoothing spline to the x-y values. Then applies to the domain and
+    returns an `output` array where the function is applied to `domain`.
+    """
+    f = scipy.interpolate.UnivariateSpline(x, y, k=degree)
+    output = f(domain)
+    spline_yvals = f(x)
+    rms_val = rms(spline_yvals, y)
+    return output, rms_val
+
 
 
 

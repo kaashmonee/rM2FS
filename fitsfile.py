@@ -154,8 +154,8 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         self.num_spectra = len(yvalues_at_start)
-        xthreshold = 2
-        ythreshold = 1
+        xthreshold = 5
+        ythreshold = 2
         cur_num_spectra = 0
         
         # Going from right to left
@@ -206,6 +206,16 @@ class FitsFile:
                 print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
             else:
                 self.num_spectra -= 1
+
+
+
+    def plot_spectra_brightness(self):
+        for ind, spectrum in enumerate(self.spectra):
+            num = ind + 1 
+            spectrum.plot_spectrum_brightness(num)
+
+        # plt.show()
+
         
 
     def get_file_name(self):
@@ -214,16 +224,3 @@ class FitsFile:
         """
         return self.fits_file[self.fits_file.rfind("/")+1:]
 
-
-
-def is_rectangular(l):
-    """
-    This is a correctness check function that is used in get_spectra() routine below.
-    It ensures that the given array l is rectangular.
-    """
-    
-    for i in l:
-        if len(i) != len(l[0]):
-            return False
-
-    return True

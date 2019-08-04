@@ -19,7 +19,7 @@ def main():
 
     directory = "fits_batch_2/"
     fn = "r0136_stitched.fits"
-    fn = "b2311_stitched.fits"
+    # fn = "b2311_stitched.fits"
     # directory = "fits_batch_1/"
     # fn = "r0760_stitched.fits"
 
@@ -42,13 +42,14 @@ def main():
         pickle_directory = "fitted_files/"
         pickle_fp = pickle_directory + fn + ".pkl"
         pickled_fits_file = None
-        save = True if args.s is not False else False
+        save = args.s
 
         try:
             with open(pickle_fp) as f:
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
                 fits_file.plot_spectra(show=True, save=save)
+                # fits_file.plot_spectra_brightness()
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)

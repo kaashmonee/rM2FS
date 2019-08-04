@@ -11,7 +11,6 @@ class Spectrum:
     This is a class that represents each white spot on the image.
     """
     spectrum_number = 1
-    # total_spectra = 1
 
     def __init__(self, xvalues, yvalues, fits_file):
         import util
@@ -23,11 +22,6 @@ class Spectrum:
         self.image_rows = self.fits_file.image_data[0]
         self.image_cols = self.fits_file.image_data[1]
 
-        # Remove very obvious outliers
-        # self.xvalues, self.yvalues = util.sigma_clip(self.xvalues, self.yvalues, sample_size=30)
-
-        self.true_yvals = None
-
         # Peaks for which a Gaussian was unable to be fit
         self.unfittable_peaks = []
 
@@ -37,6 +31,14 @@ class Spectrum:
         self.peak_width_spline_function = None
         self.peak_width_spline_rms = None
         self.widths = None
+
+        # When plotting the brightness of the spectrum, we are going to need 
+        # to store relevant information, which will be in the following varaible
+        # This should be of type SpectrumBrightnessPlotData and will be updated
+        # in the __remove_overlapping_spectra method.
+        self.spectrum_brightness_plot_data = None
+
+        Spectrum.spectrum_number += 1
 
     
     def add_peak(self, x, y):
@@ -58,16 +60,31 @@ class Spectrum:
         100 points in the spectrum, then the build is rejected and False
         is returned.
         """
+
+        # Sorting the x and y values
+        self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
+
+        # Ensuring that we keep track of the integer yvalues
+        # This is useful for when we want to plot the brightness vs. x value of
+        # the peaks.
+        self.int_xvalues = np.array(self.xvalues)
+        self.int_yvalues = np.array(self.yvalues)
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+
+        # Run the remove overlapping spectra method, which will update the 
+        # self.int_xvalues and self.int_yvalues variables. We will use those
+        # to update the self.xvalues and self.yvalues variables.
+        self.__remove_overlapping_spectrum()
+
+        self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+
+        # Ensuring that the spectrum has a reasonable size...
         xlen = len(self.xvalues)
         ylen = len(self.yvalues)
-
-        assert xlen == ylen
         if xlen <= 100:
             print("Build rejected! Fewer than 100 points in the spectrum...")
             return False
 
-        # Sorting the x and y values
-        self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
         if np.diff(self.xvalues).all() <= 0:
             print("self.xvalues:", self.xvalues)
             plt.plot(self.xvalues)
@@ -76,10 +93,6 @@ class Spectrum:
         # Adding a correctness check to ensure that the dimensions of each are correct.
         if xlen != ylen:
             raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
-
-
-        # Removes overlapping portions of the spectrum
-        self.__remove_overlapping_spectrum() 
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
@@ -99,10 +112,6 @@ class Spectrum:
         # This function fits a spline to the peak widths and generates an rms 
         # value.
         self.__fit_peak_widths()
-
-
-        # Increment the spectrum number after creation of a spectrum.
-        Spectrum.spectrum_number += 1
 
         return True
 
@@ -192,14 +201,29 @@ class Spectrum:
         value.
         """
         import util
-        f = scipy.interpolate.UnivariateSpline(self.xvalues, self.yvalues)
+        self.output, self.rms_value = util.fit_spline(self.xvalues, self.yvalues,
+                                                      domain, degree=degree)
 
-        self.output = f(domain)
 
-        # Calculate the RMS goodness of fit and display to the user if the 
-        # fit is very bad.
-        spline_yvals = f(self.xvalues)
-        self.rms_value = util.rms(spline_yvals, self.yvalues)
+    def plot_spectrum_brightness(self, num):
+        """
+        Plots the brightness of each spectra against the xvalue.
+        """
+        import util
+        plt.clf()
+        dat = self.spectrum_brightness_plot_data
+
+        plt.scatter(dat.brightness_xvals_to_plot, dat.brightness_array)
+        plt.scatter(self.int_xvalues, self.fits_file.image_data[self.int_yvalues, self.int_xvalues])
+        plt.plot(dat.brightness_xvals_to_plot, dat.smoothed_brightness, color="red")
+        plt.scatter(dat.extremax, dat.extremabright)
+
+        image_name = self.fits_file.get_file_name()
+        plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
+        plt.xlabel("xpixel")
+        plt.ylabel("brightness")
+        
+        plt.show()
 
 
     def plot_fit(self):
@@ -220,47 +244,155 @@ class Spectrum:
         """
         This routine removes the part of the spectrum on either side that is 
         responsible that overlaps. This way, we only use the middle spectrum for 
-        our analysis.
+        our analysis. This routine works as follows:
+        1. It obtains the brightness vs. x plots for each spectrum. 
+        2. It then uses a Savitzky-Golay filter to smooth the scatter. 
+        3. It obtains the local minima in the smoothed scatter. After finding 
+        the local minima, there are 3 things on which to case:
+            a. Greater than 2 local minima
+                If there are more than 2 local minima, then remove the minima
+                closest to the edges until there are only 2 remaining.
+            b. Two minima detected
+                Ensure that the two minima are not in the same half of image.
+                If they are, then remove the minimum closest to the edge.
+            c. Fewer than two minima detected
+                Do nothing
         """
 
-        # Finds the differences between 2 adjacent elements in the array.
-        diff_array = np.ediff1d(self.xvalues) 
+        import util
 
-        # Diff threshold to detect overlapping spectra
-        diff_threshold = 30
+        # Obtaining an array of brightness values for each spectrum
+        brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
-        # Contains list of indices where next index differs by more than 
-        # diff_threshold
-        diff_ind_list = [] 
+        # This dictionary is for restoring the yvalues after the xvalues with
+        # pixels that are too bright are clipped out
+        brightness_dict = {x: y for (x, y) in zip(self.int_xvalues, self.int_yvalues)}
 
-        for ind, diff in enumerate(diff_array):
-            if diff >= diff_threshold:
-                diff_ind_list.append(ind)
+        # Sigma clipping the brightness array to get rid of the extreme values
+        # Ensures that the next line restores the yvalues and that the x and y
+        # correspond
+        clip_window = 100
+        self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues,
+                                            brightness_array, 
+                                            sample_size=clip_window)
+        self.int_yvalues = [brightness_dict[x] for x in self.int_xvalues]
 
+        # xvalues that will be used for plotting
+        to_plot_x = np.array(self.int_xvalues)
 
-        # No part of the spectrum is overlapping, so there is no need to ensure
-        # remove anything.
-        if len(diff_ind_list) < 2:
-            return
+        # Correctness check
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+        assert len(self.int_xvalues) == len(brightness_array)
 
-        # Finds the largest difference between indices that differ by 
-        # diff_threshold pixels.
-        diff_between_difs = np.ediff1d(diff_ind_list)
-        max_diff_ind = np.argmax(diff_between_difs)
+        # Smoothing the brightness array
+        # Obtain window size --- a larger window size is associated with
+        # a smoother output
+        window_size = len(self.int_xvalues) // 6
 
-        # This is so that we can obtain the starting and ending index of the 
-        # x values in the diff_ind_list[] list.
-        startx_ind = max_diff_ind
-        endx_ind = max_diff_ind + 1
-
-        startx = diff_ind_list[startx_ind]
-        endx = diff_ind_list[endx_ind]
-
-        self.xvalues = self.xvalues[startx:endx]
-        self.yvalues = self.yvalues[startx:endx]
-
-        assert len(self.xvalues) == len(self.yvalues)
+        if window_size % 2 == 0:
+            window_size -= 1
         
+        order = 3
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, window_size, order)
+
+        # Obtaining the minima of the smoothed function and the x indices of the
+        # minima
+        order = 100
+        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=order)
+
+        # Obtaining the minima
+        extremax = self.int_xvalues[extrema_indices]
+        extremabright = smoothed_brightness[extrema_indices] 
+
+        # Case on the 3 different possible scenarios as described in the
+        # docstring...
+
+        # Correctness check
+        assert len(extremax) == len(extremabright)
+
+        image_width = len(self.image_cols)
+
+        # If there are greater than 2 minima, keep removing the ones closest
+        # to the edges until there are exactly 2 left
+        extremax, extremabright = util.sortxy(extremax, extremabright)
+        if len(extremax) > 2:
+            while len(extremax) != 2:
+                if extremax[0] <= abs(extremax[-1] - image_width):
+                    extremax.pop(0)
+                    extremabright.pop(0)
+                else:
+                    extremax.pop()
+                    extremabright.pop()
+
+        # Just another correctness check
+        assert len(extremax) == len(extremabright)
+
+        # If there are exactly 2 maxima
+        halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) // 2
+        if len(extremax) == 2:
+
+            x1 = extremax[0]
+            x2 = extremax[1]
+
+            if x1 <= halfway_point and x2 <= halfway_point:
+                extremax.pop(0)
+                extremabright.pop(0)
+            elif x1 >= halfway_point and x2 >= halfway_point:
+                extremax.pop()
+                extremabright.pop()
+
+
+            # The minima points should now represent the starting and ending
+            # points of the spectra
+            assert len(extremax) == len(extremabright)
+            assert len(extremax) <= 2
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+
+            # If no points were removed above
+            if len(extremax) == 2:
+                startx = list(self.int_xvalues).index(extremax[0])
+                endx = list(self.int_xvalues).index(extremax[1])
+                self.int_xvalues = self.int_xvalues[startx:endx+1]
+                self.int_yvalues = self.int_yvalues[startx:endx+1]
+
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+
+
+        if len(extremax) == 1:
+
+            # If the point is on the left side of the image, take the values 
+            # from the point to the end of the image
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+            if extremax[0] < halfway_point:
+                startx = list(self.int_xvalues).index(extremax[0])
+                self.int_xvalues = self.int_xvalues[startx:]
+                self.int_yvalues = self.int_yvalues[startx:]
+                assert len(self.int_xvalues) == len(self.int_yvalues)
+
+            # If the point is on the right, then take the values from the point
+            # to the left of the image
+            elif extremax[0] > halfway_point:
+                endx = list(self.int_xvalues).index(extremax[0])
+                self.int_xvalues = self.int_xvalues[:endx]
+                self.int_yvalues = self.int_yvalues[:endx]
+                assert len(self.int_xvalues) == len(self.int_yvalues)
+            
+            else:
+                raise ValueError("The extrema value should not be in the middle")
+
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+
+        assert len(self.int_xvalues) == len(self.int_yvalues)        
+
+        # Setting instance variables so that they can be used in the plotting
+        # function
+        self.spectrum_brightness_plot_data = SpectrumBrightnessPlotData(
+            smoothed_brightness, 
+            brightness_array, 
+            to_plot_x, 
+            extremax, 
+            extremabright
+        )
 
 
     
@@ -285,6 +417,9 @@ class Spectrum:
         self.widths = np.array(self.widths)
         xvalues = np.array(xvalues)
 
+        # TODO: This should be replaced with the more abstract util.fit_spline
+        # function --- that is the function that should be used for all spline
+        # fitting in this codebase. This is addressed in #93.
         f = scipy.interpolate.UnivariateSpline(xvalues, self.widths)
         widths_spline = f(xvalues)
         self.peak_width_spline_function = f
@@ -321,4 +456,17 @@ class Spectrum:
 
         plt.show()
 
+
+class SpectrumBrightnessPlotData:
+    """
+    This is a data class to hold the necessary data to plot the spectrum's 
+    brightness. We don't want to pollute the Spectrum namespace, so we 
+    are doing that in a separate class.
+    """
+    def __init__(self, smoothed_brightness, brightness_array, brightness_xvals, extremax, extremabright):
+        self.smoothed_brightness = smoothed_brightness
+        self.brightness_array = brightness_array
+        self.brightness_xvals_to_plot = brightness_xvals
+        self.extremax = extremax
+        self.extremabright = extremabright
 

@@ -43,12 +43,6 @@ class SpectrumUnitTest(unittest.TestCase):
 
 
 
-
-
-
-
-
-
     def test_sigma_clipping_failures1(self):
         """
         Tests sigma clipping failure on elements that are in the middle of an
