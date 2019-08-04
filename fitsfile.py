@@ -154,8 +154,8 @@ class FitsFile:
         start_pixel = 1000
         yvalues_at_start = xpeaks[start_pixel]
         self.num_spectra = len(yvalues_at_start)
-        xthreshold = 3
-        ythreshold = 3
+        xthreshold = 5
+        ythreshold = 2
         cur_num_spectra = 0
         
         # Going from right to left
