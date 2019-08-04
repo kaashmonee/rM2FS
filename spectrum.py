@@ -285,7 +285,8 @@ class Spectrum:
         assert len(self.int_xvalues) == len(brightness_array)
 
         # Smoothing the brightness array
-        # Obtain window size
+        # Obtain window size --- a larger window size is associated with
+        # a smoother output
         window_size = len(self.int_xvalues) // 6
 
         if window_size % 2 == 0:
@@ -296,7 +297,8 @@ class Spectrum:
 
         # Obtaining the minima of the smoothed function and the x indices of the
         # minima
-        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=100)
+        order = 100
+        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=order)
 
         # Obtaining the minima
         extremax = self.int_xvalues[extrema_indices]
