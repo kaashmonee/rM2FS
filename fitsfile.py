@@ -224,16 +224,3 @@ class FitsFile:
         """
         return self.fits_file[self.fits_file.rfind("/")+1:]
 
-
-
-def is_rectangular(l):
-    """
-    This is a correctness check function that is used in get_spectra() routine below.
-    It ensures that the given array l is rectangular.
-    """
-    
-    for i in l:
-        if len(i) != len(l[0]):
-            return False
-
-    return True
