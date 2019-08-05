@@ -144,7 +144,25 @@ def smooth(x,window_len=11,window='hanning'):
 
 
 def fit_parabola(x, y, domain):
-    pass
+    order = 2
+    f = construct_polynomial(x, y, order)
+    output = f(domain)
+    return output
+
+
+def construct_polynomial(x, y, order):
+    polyfit_array = np.polyfit(x, y, order)
+
+    def f(x):
+        power = 0
+        output = np.zeros(len(x))
+        for coef in polyfit_array:
+            output += coef**power
+            power += 1
+
+        return output
+
+    return f
 
 
 
