@@ -296,11 +296,11 @@ class Spectrum:
         # Obtaining the minima of the smoothed function and the x indices of the
         # minima
         order = 100
-        extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.less, order=order)
+        max_extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.greater, order=order)
 
         # Obtaining the minima
-        extremax = self.int_xvalues[extrema_indices]
-        extremabright = smoothed_brightness[extrema_indices] 
+        max_extremax = self.int_xvalues[max_extrema_indices]
+        max_extrema = smoothed_brightness[max_extrema_indices]
 
         # Case on the 3 different possible scenarios as described in the
         # docstring...
@@ -312,82 +312,13 @@ class Spectrum:
 
         # If there are greater than 2 minima, keep removing the ones closest
         # to the edges until there are exactly 2 left
-        extremax, extremabright = util.sortxy(extremax, extremabright)
-        if len(extremax) > 2:
-            while len(extremax) != 2:
-                if extremax[0] <= abs(extremax[-1] - image_width):
-                    extremax.pop(0)
-                    extremabright.pop(0)
-                else:
-                    extremax.pop()
-                    extremabright.pop()
+        max_extremax, max_extrema = util.sortxy(max_extremax, max_extrema)
+    
 
-        # Just another correctness check
-        assert len(extremax) == len(extremabright)
-
-        # If there are exactly 2 maxima
-        halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) // 2
-        if len(extremax) == 2:
-
-            x1 = extremax[0]
-            x2 = extremax[1]
-
-            if x1 <= halfway_point and x2 <= halfway_point:
-                extremax.pop(0)
-                extremabright.pop(0)
-            elif x1 >= halfway_point and x2 >= halfway_point:
-                extremax.pop()
-                extremabright.pop()
-
-
-            # The minima points should now represent the starting and ending
-            # points of the spectra
-            assert len(extremax) == len(extremabright)
-            assert len(extremax) <= 2
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-
-            # If no points were removed above
-            if len(extremax) == 2:
-                startx = list(self.int_xvalues).index(extremax[0])
-                endx = list(self.int_xvalues).index(extremax[1])
-                self.int_xvalues = self.int_xvalues[startx:endx+1]
-                self.int_yvalues = self.int_yvalues[startx:endx+1]
-
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-
-
-        if len(extremax) == 1:
-
-            # If the point is on the left side of the image, take the values 
-            # from the point to the end of the image
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-            if extremax[0] < halfway_point:
-                startx = list(self.int_xvalues).index(extremax[0])
-                self.int_xvalues = self.int_xvalues[startx:]
-                self.int_yvalues = self.int_yvalues[startx:]
-                assert len(self.int_xvalues) == len(self.int_yvalues)
-
-            # If the point is on the right, then take the values from the point
-            # to the left of the image
-            elif extremax[0] > halfway_point:
-                endx = list(self.int_xvalues).index(extremax[0])
-                self.int_xvalues = self.int_xvalues[:endx]
-                self.int_yvalues = self.int_yvalues[:endx]
-                assert len(self.int_xvalues) == len(self.int_yvalues)
-            
-            else:
-                raise ValueError("The extrema value should not be in the middle")
-
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-
-        assert len(self.int_xvalues) == len(self.int_yvalues)        
-
-        # Setting instance variables so that they can be used in the plotting
-        # function
 
         self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
+        self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
         self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness)
-        self.spec_scatter_fact.add_scatter(extremax, extremabright)
 
 
     
