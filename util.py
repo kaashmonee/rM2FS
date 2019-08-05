@@ -156,8 +156,8 @@ def construct_polynomial(x, y, order):
     def f(x):
         power = 0
         output = np.zeros(len(x))
-        for coef in polyfit_array:
-            output += coef**power
+        for coef in reversed(polyfit_array):
+            output += coef * x**power
             power += 1
 
         return output
