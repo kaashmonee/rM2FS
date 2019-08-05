@@ -245,16 +245,23 @@ class Spectrum:
         our analysis. This routine works as follows:
         1. It obtains the brightness vs. x plots for each spectrum. 
         2. It then uses a Savitzky-Golay filter to smooth the scatter. 
-        3. It obtains the local minima in the smoothed scatter. After finding 
-        the local minima, there are 3 things on which to case:
-            a. Greater than 2 local minima
-                If there are more than 2 local minima, then remove the minima
-                closest to the edges until there are only 2 remaining.
-            b. Two minima detected
-                Ensure that the two minima are not in the same half of image.
-                If they are, then remove the minimum closest to the edge.
-            c. Fewer than two minima detected
-                Do nothing
+        3. It obtains the local maxima in the smoothed scatter. After finding 
+        the local maxima, a parabola should be fit. The parabola will then be
+        divided by the brightness plot. The absolute minima in the resulting 
+        plot can be used as the starting and ending points of the overlapping 
+        spectra. There are 3 things on which to case.
+            a. One local maximum:
+                If there is only 1 local maximum, there is no need to cut the 
+                spectrum. The spectrum starts and ends have been detected 
+                appropriately.
+            b. 2 local maxima:
+                If there are 2 local maxima, there are 2 cases. If the 2 local
+                maxima are on the left side of the image, pick a point on the 
+                right side of the brightness plot for which to fit the parabola.
+                Do the same on the opposite side if the maxima are on the 
+                opposite half.
+            c. 3 local maxima:
+                If there are 3 local maxima, simply fit a parabola to all 3.
         """
 
         import util
@@ -313,7 +320,7 @@ class Spectrum:
         # If there are greater than 2 minima, keep removing the ones closest
         # to the edges until there are exactly 2 left
         max_extremax, max_extrema = util.sortxy(max_extremax, max_extrema)
-    
+
 
 
         self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
