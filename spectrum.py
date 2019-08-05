@@ -166,10 +166,10 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        # if Spectrum.spectrum_number in [15, 21]:
-        #     self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
-        #                                 show=True, save=False) 
-            # spectrum.plot_peak_widths()
+        if Spectrum.spectrum_number in [15, 21]:
+            self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
+                                        show=True, save=False)
+            self.fits_file.plot_spectra_brightness() 
 
         # if spec_ind == len(self.spectra):
         #     self.plot_spectra(num_to_plot=spec_ind, save=True)
