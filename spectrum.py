@@ -87,14 +87,12 @@ class Spectrum:
             print("Build rejected! Fewer than 100 points in the spectrum...")
             return False
 
-        if np.diff(self.xvalues).all() <= 0:
-            print("self.xvalues:", self.xvalues)
-            plt.plot(self.xvalues)
-            plt.show()
+        # Ensuring no duplicates and ensuring strictly increasing
+        assert np.diff(self.xvalues).all() <= 0
 
         # Adding a correctness check to ensure that the dimensions of each are correct.
         if xlen != ylen:
-            raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen:", xlen, " ylen:", ylen)
+            raise ValueError("The dimensions of the xvalues and yvalues array are not the same; xlen: %d ylen: %d" % (xlen, ylen))
 
         # Generating peaks after the spectrum is cleaned and narrowed
         self.peaks = [Peak(x, y) for x, y in zip(self.xvalues, self.yvalues)]
@@ -128,8 +126,6 @@ class Spectrum:
         image_height = image.shape[1]
 
         print("Fitting gaussian...")
-        import time
-        t1 = time.time()
         success_counter = 0
 
         for peak in self.peaks:
@@ -166,7 +162,7 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        if Spectrum.spectrum_number in [15, 21]:
+        if Spectrum.spectrum_number in [3, 7, 21]:
             self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
                                         show=True, save=False)
             self.fits_file.plot_spectra_brightness() 
@@ -300,6 +296,10 @@ class Spectrum:
         order = 3
         smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 
                                                          window_size, order)
+        
+        # Correctness check
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+        assert len(self.int_xvalues) == len(brightness_array)
 
         # Obtaining the minima of the smoothed function and the x indices of the
         # minima
@@ -312,8 +312,8 @@ class Spectrum:
         max_extremax = self.int_xvalues[max_extrema_indices]
         max_extrema = smoothed_brightness[max_extrema_indices]
 
-        # Case on the 3 different possible scenarios as described in the
-        # docstring...
+        # Additional correctness checks
+        assert len(smoothed_brightness) == len(self.int_xvalues)
 
         # Correctness check
         image_width = len(self.image_cols)
@@ -331,9 +331,20 @@ class Spectrum:
         assert num_max <= 3
 
         if num_max == 3:
-            domain = np.arange(self.int_xvalues[0], self.int_xvalues[-1])
-            py = util.fit_parabola(max_extremax, max_extrema, domain)
-            self.spec_plot_fact.add_plot(domain, py, color="orange")
+            py = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
+            # divided_plot = smoothed_brightness / py
+            divided_plot = -py / smoothed_brightness
+            first_half = divided_plot[0:len(divided_plot)//2]
+            second_half = divided_plot[len(divided_plot)//2:]
+            x1 = list(first_half).index(min(first_half))
+            x2 = list(second_half).index(min(second_half))
+            x1ind = list(self.int_xvalues).index(x1)
+            x2ind = list(self.int_xvalues).index(x2)
+            self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot, color="green")
+            self.spec_scatter_fact.add_scatter([self.int_xvalues[x1ind], self.int_xvalues[x2ind]], [self.int_yvalues[x1ind], self.int_yvalues[x2ind]])
+            self.int_xvalues = self.int_xvalues[x1ind:x2ind+1]
+            self.int_yvalues = self.int_xvalues[x1ind:x2ind+1]
+            # self.spec_plot_fact.add_plot(self.int_xvalues, py, color="orange")
         
         elif num_max == 2:
             pass
@@ -347,9 +358,9 @@ class Spectrum:
 
 
         # Adding a list of things to plot...
-        self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
-        self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
-        self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness)
+        # self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
+        # self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
+        # self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness,color="red")
 
 
     
