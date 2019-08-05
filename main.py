@@ -49,7 +49,7 @@ def main():
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
                 fits_file.plot_spectra(show=True, save=save)
-                # fits_file.plot_spectra_brightness()
+                fits_file.plot_spectra_brightness()
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)
