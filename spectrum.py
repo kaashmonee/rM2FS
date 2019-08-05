@@ -4,6 +4,7 @@ import scipy
 from astropy import modeling
 import gaussfit
 from gaussfit import Peak
+from util import PlotFactory, ScatterFactory
 
 
 class Spectrum:
@@ -36,7 +37,8 @@ class Spectrum:
         # to store relevant information, which will be in the following varaible
         # This should be of type SpectrumBrightnessPlotData and will be updated
         # in the __remove_overlapping_spectra method.
-        self.spectrum_brightness_plot_data = None
+        self.spec_scatter_fact = ScatterFactory()
+        self.spec_plot_fact = PlotFactory()
 
         Spectrum.spectrum_number += 1
 
@@ -211,12 +213,8 @@ class Spectrum:
         """
         import util
         plt.clf()
-        dat = self.spectrum_brightness_plot_data
-
-        plt.scatter(dat.brightness_xvals_to_plot, dat.brightness_array)
-        plt.scatter(self.int_xvalues, self.fits_file.image_data[self.int_yvalues, self.int_xvalues])
-        plt.plot(dat.brightness_xvals_to_plot, dat.smoothed_brightness, color="red")
-        plt.scatter(dat.extremax, dat.extremabright)
+        self.spec_scatter_fact.scatter()
+        self.spec_plot_fact.plot()
 
         image_name = self.fits_file.get_file_name()
         plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
@@ -386,13 +384,10 @@ class Spectrum:
 
         # Setting instance variables so that they can be used in the plotting
         # function
-        self.spectrum_brightness_plot_data = SpectrumBrightnessPlotData(
-            smoothed_brightness, 
-            brightness_array, 
-            to_plot_x, 
-            extremax, 
-            extremabright
-        )
+
+        self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
+        self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness)
+        self.spec_scatter_fact.add_scatter(extremax, extremabright)
 
 
     
@@ -457,16 +452,4 @@ class Spectrum:
         plt.show()
 
 
-class SpectrumBrightnessPlotData:
-    """
-    This is a data class to hold the necessary data to plot the spectrum's 
-    brightness. We don't want to pollute the Spectrum namespace, so we 
-    are doing that in a separate class.
-    """
-    def __init__(self, smoothed_brightness, brightness_array, brightness_xvals, extremax, extremabright):
-        self.smoothed_brightness = smoothed_brightness
-        self.brightness_array = brightness_array
-        self.brightness_xvals_to_plot = brightness_xvals
-        self.extremax = extremax
-        self.extremabright = extremabright
 

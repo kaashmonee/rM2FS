@@ -6,8 +6,6 @@ import gaussfit
 import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
-from fitsfile import FitsFile
-from spectrum import Spectrum
 from collections import Iterable
 
 
@@ -143,6 +141,40 @@ def smooth(x,window_len=11,window='hanning'):
 
     y=np.convolve(w/w.sum(),s,mode='valid')
     return y
+
+
+
+class ScatterFactory:
+    """
+    This is a data class to hold the necessary data to plot the spectrum's 
+    brightness. We don't want to pollute the Spectrum namespace, so we 
+    are doing that in a separate class.
+    """
+    def __init__(self):
+        self.scatter_list = []
+
+    def add_scatter(self, x, y):
+        self.scatter_list.append((x, y))
+
+    def scatter(self):
+        for x, y in self.scatter_list:
+            plt.scatter(x, y)
+
+
+class PlotFactory:
+    """
+    This is a data class to hold the necessary data to scatter the spectrum's 
+    brightness.
+    """
+    def __init__(self):
+        self.plot_list = []
+    
+    def add_plot(self, x, y):
+        self.plot_list.append((x, y))
+
+    def plot(self, cmap=None):
+        for x, y in self.plot_list:
+            plt.plot(x, y, color="red")
 
 
 
