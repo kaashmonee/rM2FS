@@ -298,12 +298,15 @@ class Spectrum:
             window_size -= 1
         
         order = 3
-        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, window_size, order)
+        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 
+                                                         window_size, order)
 
         # Obtaining the minima of the smoothed function and the x indices of the
         # minima
         order = 100
-        max_extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, np.greater, order=order)
+        max_extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, 
+                                                         np.greater, 
+                                                         order=order)
 
         # Obtaining the minima
         max_extremax = self.int_xvalues[max_extrema_indices]
