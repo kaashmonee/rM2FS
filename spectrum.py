@@ -275,7 +275,7 @@ class Spectrum:
 
         # Sigma clipping the brightness array to get rid of the extreme values
         # Ensures that the next line restores the yvalues and that the x and y
-        # correspond
+        # correspond. This clips away pixels that are much brigher than expected
         clip_window = 100
         self.int_xvalues, brightness_array = util.sigma_clip(self.int_xvalues,
                                             brightness_array, 
@@ -316,16 +316,37 @@ class Spectrum:
         # docstring...
 
         # Correctness check
-        assert len(extremax) == len(extremabright)
-
         image_width = len(self.image_cols)
 
         # If there are greater than 2 minima, keep removing the ones closest
         # to the edges until there are exactly 2 left
         max_extremax, max_extrema = util.sortxy(max_extremax, max_extrema)
 
+        # Correctness check
+        assert len(max_extremax) == len(max_extrema)
+
+        num_max = len(max_extremax)
+
+        # If num_max > 3, then we've got cases that we haven't accounted for
+        assert num_max <= 3
+
+        if num_max == 3:
+            domain = np.arange(self.int_xvalues[0], self.int_xvalues[-1])
+            px, py = util.fit_parabola(max_extremax, max_extrema, domain)
+            self.spec_plot_fact.add_plot(px, py, color="orange")
+        
+        elif num_max == 2:
+            pass
+
+        elif num_max == 1:
+            pass
+
+        else: # num_max must be between 1 and 3
+            raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
 
 
+
+        # Adding a list of things to plot...
         self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
         self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
         self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness)
