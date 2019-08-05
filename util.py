@@ -191,12 +191,12 @@ class PlotFactory:
     def __init__(self):
         self.plot_list = []
     
-    def add_plot(self, x, y):
-        self.plot_list.append((x, y))
+    def add_plot(self, x, y, color=None):
+        self.plot_list.append((x, y, color))
 
-    def plot(self, cmap=None):
-        for x, y in self.plot_list:
-            plt.plot(x, y, color="red")
+    def plot(self):
+        for x, y, color in self.plot_list:
+            plt.plot(x, y, color=color)
 
 
 

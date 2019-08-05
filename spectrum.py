@@ -332,8 +332,8 @@ class Spectrum:
 
         if num_max == 3:
             domain = np.arange(self.int_xvalues[0], self.int_xvalues[-1])
-            px, py = util.fit_parabola(max_extremax, max_extrema, domain)
-            self.spec_plot_fact.add_plot(px, py, color="orange")
+            py = util.fit_parabola(max_extremax, max_extrema, domain)
+            self.spec_plot_fact.add_plot(domain, py, color="orange")
         
         elif num_max == 2:
             pass
