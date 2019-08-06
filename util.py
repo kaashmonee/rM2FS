@@ -200,6 +200,7 @@ class PlotFactory:
 
 
 
+
 def get_vmin_vmax(image):
     fifth = np.percentile(image, 5)
     ninety_fifth = np.percentile(image, 95)

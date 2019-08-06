@@ -88,7 +88,7 @@ class Spectrum:
             return False
 
         # Ensuring no duplicates and ensuring strictly increasing
-        assert np.diff(self.xvalues).all() <= 0
+        # assert np.diff(self.xvalues).all() <= 0
 
         # Adding a correctness check to ensure that the dimensions of each are correct.
         if xlen != ylen:
@@ -213,9 +213,9 @@ class Spectrum:
         self.spec_plot_fact.plot()
 
         image_name = self.fits_file.get_file_name()
-        plt.title("brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
+        plt.title("-parabola/brightness vs. xvalues in %s, spectrum #: %d" % (image_name, num))
         plt.xlabel("xpixel")
-        plt.ylabel("brightness")
+        plt.ylabel("-parabola/brightness")
         
         plt.show()
 
@@ -334,17 +334,8 @@ class Spectrum:
             py = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
             # divided_plot = smoothed_brightness / py
             divided_plot = -py / smoothed_brightness
-            first_half = divided_plot[0:len(divided_plot)//2]
-            second_half = divided_plot[len(divided_plot)//2:]
-            x1 = list(first_half).index(min(first_half))
-            x2 = list(second_half).index(min(second_half))
-            x1ind = list(self.int_xvalues).index(x1)
-            x2ind = list(self.int_xvalues).index(x2)
-            self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot, color="green")
-            self.spec_scatter_fact.add_scatter([self.int_xvalues[x1ind], self.int_xvalues[x2ind]], [self.int_yvalues[x1ind], self.int_yvalues[x2ind]])
-            self.int_xvalues = self.int_xvalues[x1ind:x2ind+1]
-            self.int_yvalues = self.int_xvalues[x1ind:x2ind+1]
             # self.spec_plot_fact.add_plot(self.int_xvalues, py, color="orange")
+            self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
         
         elif num_max == 2:
             pass
