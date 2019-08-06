@@ -364,7 +364,35 @@ class Spectrum:
             # self.spec_scatter_fact.add_scatter(cleanedx, cleaned_brightness)
         
         elif num_max == 2:
-            pass
+            halfway_ind = len(self.int_xvalues)//2
+            halfway_point = self.int_xvalues[halfway_ind]
+
+            # Cases on whether there are any extrema whose x values are less
+            # than the halfway point or greater than the halfway point
+            if np.any(max_extremax < halfway_point):
+                # Left half
+                xmax = list(max_extremax)
+                brightness = list(max_extrema)
+                xmax.append(self.int_xvalues[-1])
+                brightness.append(brightness_array[-1])
+
+                parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
+
+                divided_plot = -parab_brightness / smoothed_brightness
+                
+                # self.spec_plot_fact.add_plot(self.int_xvalues, smoothed_brightness, color="red")
+                # self.spec_plot_fact.add_plot(self.int_xvalues, parab_brightness, color="orange")
+                # self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
+                # self.spec_scatter_fact.add_scatter(xmax, brightness)
+
+                self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
+
+
+            elif np.any(max_extremax >= halfway_point):
+                # right half
+                pass
+
+
 
         elif num_max == 1:
             pass
