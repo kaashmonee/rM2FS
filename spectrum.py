@@ -331,11 +331,32 @@ class Spectrum:
         assert num_max <= 3
 
         if num_max == 3:
+            # Fits a parabola
             py = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
-            # divided_plot = smoothed_brightness / py
+
             divided_plot = -py / smoothed_brightness
-            # self.spec_plot_fact.add_plot(self.int_xvalues, py, color="orange")
-            self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
+
+            # Finds the absolute minima in the first and second halves of the 
+            # image
+            length = len(self.int_xvalues)
+
+            ## Some correctness checkds before proceeding
+            assert length == len(self.int_xvalues)
+            assert length == len(divided_plot)
+
+            # Obtains the indices of the absolute minima of the first parameter
+            # in the range provided by the 2nd and 3rd parameter
+            min_left_ind = util.min_ind_range(divided_plot, 0, length//2)
+            min_right_ind = util.min_ind_range(divided_plot, length//2, length)
+
+            assert len(self.int_xvalues) == len(self.int_yvalues)
+            cleanedx = self.int_xvalues[min_left_ind:min_right_ind]
+            cleanedy = self.int_yvalues[min_left_ind:min_right_ind]
+            cleaned_brightness = brightness_array[min_left_ind:min_right_ind]
+
+            # self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
+            self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
+            self.spec_scatter_fact.add_scatter(cleanedx, cleaned_brightness)
         
         elif num_max == 2:
             pass
