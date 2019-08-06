@@ -199,6 +199,15 @@ class PlotFactory:
             plt.plot(x, y, color=color)
 
 
+def min_ind_range(array, start, end):
+    """
+    Obtains the indices of the absolute minima of the first parameter
+    in the range provided by the 2nd and 3rd parameter.
+    """
+    temp = array[start:end]
+    min_ind_temp = np.argmin(temp)
+    min_ind_real = start + min_ind_temp
+    return min_ind_real
 
 
 def get_vmin_vmax(image):
