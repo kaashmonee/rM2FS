@@ -367,25 +367,34 @@ class Spectrum:
             halfway_ind = len(self.int_xvalues)//2
             halfway_point = self.int_xvalues[halfway_ind]
 
+            xmax = list(max_extremax)
+            brightness = list(max_extrema)
+
             # Cases on whether there are any extrema whose x values are less
             # than the halfway point or greater than the halfway point
             if np.any(max_extremax < halfway_point):
                 # Left half
-                xmax = list(max_extremax)
-                brightness = list(max_extrema)
                 xmax.append(self.int_xvalues[-1])
                 brightness.append(brightness_array[-1])
 
                 parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
-                
+
+                startx_ind = np.argmin(divided_plot)
+                self.int_xvalues = self.int_xvalues[startx_ind:]
+                self.int_yvalues = self.int_yvalues[startx_ind:]
+
+                # For plotting 
+                # reduced_b = brightness_array[startx_ind:]
+                # plotx, plotb = np.array(self.int_xvalues), np.array(brightness_array)
                 # self.spec_plot_fact.add_plot(self.int_xvalues, smoothed_brightness, color="red")
                 # self.spec_plot_fact.add_plot(self.int_xvalues, parab_brightness, color="orange")
-                # self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
+                # self.spec_scatter_fact.add_scatter(plotx, brightness_array)
+                # self.spec_scatter_fact.add_scatter(self.int_xvalues, reduced_b)
                 # self.spec_scatter_fact.add_scatter(xmax, brightness)
 
-                self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
+                # self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
 
 
             elif np.any(max_extremax >= halfway_point):
