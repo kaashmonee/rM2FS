@@ -350,13 +350,18 @@ class Spectrum:
             min_right_ind = util.min_ind_range(divided_plot, length//2, length)
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
-            cleanedx = self.int_xvalues[min_left_ind:min_right_ind]
-            cleanedy = self.int_yvalues[min_left_ind:min_right_ind]
-            cleaned_brightness = brightness_array[min_left_ind:min_right_ind]
+
+            self.int_xvalues = self.int_xvalues[min_left_ind:min_right_ind]
+            self.int_yvalues = self.int_yvalues[min_left_ind:min_right_ind]
+
+            ### For plotting purposes...
+            # cleanedx = self.int_xvalues[min_left_ind:min_right_ind]
+            # cleanedy = self.int_yvalues[min_left_ind:min_right_ind]
+            # cleaned_brightness = brightness_array[min_left_ind:min_right_ind]
 
             # self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
-            self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
-            self.spec_scatter_fact.add_scatter(cleanedx, cleaned_brightness)
+            # self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
+            # self.spec_scatter_fact.add_scatter(cleanedx, cleaned_brightness)
         
         elif num_max == 2:
             pass
