@@ -397,11 +397,17 @@ class Spectrum:
                 divided_plot = -parab_brightness / smoothed_brightness
 
                 endx_ind = np.argmin(divided_plot)
+
+                plotx = np.array(self.int_xvalues)
+
                 self.int_xvalues = self.int_xvalues[:endx_ind]
                 self.int_yvalues = self.int_yvalues[:endx_ind]
-                
+                 
                 # Plot to ensure correctness
+                plot_brightness = brightness_array[:endx_ind]
 
+                self.spec_scatter_fact.add_scatter(plotx, brightness_array)
+                self.spec_scatter_fact.add_scatter(self.int_xvalues, plot_brightness)
 
 
         elif num_max == 1:
