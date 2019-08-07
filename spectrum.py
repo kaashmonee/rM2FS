@@ -330,6 +330,9 @@ class Spectrum:
         # If num_max > 3, then we've got cases that we haven't accounted for
         assert num_max <= 3
 
+        self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
+        self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
+
         if num_max == 3:
             # Fits a parabola
             py = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
@@ -372,7 +375,7 @@ class Spectrum:
 
             # Cases on whether there are any extrema whose x values are less
             # than the halfway point or greater than the halfway point
-            if np.any(max_extremax < halfway_point):
+            if np.average(max_extremax) < halfway_point:
                 # Left half
                 xmax.append(self.int_xvalues[-1])
                 brightness.append(brightness_array[-1])
@@ -387,8 +390,8 @@ class Spectrum:
 
 
 
-            elif np.any(max_extremax >= halfway_point):
-                # right half
+            elif np.average(max_extremax) > halfway_point:
+                print("Gets here...")
                 xmax.append(self.int_xvalues[0])
                 brightness.append(brightness_array[0])
 
@@ -411,16 +414,14 @@ class Spectrum:
 
 
         elif num_max == 1:
+            # Do nothing...
             pass
 
         else: # num_max must be between 1 and 3
             raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
 
 
-
         # Adding a list of things to plot...
-        # self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
-        # self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
         # self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness,color="red")
 
 
