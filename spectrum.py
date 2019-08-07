@@ -162,10 +162,10 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        if Spectrum.spectrum_number in [3, 7, 21]:
-            self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
-                                        show=True, save=False)
-            self.fits_file.plot_spectra_brightness() 
+        # if Spectrum.spectrum_number in [3, 7, 21]:
+        #     self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
+        #                                 show=True, save=False)
+        #     self.fits_file.plot_spectra_brightness() 
 
         # if spec_ind == len(self.spectra):
         #     self.plot_spectra(num_to_plot=spec_ind, save=True)
@@ -330,8 +330,6 @@ class Spectrum:
         # If num_max > 3, then we've got cases that we haven't accounted for
         assert num_max <= 3
 
-        self.spec_scatter_fact.add_scatter(to_plot_x, brightness_array)
-        self.spec_scatter_fact.add_scatter(max_extremax, max_extrema)
 
         if num_max == 3:
             # Fits a parabola
@@ -357,14 +355,6 @@ class Spectrum:
             self.int_xvalues = self.int_xvalues[min_left_ind:min_right_ind]
             self.int_yvalues = self.int_yvalues[min_left_ind:min_right_ind]
 
-            ### For plotting purposes...
-            # cleanedx = self.int_xvalues[min_left_ind:min_right_ind]
-            # cleanedy = self.int_yvalues[min_left_ind:min_right_ind]
-            # cleaned_brightness = brightness_array[min_left_ind:min_right_ind]
-
-            # self.spec_plot_fact.add_plot(self.int_xvalues, divided_plot)
-            # self.spec_scatter_fact.add_scatter(self.int_xvalues, brightness_array)
-            # self.spec_scatter_fact.add_scatter(cleanedx, cleaned_brightness)
         
         elif num_max == 2:
             halfway_ind = len(self.int_xvalues)//2
@@ -420,9 +410,6 @@ class Spectrum:
         else: # num_max must be between 1 and 3
             raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
 
-
-        # Adding a list of things to plot...
-        # self.spec_plot_fact.add_plot(to_plot_x, smoothed_brightness,color="red")
 
 
     
@@ -485,6 +472,5 @@ class Spectrum:
         ax.text(5, 5, rms_text)
 
         plt.show()
-
 
 
