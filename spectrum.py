@@ -76,14 +76,15 @@ class Spectrum:
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
-        self.__remove_overlapping_spectrum()
+        # self.__remove_overlapping_spectrum()
 
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
         # Ensuring that the spectrum has a reasonable size...
         xlen = len(self.xvalues)
         ylen = len(self.yvalues)
-        if xlen <= 100:
+        if xlen == 0:
+            print("xlen:", xlen)
             print("Build rejected! Fewer than 100 points in the spectrum...")
             return False
 
