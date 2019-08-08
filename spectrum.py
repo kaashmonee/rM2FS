@@ -369,8 +369,8 @@ class Spectrum:
 
         
         elif num_max == 2:
-            halfway_ind = len(self.int_xvalues)//2
             halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) / 2
+            halfway_ind = util.nearest_ind_to_val(self.int_xvalues, halfway_point)
             if Spectrum.spectrum_number == 11: print("halfway_point:", halfway_point)
 
             xmax = list(max_extremax)
@@ -387,7 +387,6 @@ class Spectrum:
 
                 divided_plot = -parab_brightness / smoothed_brightness
 
-                # startx_ind = np.argmin(divided_plot)
                 startx_ind = util.min_ind_range(divided_plot, 0, halfway_ind)
                 
                 # Setting all the quantities for plotting
@@ -399,15 +398,14 @@ class Spectrum:
 
 
             elif np.average(max_extremax) > halfway_point:
-                print("Gets here...")
                 xmax.extend(self.int_xvalues[0:10])
                 brightness.extend(brightness_array[0:10])
 
-                parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
+                parab_brightness = util.fit_parabola(xmax, brightness, 
+                                                     self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
 
-                # endx_ind = np.argmin(divided_plot)
                 endx_ind = util.min_ind_range(divided_plot, halfway_ind, length)
 
                 corrected_brightness = brightness_array[:endx_ind]

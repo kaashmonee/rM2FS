@@ -85,6 +85,15 @@ def sortxy(xvalues, yvalues):
     return sorted(xvalues), sorted_y
 
 
+def nearest_ind_to_val(arr, val):
+    """
+    Given some array arr, it returns the index of the element that is closest to
+    val. If there are multiple such elements, it returns a list.
+    """
+    arr = np.array(arr)
+    return (np.abs(array - value)).argmin()
+
+
 def smooth(x,window_len=11,window='hanning'):
     """smooth the data using a window with requested size.
     
