@@ -76,9 +76,9 @@ class Spectrum:
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
-        # self.__remove_overlapping_spectrum()
+        self.__remove_overlapping_spectrum()
 
-        self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+        # self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
         # Ensuring that the spectrum has a reasonable size...
         xlen = len(self.xvalues)
@@ -163,10 +163,10 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        # if Spectrum.spectrum_number in [3, 7, 21]:
-        #     self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
-        #                                 show=True, save=False)
-        #     self.fits_file.plot_spectra_brightness() 
+        if Spectrum.spectrum_number in [21]:
+            self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
+                                        show=True, save=False)
+            self.fits_file.plot_spectra_brightness() 
 
         # if spec_ind == len(self.spectra):
         #     self.plot_spectra(num_to_plot=spec_ind, save=True)
@@ -326,7 +326,13 @@ class Spectrum:
         # Correctness check
         assert len(max_extremax) == len(max_extrema)
 
+        # Variables that are used for plotting...
         num_max = len(max_extremax)
+        corrected_brightness = []
+        originalx = np.array(self.int_xvalues)
+        xmax_plot = []
+        brightnes_max_plot = []
+        divided_plot = []
 
         # If num_max > 3, then we've got cases that we haven't accounted for
         assert num_max <= 3
@@ -353,6 +359,10 @@ class Spectrum:
 
             assert len(self.int_xvalues) == len(self.int_yvalues)
 
+            corrected_brightness = brightness_array[min_left_ind:min_right_ind]
+            xmax_plot = max_extremax
+            brightness_max_plot = max_extrema
+
             self.int_xvalues = self.int_xvalues[min_left_ind:min_right_ind]
             self.int_yvalues = self.int_yvalues[min_left_ind:min_right_ind]
 
@@ -376,6 +386,10 @@ class Spectrum:
                 divided_plot = -parab_brightness / smoothed_brightness
 
                 startx_ind = np.argmin(divided_plot)
+                
+                # Setting all the quantities for plotting
+                corrected_brightness = brightness_array[startx_ind:]
+
                 self.int_xvalues = self.int_xvalues[startx_ind:]
                 self.int_yvalues = self.int_yvalues[startx_ind:]
 
@@ -392,16 +406,13 @@ class Spectrum:
 
                 endx_ind = np.argmin(divided_plot)
 
-                plotx = np.array(self.int_xvalues)
+                corrected_brightness = brightness_array[:endx_ind]
 
                 self.int_xvalues = self.int_xvalues[:endx_ind]
                 self.int_yvalues = self.int_yvalues[:endx_ind]
                  
-                # Plot to ensure correctness
-                plot_brightness = brightness_array[:endx_ind]
-
-                self.spec_scatter_fact.add_scatter(plotx, brightness_array)
-                self.spec_scatter_fact.add_scatter(self.int_xvalues, plot_brightness)
+            xmax_plot = xmax
+            brightness_max_plot = brightness
 
 
         elif num_max == 1:
@@ -410,6 +421,11 @@ class Spectrum:
 
         else: # num_max must be between 1 and 3
             raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
+
+        # self.spec_scatter_fact.add_scatter(originalx, brightness_array)
+        # self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
+        # self.spec_scatter_fact.add_scatter(xmax_plot, brightness_max_plot)
+        self.spec_plot_fact.add_plot(originalx, divided_plot)
 
 
 
