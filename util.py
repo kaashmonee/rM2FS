@@ -143,6 +143,28 @@ def smooth(x,window_len=11,window='hanning'):
     return y
 
 
+def fit_parabola(x, y, domain):
+    order = 2
+    f = construct_polynomial(x, y, order)
+    output = f(domain)
+    return output
+
+
+def construct_polynomial(x, y, order):
+    polyfit_array = np.polyfit(x, y, order)
+
+    def f(x):
+        power = 0
+        output = np.zeros(len(x))
+        for coef in reversed(polyfit_array):
+            output += coef * x**power
+            power += 1
+
+        return output
+
+    return f
+
+
 
 class ScatterFactory:
     """
@@ -169,13 +191,23 @@ class PlotFactory:
     def __init__(self):
         self.plot_list = []
     
-    def add_plot(self, x, y):
-        self.plot_list.append((x, y))
+    def add_plot(self, x, y, color=None):
+        self.plot_list.append((x, y, color))
 
-    def plot(self, cmap=None):
-        for x, y in self.plot_list:
-            plt.plot(x, y, color="red")
+    def plot(self):
+        for x, y, color in self.plot_list:
+            plt.plot(x, y, color=color)
 
+
+def min_ind_range(array, start, end):
+    """
+    Obtains the indices of the absolute minima of the first parameter
+    in the range provided by the 2nd and 3rd parameter.
+    """
+    temp = array[start:end]
+    min_ind_temp = np.argmin(temp)
+    min_ind_real = start + min_ind_temp
+    return min_ind_real
 
 
 def get_vmin_vmax(image):

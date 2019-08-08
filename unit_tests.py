@@ -23,6 +23,9 @@ class SpectrumUnitTest(unittest.TestCase):
         self.assertTrue(new_xvals.all() == xvalues.all()
                         and new_yvals.all() == yvalues.all())
 
+
+        print("sigma_clipping no failures passed...")
+
     
     def test_sortxy(self):
         """
@@ -40,6 +43,8 @@ class SpectrumUnitTest(unittest.TestCase):
 
         self.assertTrue(list(sortedx) == list(range(1, 101)))
         self.assertTrue(list(sortedy) == list(range(401, 501)))
+
+        print("sortxy() passed...")
 
 
 
@@ -62,6 +67,8 @@ class SpectrumUnitTest(unittest.TestCase):
         self.assertTrue(np.array_equal(xvalues, new_xvals))
         self.assertTrue(np.array_equal(yvalues, new_yvals))
 
+        print("sigma_clipping_failures1 passed...")
+
     def test_sigma_clipping_failures2(self):
         """
         Tests sigma clipping function on failing the first and last elements.
@@ -81,33 +88,25 @@ class SpectrumUnitTest(unittest.TestCase):
         self.assertTrue(np.array_equal(xvalues, new_xvals))
         self.assertTrue(np.array_equal(yvalues, new_yvals))
 
-    # def test_sigma_clipping_failures3(self):
-    #     """
-    #     This ensures that the alert message is displayed if over 10% of 
-    #     the pixels are removed.
-    #     """
-    #     xvalues = np.arange(10)
-    #     yvalues = np.random.normal(10, 3, 10)
-    #     yvalues[3] = -5
-    #     yvalues[5] = 100
+        print("sigma_clipping_failures2 passed...")
 
-    #     new_xvals, new_yvals = util.sigma_clip(xvalues, yvalues)
+    
+    def test_min_ind_range(self):
+        test_array1 = [1, 3, 4, 5, 9, 0, 3, 4, -1, 30]
+        start, end = 2, 5
+        min_ind = util.min_ind_range(test_array1, start, end)
+        self.assertTrue(min_ind == 2)
 
-    #     xvalues = np.delete(xvalues, [3, 5])
-    #     yvalues = np.delete(yvalues, [3, 5])
+        start, end = 0, len(test_array1)//2
+        min_ind = util.min_ind_range(test_array1, start, end)
+        self.assertTrue(min_ind == 0)
 
-    #     message = "Over 10% of pixels have been rejected in the sigma_clip routine."
+        start, end = len(test_array1)//2, len(test_array1)
+        min_ind = util.min_ind_range(test_array1, start, end)
+        self.assertTrue(min_ind == 8)
 
-    #     expected = """
-    #     ==========================
-    #     Warning: %s
-    #     ==========================
-    #     """
-    #     captured = sys.__stdout__
-    #     print(sys.__stdout__)
-    #     print(expected % message)
+        print("min_ind_range() tests passed...")
 
-    #     self.assertEqual(expected, captured)
 
 
 if __name__ == "__main__":

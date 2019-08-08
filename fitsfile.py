@@ -15,7 +15,8 @@ import sys
 class FitsFile:
     def __init__(self, fits_file):
         """
-        Creates a class that opens and contains .fits image attributes. It takes in a fits image path.
+        Creates a class that opens and contains .fits image attributes. 
+        It takes in a fits image path.
         """
         self.fits_file = fits_file
         hdul = fits.open(fits_file)
