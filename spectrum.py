@@ -424,7 +424,8 @@ class Spectrum:
 
         else: # num_max must be between 1 and 3
             raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
-
+        
+        # The following lines are here for plotting and diagnostic purposes...
         # self.spec_scatter_fact.add_scatter(originalx, brightness_array)
         # self.spec_plot_fact.add_plot(originalx, parab_brightness, color="red")
         # self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
