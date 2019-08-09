@@ -208,6 +208,23 @@ class FitsFile:
             else:
                 self.num_spectra -= 1
 
+        # Removes dark spectra
+        self.__remove_dark_spectra()
+
+
+    def __remove_dark_spectra(self):
+        """
+        Some spectra are much darker than others. This sometimes results in 
+        cases where the overlap detection is poor. This removes spectra whose 
+        average brightnesses are less than 5% of the median brightness of all 
+        the spectra.
+        """
+
+        ave_sb = {spectrum: spectrum.average_brightness() for spectrum in self.spectra}
+        median_brightness = np.median(np.array(list(ave_sb.values())))
+        cleaned_spectra = [spectrum for spectrum in ave_sb if ave_sb[spectrum] >= 0.05 * median_brightness]
+        self.spectra = cleaned_spectra
+
 
 
     def plot_spectra_brightness(self):

@@ -78,7 +78,7 @@ class Spectrum:
         # to update the self.xvalues and self.yvalues variables.
         self.__remove_overlapping_spectrum()
 
-        self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+        self.xvalues, self.yvalues = list(self.int_xvalues), list(self.int_yvalues)
 
         # Ensuring that the spectrum has a reasonable size...
         xlen = len(self.xvalues)
@@ -191,6 +191,11 @@ class Spectrum:
 
         
         return scatter_plot
+
+
+    def average_brightness(self):
+        brightness = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
+        return np.average(brightness)
 
 
     def __fit_spectrum(self, domain, degree):
