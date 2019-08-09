@@ -163,10 +163,10 @@ class Spectrum:
         # ould be taking place here.                                # 
         #############################################################
 
-        if Spectrum.spectrum_number in [21]:
-            self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
-                                        show=True, save=False)
-            self.fits_file.plot_spectra_brightness() 
+        # if Spectrum.spectrum_number in [21]:
+        #     self.fits_file.plot_spectra(num_to_plot=Spectrum.spectrum_number, 
+        #                                 show=True, save=False)
+        #     self.fits_file.plot_spectra_brightness() 
 
         # if spec_ind == len(self.spectra):
         #     self.plot_spectra(num_to_plot=spec_ind, save=True)
@@ -425,10 +425,10 @@ class Spectrum:
         else: # num_max must be between 1 and 3
             raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
 
-        self.spec_scatter_fact.add_scatter(originalx, brightness_array)
-        self.spec_plot_fact.add_plot(originalx, parab_brightness, color="red")
-        self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
-        self.spec_scatter_fact.add_scatter(xmax_plot, brightness_max_plot)
+        # self.spec_scatter_fact.add_scatter(originalx, brightness_array)
+        # self.spec_plot_fact.add_plot(originalx, parab_brightness, color="red")
+        # self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
+        # self.spec_scatter_fact.add_scatter(xmax_plot, brightness_max_plot)
         # self.spec_plot_fact.add_plot(originalx, divided_plot)
 
 
