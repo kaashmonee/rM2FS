@@ -78,12 +78,12 @@ class Spectrum:
         # to update the self.xvalues and self.yvalues variables.
         self.__remove_overlapping_spectrum()
 
-        # self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+        self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
         # Ensuring that the spectrum has a reasonable size...
         xlen = len(self.xvalues)
         ylen = len(self.yvalues)
-        if xlen == 0:
+        if xlen <= 100:
             print("xlen:", xlen)
             print("Build rejected! Fewer than 100 points in the spectrum...")
             return False
@@ -378,10 +378,11 @@ class Spectrum:
 
             # Cases on whether there are any extrema whose x values are less
             # than the halfway point or greater than the halfway point
+            parab_fit_range = 50
             if np.average(max_extremax) < halfway_point:
                 # Left half
-                xmax.extend(self.int_xvalues[-10:])
-                brightness.extend(brightness_array[-10:])
+                xmax.extend(self.int_xvalues[-parab_fit_range:])
+                brightness.extend(brightness_array[-parab_fit_range:])
 
                 parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
 
@@ -398,8 +399,8 @@ class Spectrum:
 
 
             elif np.average(max_extremax) > halfway_point:
-                xmax.extend(self.int_xvalues[0:10])
-                brightness.extend(brightness_array[0:10])
+                xmax.extend(self.int_xvalues[:parab_fit_range])
+                brightness.extend(brightness_array[:parab_fit_range])
 
                 parab_brightness = util.fit_parabola(xmax, brightness, 
                                                      self.int_xvalues)

@@ -91,7 +91,7 @@ def nearest_ind_to_val(arr, val):
     val. If there are multiple such elements, it returns a list.
     """
     arr = np.array(arr)
-    return (np.abs(array - value)).argmin()
+    return (np.abs(arr - val)).argmin()
 
 
 def smooth(x,window_len=11,window='hanning'):
