@@ -27,7 +27,6 @@ class FitsFile:
         self.spectra = []
         self.num_spectra = 0
 
-        # self.__get_spectra()
 
 
     def get_dimensions(self):
@@ -149,6 +148,11 @@ class FitsFile:
         import util
 
         xpeaks = self.__find_peaks()
+        self.xpeaks = xpeaks
+
+        # Obtains the expected starting and ending point for the stacked 
+        # overlapping regions
+        self.expected_start, self.expected_end = get_avg_overlapping_reg(xpeaks)
 
         image_length = self.image_data.shape[1]
 
@@ -200,6 +204,7 @@ class FitsFile:
                     break
 
             build_success = s.build()
+
             if build_success: 
                 cur_num_spectra += 1
                 print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
@@ -209,19 +214,37 @@ class FitsFile:
                 self.num_spectra -= 1
 
 
-
     def plot_spectra_brightness(self):
         for ind, spectrum in enumerate(self.spectra):
             num = ind + 1 
             spectrum.plot_spectrum_brightness(num)
 
-        # plt.show()
 
-        
+    def get_stacked_brightness(self):
+        xvalues = sorted(list(self.xpeaks.keys()))
+        brightness_dict = {x: self.image_data[self.xpeaks[x], x] for x in self.xpeaks}
+        brightness_ave = {x: np.average(brightness_dict[x]) for x in brightness_dict}
+        brightness_vals = [brightness_ave[x] for x in xvalues]
+
+        return xvalues, brightness_vals
+
+
+
 
     def get_file_name(self):
         """
         Returns the name of the file independent of the path.
         """
         return self.fits_file[self.fits_file.rfind("/")+1:]
+
+
+
+
+def show_stacked_brightness(self, xvalues, brightness_vals):
+    plt.xlabel("xpixel")
+    plt.ylabel("average brightness")
+    plt.title("average spectrum brightness vs. xpixel")
+    plt.scatter(xvalues, brightness_vals)
+    plt.show()
+
 

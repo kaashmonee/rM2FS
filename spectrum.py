@@ -76,7 +76,7 @@ class Spectrum:
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
-        self.__remove_overlapping_spectrum()
+        self.remove_overlapping_spectrum()
 
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
@@ -235,7 +235,7 @@ class Spectrum:
         )
 
     
-    def __remove_overlapping_spectrum(self):
+    def remove_overlapping_spectrum(self):
         """
         This routine removes the part of the spectrum on either side that is 
         responsible that overlaps. This way, we only use the middle spectrum for 
@@ -286,35 +286,11 @@ class Spectrum:
         assert len(self.int_xvalues) == len(self.int_yvalues)
         assert len(self.int_xvalues) == len(brightness_array)
 
-        # Smoothing the brightness array
-        # Obtain window size --- a larger window size is associated with
-        # a smoother output
-        window_size = len(self.int_xvalues) // 6
+        # Obtaining maxima...
+        max_extremax, max_extrema = find_smoothed_max(self.int_xvalues, 
+                                                      self.int_yvalues, 
+                                                      brightness_array)
 
-        if window_size % 2 == 0:
-            window_size -= 1
-        
-        order = 3
-        smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 
-                                                         window_size, order)
-        
-        # Correctness check
-        assert len(self.int_xvalues) == len(self.int_yvalues)
-        assert len(self.int_xvalues) == len(brightness_array)
-
-        # Obtaining the minima of the smoothed function and the x indices of the
-        # minima
-        order = 100
-        max_extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, 
-                                                         np.greater, 
-                                                         order=order)
-
-        # Obtaining the minima
-        max_extremax = self.int_xvalues[max_extrema_indices]
-        max_extrema = smoothed_brightness[max_extrema_indices]
-
-        # Additional correctness checks
-        assert len(smoothed_brightness) == len(self.int_xvalues)
 
         # Correctness check
         image_width = len(self.image_cols)
@@ -326,110 +302,10 @@ class Spectrum:
         # Correctness check
         assert len(max_extremax) == len(max_extrema)
 
-        # Variables that are used for plotting...
-        num_max = len(max_extremax)
-        corrected_brightness = []
-        originalx = np.array(self.int_xvalues)
-        xmax_plot = []
-        brightnes_max_plot = []
-        divided_plot = []
-        parab_brightness = []
 
-        # If num_max > 3, then we've got cases that we haven't accounted for
-        assert num_max <= 3
-        length = len(self.int_xvalues)
+        start_ind, end_ind = get_start_end_ind(max_extremax, max_extrema, 
+                                               self.int_xvalues)
 
-
-        if num_max == 3:
-            # Fits a parabola
-            parab_brightness = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
-
-            divided_plot = -parab_brightness / smoothed_brightness
-
-            # Finds the absolute minima in the first and second halves of the 
-            # image
-
-            ## Some correctness checkds before proceeding
-            assert length == len(self.int_xvalues)
-            assert length == len(divided_plot)
-
-            # Obtains the indices of the absolute minima of the first parameter
-            # in the range provided by the 2nd and 3rd parameter
-            min_left_ind = util.min_ind_range(divided_plot, 0, length//2)
-            min_right_ind = util.min_ind_range(divided_plot, length//2, length)
-
-            assert len(self.int_xvalues) == len(self.int_yvalues)
-
-            corrected_brightness = brightness_array[min_left_ind:min_right_ind]
-            xmax_plot = max_extremax
-            brightness_max_plot = max_extrema
-
-            self.int_xvalues = self.int_xvalues[min_left_ind:min_right_ind]
-            self.int_yvalues = self.int_yvalues[min_left_ind:min_right_ind]
-
-        
-        elif num_max == 2:
-            halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) / 2
-            halfway_ind = util.nearest_ind_to_val(self.int_xvalues, halfway_point)
-            if Spectrum.spectrum_number == 11: print("halfway_point:", halfway_point)
-
-            xmax = list(max_extremax)
-            brightness = list(max_extrema)
-
-            # Cases on whether there are any extrema whose x values are less
-            # than the halfway point or greater than the halfway point
-            parab_fit_range = 50
-            if np.average(max_extremax) < halfway_point:
-                # Left half
-                xmax.extend(self.int_xvalues[-parab_fit_range:])
-                brightness.extend(brightness_array[-parab_fit_range:])
-
-                parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
-
-                divided_plot = -parab_brightness / smoothed_brightness
-
-                startx_ind = util.min_ind_range(divided_plot, 0, halfway_ind)
-                
-                # Setting all the quantities for plotting
-                corrected_brightness = brightness_array[startx_ind:]
-
-                self.int_xvalues = self.int_xvalues[startx_ind:]
-                self.int_yvalues = self.int_yvalues[startx_ind:]
-
-
-
-            elif np.average(max_extremax) > halfway_point:
-                xmax.extend(self.int_xvalues[:parab_fit_range])
-                brightness.extend(brightness_array[:parab_fit_range])
-
-                parab_brightness = util.fit_parabola(xmax, brightness, 
-                                                     self.int_xvalues)
-
-                divided_plot = -parab_brightness / smoothed_brightness
-
-                endx_ind = util.min_ind_range(divided_plot, halfway_ind, length)
-
-                corrected_brightness = brightness_array[:endx_ind]
-
-                self.int_xvalues = self.int_xvalues[:endx_ind]
-                self.int_yvalues = self.int_yvalues[:endx_ind]
-                 
-            xmax_plot = xmax
-            brightness_max_plot = brightness
-
-
-        elif num_max == 1:
-            # Do nothing...
-            return
-
-        else: # num_max must be between 1 and 3
-            raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
-
-        # self.spec_scatter_fact.add_scatter(originalx, brightness_array)
-        # self.spec_plot_fact.add_plot(originalx, parab_brightness, color="red")
-        # self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
-        # self.spec_scatter_fact.add_scatter(xmax_plot, brightness_max_plot)
-        # self.spec_plot_fact.add_plot(originalx, divided_plot)
 
 
 
@@ -494,4 +370,151 @@ class Spectrum:
 
         plt.show()
 
+
+
+def find_smoothed_max(xvalues, yvalues, brightness_array):
+    """
+    This routine obtains the maxima in the smoothed brightness plot.
+    It then returns an array of the xvalues and the yvalues of the locations
+    of those maxima.
+    """
+
+    # Smoothing the brightness array
+    # Obtain window size --- a larger window size is associated with
+    # a smoother output
+    window_size = len(xvalues) // 6
+
+    if window_size % 2 == 0:
+        window_size -= 1
+    
+    order = 3
+    smoothed_brightness = scipy.signal.savgol_filter(brightness_array, 
+                                                        window_size, order)
+    
+    # Correctness check
+    assert len(xvalues) == len(yvalues)
+    assert len(xvalues) == len(brightness_array)
+
+    # Obtaining the minima of the smoothed function and the x indices of the
+    # minima
+    order = 100
+    max_extrema_indices = scipy.signal.argrelextrema(smoothed_brightness, 
+                                                        np.greater, 
+                                                        order=order)
+
+    # Obtaining the minima
+    max_extremax = xvalues[max_extrema_indices]
+    max_extrema = smoothed_brightness[max_extrema_indices]
+    
+    # Additional correctness checks
+    assert len(smoothed_brightness) == len(xvalues)
+
+    return max_extremax, max_extrema
+
+
+
+def get_start_end_ind(max_extremax, max_extrema, xvalues):
+    """
+    This function returns the starting and ending indices of the 
+    """
+    # Variables that are used for plotting...
+    corrected_brightness = []
+    originalx = np.array(xvalues)
+    xmax_plot = []
+    brightnes_max_plot = []
+    divided_plot = []
+    parab_brightness = []
+
+    # If num_max > 3, then we've got cases that we haven't accounted for
+    assert num_max <= 3
+    length = len(xvalues)
+
+    # Introducing the halfway_point 
+    halfway_point = (self.int_xvalues[-1] - self.int_xvalues[0]) / 2
+    halfway_ind = util.nearest_ind_to_val(self.int_xvalues, halfway_point)
+    num_max = len(max_extremax)
+
+    if num_max == 3:
+        # Fits a parabola
+        parab_brightness = util.fit_parabola(max_extremax, max_extrema, 
+                                            self.int_xvalues)
+
+        divided_plot = -parab_brightness / smoothed_brightness
+
+        # Finds the absolute minima in the first and second halves of the 
+        # image
+
+        ## Some correctness checkds before proceeding
+        assert length == len(self.int_xvalues)
+        assert length == len(divided_plot)
+
+        # Obtains the indices of the absolute minima of the first parameter
+        # in the range provided by the 2nd and 3rd parameter
+        min_left_ind = util.min_ind_range(divided_plot, 0, halfway_ind)
+        min_right_ind = util.min_ind_range(divided_plot, halfway_ind, length)
+
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+
+        corrected_brightness = brightness_array[min_left_ind:min_right_ind]
+        xmax_plot = max_extremax
+        brightness_max_plot = max_extrema
+
+        return min_left_ind, min_right_ind
+
+
+    elif num_max == 2:
+        xmax = list(max_extremax)
+        brightness = list(max_extrema)
+
+        # Cases on whether there are any extrema whose x values are less
+        # than the halfway point or greater than the halfway point
+        parab_fit_range = 50
+        if np.average(max_extremax) < halfway_point:
+            # Left half
+            xmax.extend(self.int_xvalues[-parab_fit_range:])
+            brightness.extend(brightness_array[-parab_fit_range:])
+
+            parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
+
+            divided_plot = -parab_brightness / smoothed_brightness
+
+            startx_ind = util.min_ind_range(divided_plot, 0, halfway_ind)
+            
+            # Setting all the quantities for plotting
+            corrected_brightness = brightness_array[startx_ind:]
+
+            return startx_ind, length
+
+
+        elif np.average(max_extremax) > halfway_point:
+            xmax.extend(self.int_xvalues[:parab_fit_range])
+            brightness.extend(brightness_array[:parab_fit_range])
+
+            parab_brightness = util.fit_parabola(xmax, brightness, 
+                                                    self.int_xvalues)
+
+            divided_plot = -parab_brightness / smoothed_brightness
+
+            endx_ind = util.min_ind_range(divided_plot, halfway_ind, length)
+
+            corrected_brightness = brightness_array[:endx_ind]
+
+            return 0, endx_ind
+
+        xmax_plot = xmax
+        brightness_max_plot = brightness
+
+
+    elif num_max == 1:
+        # Do nothing...
+        return
+
+    else: # num_max must be between 1 and 3
+        raise ValueError("num_max = %d. This case is not accounted for." % (num_max))
+
+    # self.spec_scatter_fact.add_scatter(originalx, brightness_array)
+    # self.spec_plot_fact.add_plot(originalx, parab_brightness, color="red")
+    # self.spec_scatter_fact.add_scatter(self.int_xvalues, corrected_brightness)
+    # self.spec_scatter_fact.add_scatter(xmax_plot, brightness_max_plot)
+    # self.spec_plot_fact.add_plot(originalx, divided_plot)
 

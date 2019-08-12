@@ -1,5 +1,5 @@
 import argparse
-from fitsfile import FitsFile
+from fitsfile import FitsFile, show_stacked_brightness
 import util
 import os
 import gaussfit
@@ -50,7 +50,8 @@ def main():
                 print("Found pickled file in fitted_files/. Plotting spectra...")
                 fits_file = util.load(pickle_fp)
                 fits_file.plot_spectra(show=True, save=save)
-                fits_file.plot_spectra_brightness()
+                # fits_file.plot_spectra_brightness()
+                show_stacked_brightness(fits_file.get_stacked_brightness())
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)
