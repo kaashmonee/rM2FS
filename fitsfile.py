@@ -217,7 +217,35 @@ class FitsFile:
 
         # plt.show()
 
-        
+
+    def __fit_overlap_boundary_parabola(self):
+        """
+        This function fits a parabola to the overlap boundaries after the 
+        spectrum.remove_overlap_spectrum is run.
+        """
+        spectrum_startx = []
+        spectrum_starty = []
+        spectrum_endx = []
+        spectrum_endy = []
+
+        for spectrum in self.spectra:
+            spectrum_startx.append(spectrum.int_xvalues[0])
+            spectrum_starty.append(spectrum.int_yvalues[0])
+            spectrum_endx.append(spectrum.int_xvalues[-1])
+            spectrum_endy.append(spectrum.int_yvalues[-1])
+
+        height = self.image_data.shape[0]
+        domain = np.arange(height)
+
+        start_parab = util.fit_parabola(spectrum_starty, spectrum_startx, domain)
+        end_parab = util.fit_parabola(spectrum_endy, spectrum_endx, domain)
+
+        # Plotting...
+        plt.plot(start_parab, domain)
+        plt.plot(end_parab, domain)
+        plt.show()
+
+
 
     def get_file_name(self):
         """
