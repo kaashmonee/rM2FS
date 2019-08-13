@@ -209,6 +209,8 @@ class FitsFile:
                 self.num_spectra -= 1
 
 
+        self.__fit_overlap_boundary_parabola()
+
 
     def plot_spectra_brightness(self):
         for ind, spectrum in enumerate(self.spectra):
@@ -223,6 +225,8 @@ class FitsFile:
         This function fits a parabola to the overlap boundaries after the 
         spectrum.remove_overlap_spectrum is run.
         """
+        import util
+
         spectrum_startx = []
         spectrum_starty = []
         spectrum_endx = []
