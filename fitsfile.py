@@ -71,6 +71,11 @@ class FitsFile:
             fit_plot = spectrum.plot_fit()
             fit_plots.append(fit_plot)
 
+
+        # Plotting...
+        plt.plot(self.start_parab, self.parab_range)
+        plt.plot(self.end_parab, self.parab_range)
+
         plt.xlabel("xpixel")
         plt.ylabel("ypixel") 
         plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(self.num_spectra))
@@ -244,10 +249,10 @@ class FitsFile:
         start_parab = util.fit_parabola(spectrum_starty, spectrum_startx, domain)
         end_parab = util.fit_parabola(spectrum_endy, spectrum_endx, domain)
 
-        # Plotting...
-        plt.plot(start_parab, domain)
-        plt.plot(end_parab, domain)
-        plt.show()
+        self.start_parab = start_parab
+        self.end_parab = end_parab
+        self.parab_range = domain
+
 
 
 
