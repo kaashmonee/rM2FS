@@ -66,6 +66,12 @@ class Spectrum:
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
 
+        # Retaining a list of the original, unmodified x and y values
+        # This is for cases where the spectrum is cut off prematurely. In such
+        # cases, we want to retain this information so that we can re-cut the 
+        # spectrum to the parabola.
+        self.ox, self.oy = list(self.xvalues), list(self.yvalues)
+
         # Ensuring that we keep track of the integer yvalues
         # This is useful for when we want to plot the brightness vs. x value of
         # the peaks.
