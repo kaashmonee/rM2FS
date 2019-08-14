@@ -163,6 +163,8 @@ class FitsFile:
         xthreshold = 5
         ythreshold = 2
         cur_num_spectra = 0
+
+        spectra = []
         
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
@@ -204,27 +206,25 @@ class FitsFile:
                 if abs(prev_spec_x - cur_x) >= xthreshold:
                     break
 
-            s.remove_overlapping_spectrum()
-            self.spectra.append(s)
+            s.build_prepare()
+            spectra.add(s)
 
 
         self.__fit_overlap_boundary_parabola()
         self.__update_spectral_boundaries()
                     
-        built_spectra = []
-        for spectrum in self.spectra: 
+        for spectrum in spectra: 
 
             build_success = spectrum.build()
 
             if build_success: 
                 cur_num_spectra += 1
-                built_spectra.append(spectrum)
+                self.spectra.append(spectrum)
                 print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
                 print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
             else:
                 self.num_spectra -= 1
 
-        self.spectra = built_spectra
 
 
     def plot_spectra_brightness(self):

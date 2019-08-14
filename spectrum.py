@@ -52,16 +52,13 @@ class Spectrum:
 
 
 
-    def build(self):
+    def build_init(self):
+        """
+        THis function initializes the necessary values to prepare before the 
+        build process commences. These initialation variables are useful later
+        on.
+        """
         import util
-        """
-        After all the points have been added to the spectrum, this function
-        must be called to 'build' the spectrum, which performs Gaussian fits of 
-        the integer peaks, removes outliers, removes the overlapping portions
-        of the spectra, and establishes a width profile. If there are fewer than
-        100 points in the spectrum, then the build is rejected and False
-        is returned.
-        """
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
@@ -82,7 +79,11 @@ class Spectrum:
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
-        # self.__remove_overlapping_spectrum()
+        self.__remove_overlapping_spectrum()
+
+
+
+    def build(self):
 
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
@@ -241,7 +242,7 @@ class Spectrum:
         )
 
     
-    def remove_overlapping_spectrum(self):
+    def __remove_overlapping_spectrum(self):
         """
         This routine removes the part of the spectrum on either side that is 
         responsible that overlaps. This way, we only use the middle spectrum for 
