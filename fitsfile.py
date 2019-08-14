@@ -264,6 +264,40 @@ class FitsFile:
         self.ep_rms = ep_rms
 
 
+    def __update_spectral_boundaries(self):
+        """
+        Fixes the spectral boundaries by replacing the spectral boundaries with 
+        points that should be closer to the edges.
+        """
+        import util
+
+        height = self.image_data.shape[0]
+        domain = np.arange(height)
+
+        for spectrum in self.spectra:
+            # Updating the left half boundaries
+            startx = self.spectrum.int_xvalues[0]
+            starty = self.spectrum.int_yvalues[0]
+
+            parab_startx_ind = util.nearest_ind_to_val(self.start_parab, startx)
+            start_parabx = self.start_parab[parab_startx_ind]
+            
+            # If the true yvalue is greater than 3 std. dev. away from the 
+            # parabola, replace the y value with the x value at the parabola
+            if abs(start_parabx - startx) >= 3 * self.sp_rms:
+                self.spectrum.int_xvalues[0] = start_parabx
+                
+
+            # Repeat same procedure as above for the last values
+            endx = self.spectrum.int_xvalues[-1]
+            endy = self.spectrum.int_yvalues[-1]
+
+            parab_endx_ind = util.nearest_ind_to_val(self.end_parab, endx)
+            end_parabx = self.end_parab[parab_endx_ind]
+
+            if abs(end_parabx - endx) >= 3 * self.ep_rms:
+                self.spectrum.int_xvalues[-1] = end_parabx
+
 
 
     def get_file_name(self):
