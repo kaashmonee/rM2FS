@@ -156,7 +156,12 @@ def fit_parabola(x, y, domain):
     order = 2
     f = construct_polynomial(x, y, order)
     output = f(domain)
-    return output
+
+    # Calculates and returns the rms value
+    rms_op = f(x)
+    fn_rms = rms(rms_op, y)
+
+    return output, fn_rms
 
 
 def construct_polynomial(x, y, order):
