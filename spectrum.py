@@ -348,7 +348,7 @@ class Spectrum:
 
         if num_max == 3:
             # Fits a parabola
-            parab_brightness = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
+            parab_brightness,_ = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
 
             divided_plot = -parab_brightness / smoothed_brightness
 
@@ -390,7 +390,7 @@ class Spectrum:
                 xmax.extend(self.int_xvalues[-parab_fit_range:])
                 brightness.extend(brightness_array[-parab_fit_range:])
 
-                parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
+                parab_brightness,_ = util.fit_parabola(xmax, brightness, self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
 
@@ -408,7 +408,7 @@ class Spectrum:
                 xmax.extend(self.int_xvalues[:parab_fit_range])
                 brightness.extend(brightness_array[:parab_fit_range])
 
-                parab_brightness = util.fit_parabola(xmax, brightness, 
+                parab_brightness,_ = util.fit_parabola(xmax, brightness, 
                                                      self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
