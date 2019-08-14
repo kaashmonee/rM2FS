@@ -82,7 +82,7 @@ class Spectrum:
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
-        self.__remove_overlapping_spectrum()
+        # self.__remove_overlapping_spectrum()
 
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
@@ -241,7 +241,7 @@ class Spectrum:
         )
 
     
-    def __remove_overlapping_spectrum(self):
+    def remove_overlapping_spectrum(self):
         """
         This routine removes the part of the spectrum on either side that is 
         responsible that overlaps. This way, we only use the middle spectrum for 
