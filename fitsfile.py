@@ -295,28 +295,28 @@ class FitsFile:
             # Updating the left half boundaries
             startx = spectrum.int_xvalues[0]
             starty = spectrum.int_yvalues[0]
-
-            parab_startx_ind = util.nearest_ind_to_val(self.start_parab, startx)
-            start_parabx = self.start_parab[parab_startx_ind]
+            
+            parab_starty_ind = util.nearest_ind_to_val(domain, starty)
+            start_parabx = self.start_parab[parab_starty_ind]
             
             # If the true yvalue is greater than 3 std. dev. away from the 
             # parabola, replace the y value with the x value at the parabola
-            int_xvals = []
-            int_yvals = []
+            int_xvals = list(spectrum.ox)
+            int_yvals = list(spectrum.oy)
             if abs(start_parabx - startx) >= 3 * self.sp_rms:
                 # Obtain index of xvalue that is closest to the starting value
                 # of the parabola
                 spec_start_ind = util.nearest_ind_to_val(spectrum.ox, start_parabx)
-                int_xvals = spectrum.ox[spec_start_ind:]
-                int_yvals = spectrum.oy[spec_start_ind:]
+                int_xvals = int_xvals[spec_start_ind:]
+                int_yvals = int_yvals[spec_start_ind:]
 
 
             # Repeat same procedure as above for the last values
             endx = spectrum.int_xvalues[-1]
             endy = spectrum.int_yvalues[-1]
 
-            parab_endx_ind = util.nearest_ind_to_val(self.end_parab, endx)
-            end_parabx = self.end_parab[parab_endx_ind]
+            parab_endy_ind = util.nearest_ind_to_val(domain, endy)
+            end_parabx = self.end_parab[parab_endy_ind]
 
             if abs(end_parabx - endx) >= 3 * self.ep_rms:
                 spec_end_ind = util.nearest_ind_to_val(int_xvals, end_parabx)

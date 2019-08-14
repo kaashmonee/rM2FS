@@ -94,8 +94,10 @@ class Spectrum:
 
     def build(self):
 
+        import util
 
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+        xlen, ylen = len(self.xvalues), len(self.yvalues)
 
         # Ensuring that the spectrum has a reasonable size...
         build_success = util.ensure_min_spec_length(self.xvalues, self.yvalues)
