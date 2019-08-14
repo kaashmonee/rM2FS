@@ -284,9 +284,15 @@ class FitsFile:
             
             # If the true yvalue is greater than 3 std. dev. away from the 
             # parabola, replace the y value with the x value at the parabola
+            int_xvals = []
+            int_yvals = []
             if abs(start_parabx - startx) >= 3 * self.sp_rms:
-                self.spectrum.int_xvalues[0] = start_parabx
-                
+                # Obtain index of xvalue that is closest to the starting value
+                # of the parabola
+                spec_start_ind = util.nearest_ind_to_val(spectrum.ox, start_parabx)
+                int_xvals = spectrum.ox[spec_start_ind:]
+                int_yvals = spectrum.oy[spec_start_ind:]
+
 
             # Repeat same procedure as above for the last values
             endx = self.spectrum.int_xvalues[-1]
@@ -296,7 +302,14 @@ class FitsFile:
             end_parabx = self.end_parab[parab_endx_ind]
 
             if abs(end_parabx - endx) >= 3 * self.ep_rms:
-                self.spectrum.int_xvalues[-1] = end_parabx
+                spec_end_ind = util.nearest_ind_to_val(int_xvals, end_parabx)
+                int_xvals = int_xvals[:spec_end_ind]
+                int_yvals = int_yvals[:spec_end_ind]
+            
+            # Update the spectrum int_xvals and the int_yvals
+            spectrum.int_xvalues = int_xvals
+            spectrum.int_yvalues = int_yvals
+
 
 
 
