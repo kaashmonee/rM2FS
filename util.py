@@ -156,7 +156,24 @@ def fit_parabola(x, y, domain):
     order = 2
     f = construct_polynomial(x, y, order)
     output = f(domain)
-    return output
+
+    # Calculates and returns the rms value
+    rms_op = f(np.array(x))
+    fn_rms = rms(rms_op, np.array(y))
+
+    return output, fn_rms
+
+
+def ensure_min_spec_length(xvalues, yvalues):
+    xlen = len(xvalues)
+    ylen = len(yvalues)
+    assert xlen == ylen
+    if xlen <= 100:
+        print("xlen:", xlen)
+        print("Build rejected! Fewer than 100 points in the spectrum...")
+        return False
+
+    return True
 
 
 def construct_polynomial(x, y, order):
@@ -236,7 +253,8 @@ def find_int_peaks(intensity_array, height=100, dist=5):
 def find_xy_peaks(x, y):
     """
     Finds peaks in a distribution given the x values and the yvalues. Returns
-    the (x, y) coordinates of the peaks.
+    the (x, y) coordinates of the peaks as an array of xvalues and an array of 
+    yvalues.
     """
     peaks,_ = scipy.signal.find_peaks(y)
     xpeaks = np.take(x, peaks)

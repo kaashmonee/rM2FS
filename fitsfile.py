@@ -71,6 +71,11 @@ class FitsFile:
             fit_plot = spectrum.plot_fit()
             fit_plots.append(fit_plot)
 
+
+        # Plotting...
+        plt.plot(self.start_parab, self.parab_range)
+        plt.plot(self.end_parab, self.parab_range)
+
         plt.xlabel("xpixel")
         plt.ylabel("ypixel") 
         plt.title("Image " + self.get_file_name() + " with Spectral Continuum Fits\nSpectra " + str(num_to_plot) + "/" + str(self.num_spectra))
@@ -158,7 +163,7 @@ class FitsFile:
         xthreshold = 5
         ythreshold = 2
         cur_num_spectra = 0
-        
+
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
             cur_y = y
@@ -199,15 +204,34 @@ class FitsFile:
                 if abs(prev_spec_x - cur_x) >= xthreshold:
                     break
 
-            build_success = s.build()
-            if build_success: 
+            build_prep_success = s.build_prepare()
+            if build_prep_success:
                 cur_num_spectra += 1
-                print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
                 self.spectra.append(s)
-                print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
+                print("Spectrum %d/%d ready for building..." % (cur_num_spectra, self.num_spectra))
             else:
                 self.num_spectra -= 1
 
+
+        self.__fit_overlap_boundary_parabola()
+        self.__update_spectral_boundaries()
+        
+        built_spectra = []
+        cur_num_spectra = 0
+
+        for spectrum in self.spectra: 
+
+            build_success = spectrum.build()
+
+            if build_success: 
+                cur_num_spectra += 1
+                built_spectra.append(spectrum)
+                print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
+                print("Min x:", spectrum.xvalues[0], "\nMax x:", spectrum.xvalues[-1])
+            else:
+                self.num_spectra -= 1
+
+        self.spectra = built_spectra
 
 
     def plot_spectra_brightness(self):
@@ -217,7 +241,101 @@ class FitsFile:
 
         # plt.show()
 
-        
+
+    def __fit_overlap_boundary_parabola(self):
+        """
+        This function fits a parabola to the overlap boundaries after the 
+        spectrum.remove_overlap_spectrum is run. However, since a vertical 
+        parabola needs to be fit, the y value are the effective xvalues and 
+        the xvalues are the effective yvalues.
+        """
+        import util
+
+        spectrum_startx = []
+        spectrum_starty = []
+        spectrum_endx = []
+        spectrum_endy = []
+
+        for spectrum in self.spectra:
+            spectrum_startx.append(spectrum.int_xvalues[0])
+            spectrum_starty.append(spectrum.int_yvalues[0])
+            spectrum_endx.append(spectrum.int_xvalues[-1])
+            spectrum_endy.append(spectrum.int_yvalues[-1])
+
+        height = self.image_data.shape[0]
+        domain = np.arange(height)
+
+        start_parab, sp_rms = util.fit_parabola(spectrum_starty, 
+                                                spectrum_startx, 
+                                                domain)
+
+        end_parab, ep_rms = util.fit_parabola(spectrum_endy, spectrum_endx, 
+                                              domain)
+
+        self.start_parab = start_parab
+        self.end_parab = end_parab
+        self.parab_range = domain
+
+        # StartParabola_rms and EndParabola_rms
+        self.sp_rms = sp_rms
+        self.ep_rms = ep_rms
+
+
+    def __update_spectral_boundaries(self):
+        """
+        Fixes the spectral boundaries by replacing the spectral boundaries with 
+        points that should be closer to the edges.
+        """
+        import util
+
+        height = self.image_data.shape[0]
+        domain = np.arange(height)
+
+        print("spectral boundaries before...")
+
+        for spectrum in self.spectra:
+            # Updating the left half boundaries
+            startx = spectrum.int_xvalues[0]
+            starty = spectrum.int_yvalues[0]
+            
+            parab_starty_ind = util.nearest_ind_to_val(domain, starty)
+            start_parabx = self.start_parab[parab_starty_ind]
+            
+
+            # Starting and ending indices of the first and last 
+            # values of the int_xvalues array in the spectrum.ox array
+            spec_start_ind = spectrum.ox.index(spectrum.int_xvalues[0])
+            spec_end_ind = spectrum.ox.index(spectrum.int_xvalues[-1])
+
+            # If the true yvalue is greater than 3 std. dev. away from the 
+            # parabola, replace the y value with the x value at the parabola
+            if abs(start_parabx - startx) >= 3 * self.sp_rms:
+                # Obtain index of xvalue that is closest to the starting value
+                # of the parabola
+                print("start_parabx:", start_parabx, "startx:", startx)
+                spec_start_ind = util.nearest_ind_to_val(spectrum.ox, start_parabx)
+
+
+            # Repeat same procedure as above for the last values
+            endx = spectrum.int_xvalues[-1]
+            endy = spectrum.int_yvalues[-1]
+
+            parab_endy_ind = util.nearest_ind_to_val(domain, endy)
+            end_parabx = self.end_parab[parab_endy_ind]
+            
+            if abs(end_parabx - endx) >= 3 * self.ep_rms:
+                print("end_parabx:", end_parabx, "endx:", endx)
+                spec_end_ind = util.nearest_ind_to_val(spectrum.ox, end_parabx)
+            
+            int_xvals = spectrum.ox[spec_start_ind:spec_end_ind]
+            int_yvals = spectrum.oy[spec_start_ind:spec_end_ind]
+
+            # Update the spectrum int_xvals and the int_yvals
+            spectrum.int_xvalues = int_xvals
+            spectrum.int_yvalues = int_yvals
+
+
+
 
     def get_file_name(self):
         """

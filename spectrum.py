@@ -52,19 +52,22 @@ class Spectrum:
 
 
 
-    def build(self):
+    def build_prepare(self):
+        """
+        THis function initializes the necessary values to prepare before the 
+        build process commences. These initialation variables are useful later
+        on.
+        """
         import util
-        """
-        After all the points have been added to the spectrum, this function
-        must be called to 'build' the spectrum, which performs Gaussian fits of 
-        the integer peaks, removes outliers, removes the overlapping portions
-        of the spectra, and establishes a width profile. If there are fewer than
-        100 points in the spectrum, then the build is rejected and False
-        is returned.
-        """
 
         # Sorting the x and y values
         self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
+
+        # Retaining a list of the original, unmodified x and y values
+        # This is for cases where the spectrum is cut off prematurely. In such
+        # cases, we want to retain this information so that we can re-cut the 
+        # spectrum to the parabola.
+        self.ox, self.oy = list(self.xvalues), list(self.yvalues)
 
         # Ensuring that we keep track of the integer yvalues
         # This is useful for when we want to plot the brightness vs. x value of
@@ -73,20 +76,35 @@ class Spectrum:
         self.int_yvalues = np.array(self.yvalues)
         assert len(self.int_xvalues) == len(self.int_yvalues)
 
+        # Ensuring that the spectrum has a reasonable size...
+        build_success = util.ensure_min_spec_length(self.xvalues, self.yvalues)
+
+        if not build_success:
+            return False
+                
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
         self.__remove_overlapping_spectrum()
 
+        return True
+
+
+
+
+    def build(self):
+
+        import util
+
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
+        xlen, ylen = len(self.xvalues), len(self.yvalues)
 
         # Ensuring that the spectrum has a reasonable size...
-        xlen = len(self.xvalues)
-        ylen = len(self.yvalues)
-        if xlen <= 100:
-            print("xlen:", xlen)
-            print("Build rejected! Fewer than 100 points in the spectrum...")
+        build_success = util.ensure_min_spec_length(self.xvalues, self.yvalues)
+
+        if not build_success:
             return False
+
 
         # Ensuring no duplicates and ensuring strictly increasing
         # assert np.diff(self.xvalues).all() <= 0
@@ -342,7 +360,7 @@ class Spectrum:
 
         if num_max == 3:
             # Fits a parabola
-            parab_brightness = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
+            parab_brightness,_ = util.fit_parabola(max_extremax, max_extrema, self.int_xvalues)
 
             divided_plot = -parab_brightness / smoothed_brightness
 
@@ -384,7 +402,7 @@ class Spectrum:
                 xmax.extend(self.int_xvalues[-parab_fit_range:])
                 brightness.extend(brightness_array[-parab_fit_range:])
 
-                parab_brightness = util.fit_parabola(xmax, brightness, self.int_xvalues)
+                parab_brightness,_ = util.fit_parabola(xmax, brightness, self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
 
@@ -402,7 +420,7 @@ class Spectrum:
                 xmax.extend(self.int_xvalues[:parab_fit_range])
                 brightness.extend(brightness_array[:parab_fit_range])
 
-                parab_brightness = util.fit_parabola(xmax, brightness, 
+                parab_brightness,_ = util.fit_parabola(xmax, brightness, 
                                                      self.int_xvalues)
 
                 divided_plot = -parab_brightness / smoothed_brightness
