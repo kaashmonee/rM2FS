@@ -52,7 +52,7 @@ class Spectrum:
 
 
 
-    def build_init(self):
+    def build_prepare(self):
         """
         THis function initializes the necessary values to prepare before the 
         build process commences. These initialation variables are useful later
