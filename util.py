@@ -158,8 +158,8 @@ def fit_parabola(x, y, domain):
     output = f(domain)
 
     # Calculates and returns the rms value
-    rms_op = f(x)
-    fn_rms = rms(rms_op, y)
+    rms_op = f(np.array(x))
+    fn_rms = rms(rms_op, np.array(y))
 
     return output, fn_rms
 
