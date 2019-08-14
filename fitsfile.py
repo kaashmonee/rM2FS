@@ -291,6 +291,8 @@ class FitsFile:
         height = self.image_data.shape[0]
         domain = np.arange(height)
 
+        print("spectral boundaries before...")
+
         for spectrum in self.spectra:
             # Updating the left half boundaries
             startx = spectrum.int_xvalues[0]
@@ -306,7 +308,7 @@ class FitsFile:
             if abs(start_parabx - startx) >= 3 * self.sp_rms:
                 # Obtain index of xvalue that is closest to the starting value
                 # of the parabola
-                spec_start_ind = util.nearest_ind_to_val(spectrum.ox, start_parabx)
+                spec_start_ind = util.nearest_ind_to_val(int_xvals, start_parabx)
                 int_xvals = int_xvals[spec_start_ind:]
                 int_yvals = int_yvals[spec_start_ind:]
 
