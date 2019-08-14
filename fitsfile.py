@@ -164,8 +164,6 @@ class FitsFile:
         ythreshold = 2
         cur_num_spectra = 0
 
-        spectra = []
-        
         # Going from right to left
         for num, y in enumerate(yvalues_at_start):
             cur_y = y
@@ -206,25 +204,34 @@ class FitsFile:
                 if abs(prev_spec_x - cur_x) >= xthreshold:
                     break
 
-            s.build_prepare()
-            spectra.add(s)
+            build_prep_success = s.build_prepare()
+            if build_prep_success:
+                cur_num_spectra += 1
+                self.spectra.append(s)
+                print("Spectrum %d/%d ready for building..." % (cur_num_spectra, self.num_spectra))
+            else:
+                self.num_spectra -= 1
 
 
         self.__fit_overlap_boundary_parabola()
         self.__update_spectral_boundaries()
-                    
-        for spectrum in spectra: 
+        
+        built_spectra = []
+        cur_num_spectra = 0
+
+        for spectrum in self.spectra: 
 
             build_success = spectrum.build()
 
             if build_success: 
                 cur_num_spectra += 1
-                self.spectra.append(spectrum)
+                built_spectra.append(spectrum)
                 print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
                 print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
             else:
                 self.num_spectra -= 1
 
+        self.spectra = built_spectra
 
 
     def plot_spectra_brightness(self):
@@ -286,8 +293,8 @@ class FitsFile:
 
         for spectrum in self.spectra:
             # Updating the left half boundaries
-            startx = self.spectrum.int_xvalues[0]
-            starty = self.spectrum.int_yvalues[0]
+            startx = spectrum.int_xvalues[0]
+            starty = spectrum.int_yvalues[0]
 
             parab_startx_ind = util.nearest_ind_to_val(self.start_parab, startx)
             start_parabx = self.start_parab[parab_startx_ind]
@@ -305,8 +312,8 @@ class FitsFile:
 
 
             # Repeat same procedure as above for the last values
-            endx = self.spectrum.int_xvalues[-1]
-            endy = self.spectrum.int_yvalues[-1]
+            endx = spectrum.int_xvalues[-1]
+            endy = spectrum.int_yvalues[-1]
 
             parab_endx_ind = util.nearest_ind_to_val(self.end_parab, endx)
             end_parabx = self.end_parab[parab_endx_ind]

@@ -164,6 +164,18 @@ def fit_parabola(x, y, domain):
     return output, fn_rms
 
 
+def ensure_min_spec_length(xvalues, yvalues):
+    xlen = len(xvalues)
+    ylen = len(yvalues)
+    assert xlen == ylen
+    if xlen <= 100:
+        print("xlen:", xlen)
+        print("Build rejected! Fewer than 100 points in the spectrum...")
+        return False
+
+    return True
+
+
 def construct_polynomial(x, y, order):
     polyfit_array = np.polyfit(x, y, order)
 

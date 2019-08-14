@@ -76,24 +76,33 @@ class Spectrum:
         self.int_yvalues = np.array(self.yvalues)
         assert len(self.int_xvalues) == len(self.int_yvalues)
 
+        # Ensuring that the spectrum has a reasonable size...
+        build_success = util.ensure_min_spec_length(self.xvalues, self.yvalues)
+
+        if not build_success:
+            return False
+                
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
         # to update the self.xvalues and self.yvalues variables.
         self.__remove_overlapping_spectrum()
 
+        return True
+
+
 
 
     def build(self):
 
+
         self.xvalues, self.yvalues = self.int_xvalues, self.int_yvalues
 
         # Ensuring that the spectrum has a reasonable size...
-        xlen = len(self.xvalues)
-        ylen = len(self.yvalues)
-        if xlen <= 100:
-            print("xlen:", xlen)
-            print("Build rejected! Fewer than 100 points in the spectrum...")
+        build_success = util.ensure_min_spec_length(self.xvalues, self.yvalues)
+
+        if not build_success:
             return False
+
 
         # Ensuring no duplicates and ensuring strictly increasing
         # assert np.diff(self.xvalues).all() <= 0
