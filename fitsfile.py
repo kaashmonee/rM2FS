@@ -228,7 +228,9 @@ class FitsFile:
     def __fit_overlap_boundary_parabola(self):
         """
         This function fits a parabola to the overlap boundaries after the 
-        spectrum.remove_overlap_spectrum is run.
+        spectrum.remove_overlap_spectrum is run. However, since a vertical 
+        parabola needs to be fit, the y value are the effective xvalues and 
+        the xvalues are the effective yvalues.
         """
         import util
 
@@ -246,12 +248,20 @@ class FitsFile:
         height = self.image_data.shape[0]
         domain = np.arange(height)
 
-        start_parab = util.fit_parabola(spectrum_starty, spectrum_startx, domain)
-        end_parab = util.fit_parabola(spectrum_endy, spectrum_endx, domain)
+        start_parab, sp_rms = util.fit_parabola(spectrum_starty, 
+                                                spectrum_startx, 
+                                                domain)
+
+        end_parab, ep_rms = util.fit_parabola(spectrum_endy, spectrum_endx, 
+                                              domain)
 
         self.start_parab = start_parab
         self.end_parab = end_parab
         self.parab_range = domain
+
+        # StartParabola_rms and EndParabola_rms
+        self.sp_rms = sp_rms
+        self.ep_rms = ep_rms
 
 
 
