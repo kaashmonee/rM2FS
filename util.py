@@ -241,7 +241,8 @@ def find_int_peaks(intensity_array, height=100, dist=5):
 def find_xy_peaks(x, y):
     """
     Finds peaks in a distribution given the x values and the yvalues. Returns
-    the (x, y) coordinates of the peaks.
+    the (x, y) coordinates of the peaks as an array of xvalues and an array of 
+    yvalues.
     """
     peaks,_ = scipy.signal.find_peaks(y)
     xpeaks = np.take(x, peaks)
