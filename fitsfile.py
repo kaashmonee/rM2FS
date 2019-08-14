@@ -227,7 +227,7 @@ class FitsFile:
                 cur_num_spectra += 1
                 built_spectra.append(spectrum)
                 print("Building spectrum %d/%d" % (cur_num_spectra, self.num_spectra))
-                print("Min x:", s.xvalues[0], "\nMax x:", s.xvalues[-1])
+                print("Min x:", spectrum.xvalues[0], "\nMax x:", spectrum.xvalues[-1])
             else:
                 self.num_spectra -= 1
 
@@ -301,15 +301,14 @@ class FitsFile:
             parab_starty_ind = util.nearest_ind_to_val(domain, starty)
             start_parabx = self.start_parab[parab_starty_ind]
             
-            # If the true yvalue is greater than 3 std. dev. away from the 
-            # parabola, replace the y value with the x value at the parabola
-            int_xvals, int_yvals = [], []
 
             # Starting and ending indices of the first and last 
             # values of the int_xvalues array in the spectrum.ox array
             spec_start_ind = spectrum.ox.index(spectrum.int_xvalues[0])
             spec_end_ind = spectrum.ox.index(spectrum.int_xvalues[-1])
 
+            # If the true yvalue is greater than 3 std. dev. away from the 
+            # parabola, replace the y value with the x value at the parabola
             if abs(start_parabx - startx) >= 3 * self.sp_rms:
                 # Obtain index of xvalue that is closest to the starting value
                 # of the parabola
@@ -328,8 +327,8 @@ class FitsFile:
                 print("end_parabx:", end_parabx, "endx:", endx)
                 spec_end_ind = util.nearest_ind_to_val(spectrum.ox, end_parabx)
             
-            int_xvals = spectrum.ox[spec_start_ind:spec_end_ind+1]
-            int_yvals = spectrum.oy[spec_start_ind:spec_end_ind+1]
+            int_xvals = spectrum.ox[spec_start_ind:spec_end_ind]
+            int_yvals = spectrum.oy[spec_start_ind:spec_end_ind]
 
             # Update the spectrum int_xvals and the int_yvals
             spectrum.int_xvalues = int_xvals
