@@ -303,14 +303,18 @@ class FitsFile:
             
             # If the true yvalue is greater than 3 std. dev. away from the 
             # parabola, replace the y value with the x value at the parabola
-            int_xvals = list(spectrum.ox)
-            int_yvals = list(spectrum.oy)
+            int_xvals, int_yvals = [], []
+
+            # Starting and ending indices of the first and last 
+            # values of the int_xvalues array in the spectrum.ox array
+            spec_start_ind = spectrum.ox.index(spectrum.int_xvalues[0])
+            spec_end_ind = spectrum.ox.index(spectrum.int_xvalues[-1])
+
             if abs(start_parabx - startx) >= 3 * self.sp_rms:
                 # Obtain index of xvalue that is closest to the starting value
                 # of the parabola
-                spec_start_ind = util.nearest_ind_to_val(int_xvals, start_parabx)
-                int_xvals = int_xvals[spec_start_ind:]
-                int_yvals = int_yvals[spec_start_ind:]
+                print("start_parabx:", start_parabx, "startx:", startx)
+                spec_start_ind = util.nearest_ind_to_val(spectrum.ox, start_parabx)
 
 
             # Repeat same procedure as above for the last values
@@ -319,12 +323,14 @@ class FitsFile:
 
             parab_endy_ind = util.nearest_ind_to_val(domain, endy)
             end_parabx = self.end_parab[parab_endy_ind]
-
-            if abs(end_parabx - endx) >= 3 * self.ep_rms:
-                spec_end_ind = util.nearest_ind_to_val(int_xvals, end_parabx)
-                int_xvals = int_xvals[:spec_end_ind]
-                int_yvals = int_yvals[:spec_end_ind]
             
+            if abs(end_parabx - endx) >= 3 * self.ep_rms:
+                print("end_parabx:", end_parabx, "endx:", endx)
+                spec_end_ind = util.nearest_ind_to_val(spectrum.ox, end_parabx)
+            
+            int_xvals = spectrum.ox[spec_start_ind:spec_end_ind+1]
+            int_yvals = spectrum.oy[spec_start_ind:spec_end_ind+1]
+
             # Update the spectrum int_xvals and the int_yvals
             spectrum.int_xvalues = int_xvals
             spectrum.int_yvalues = int_yvals
