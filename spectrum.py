@@ -15,10 +15,23 @@ class Spectrum:
 
     def __init__(self, xvalues, yvalues, fits_file):
         import util
-        # These variables must be lists so that we can add spectra. They will
-        # be turned into numpy arrays after we call the `build` function.
-        self.xvalues = list(xvalues)
-        self.yvalues = list(yvalues)
+        # Sorting the x and y values
+        self.xvalues, self.yvalues = util.sortxy(xvalues, yvalues)
+
+        # Retaining a list of the original, unmodified x and y values
+        # This is for cases where the spectrum is cut off prematurely. In such
+        # cases, we want to retain this information so that we can re-cut the 
+        # spectrum to the parabola.
+        self.ox, self.oy = list(self.xvalues), list(self.yvalues)
+
+        # Ensuring that we keep track of the integer yvalues
+        # This is useful for when we want to plot the brightness vs. x value of
+        # the peaks.
+        self.int_xvalues = np.array(self.xvalues)
+        self.int_yvalues = np.array(self.yvalues)
+        assert len(self.int_xvalues) == len(self.int_yvalues)
+
+
         self.fits_file = fits_file
         self.image_rows = self.fits_file.image_data[0]
         self.image_cols = self.fits_file.image_data[1]
@@ -62,22 +75,6 @@ class Spectrum:
         100 points in the spectrum, then the build is rejected and False
         is returned.
         """
-
-        # Sorting the x and y values
-        self.xvalues, self.yvalues = util.sortxy(self.xvalues, self.yvalues)
-
-        # Retaining a list of the original, unmodified x and y values
-        # This is for cases where the spectrum is cut off prematurely. In such
-        # cases, we want to retain this information so that we can re-cut the 
-        # spectrum to the parabola.
-        self.ox, self.oy = list(self.xvalues), list(self.yvalues)
-
-        # Ensuring that we keep track of the integer yvalues
-        # This is useful for when we want to plot the brightness vs. x value of
-        # the peaks.
-        self.int_xvalues = np.array(self.xvalues)
-        self.int_yvalues = np.array(self.yvalues)
-        assert len(self.int_xvalues) == len(self.int_yvalues)
 
         # Run the remove overlapping spectra method, which will update the 
         # self.int_xvalues and self.int_yvalues variables. We will use those
@@ -268,7 +265,6 @@ class Spectrum:
         """
 
         import util
-
         # Obtaining an array of brightness values for each spectrum
         brightness_array = self.fits_file.image_data[self.int_yvalues, self.int_xvalues]
 
