@@ -19,10 +19,6 @@ def main():
 
     directory = "fits_batch_2/"
     fn = "b0136_stitched.fits"
-    # fn = "r0136_stitched.fits"
-    # fn = "b2311_stitched.fits"
-    # directory = "fits_batch_1/"
-    # fn = "r0760_stitched.fits"
 
     default_path = directory + fn
 
