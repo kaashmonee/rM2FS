@@ -3,6 +3,7 @@ from fitsfile import FitsFile
 import util
 import os
 import gaussfit
+import config
 
 def main():
     # Doing brief cmd line parsing.
@@ -17,17 +18,17 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    directory = "fits_batch_2/"
-    fn = "b0136_stitched.fits"
+    # directory = "fits_batch_2/"
+    # fn = "b0136_stitched.fits"
 
-    default_path = directory + fn
+    # default_path = directory + fn
 
     if args.l is not False:
-        for num, fits_path in enumerate(os.listdir(directory)):
+        for num, fits_path in enumerate(os.listdir(config.directory)):
             try:
-                fits_file = FitsFile(directory+fits_path)
+                fits_file = FitsFile(config.directory+fits_path)
 
-                num_files = len(os.listdir(directory))
+                num_files = len(os.listdir(config.directory))
                 print("Fitting %s (%d/%d)" % (fits_file.get_file_name(), num+1, num_files))
 
                 util.perform_fits(fits_file)
@@ -36,22 +37,20 @@ def main():
                 print(fits_file.get_file_name() + " failed")
     else:
         # Check if the file already exists in the directory first
-        pickle_directory = "fitted_files/"
-        pickle_fp = pickle_directory + fn + ".pkl"
         pickled_fits_file = None
         save = args.s
 
         try:
-            with open(pickle_fp) as f:
+            with open(config.pickle_fp) as f:
                 print("Found pickled file in fitted_files/. Plotting spectra...")
-                fits_file = util.load(pickle_fp)
+                fits_file = util.load(config.pickle_fp)
                 fits_file.plot_spectra(show=True, save=save)
                 fits_file.plot_spectra_brightness()
         except FileNotFoundError as e:
             error_message = "Pickled file not found in fitted_files/ directory. Fitting the image..."
             print(error_message)
 
-            fits_file = FitsFile(default_path) 
+            fits_file = FitsFile(config.default_path) 
             util.perform_fits(fits_file)
 
         print("\nDone")
