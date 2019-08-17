@@ -18,11 +18,6 @@ def main():
     # For each one, we should identify the assertion that failed and see what we
     # can change so that it does work.
 
-    # directory = "fits_batch_2/"
-    # fn = "b0136_stitched.fits"
-
-    # default_path = directory + fn
-
     if args.l is not False:
         for num, fits_path in enumerate(os.listdir(config.directory)):
             try:
